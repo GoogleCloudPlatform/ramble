@@ -33,23 +33,9 @@ class Lock(llnl.util.lock.Lock):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self._enable = ramble.config.get("config:locks", True)
-
-    def _lock(self, op, timeout=0):
-        if self._enable:
-            return super()._lock(op, timeout)
-        else:
-            return 0, 0
-
-    def _unlock(self):
-        """Unlock call that always succeeds."""
-        if self._enable:
-            super()._unlock()
-
-    def cleanup(self, *args):
-        if self._enable:
-            super().cleanup(*args)
+        kwargs["enable"] = self._enable
+        super().__init__(*args, **kwargs)
 
 
 def check_lock_safety(path):

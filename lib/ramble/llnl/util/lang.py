@@ -5,23 +5,36 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-
-from __future__ import division
-
+import collections.abc
 import contextlib
+import fnmatch
 import functools
-import inspect
+import itertools
 import os
 import re
 import sys
 import traceback
+import types
+import typing
+import warnings
 from datetime import datetime, timedelta
-from typing import List, Tuple
-
-from llnl.util.compat import MutableMapping, MutableSequence, zip_longest
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 # Ignore emacs backups when listing modules
-ignore_modules = [r'^\.#', '~$']
+ignore_modules = r"^\.#|~$"
 
 
 def index_by(objects, *funcs):
@@ -57,7 +70,7 @@ def index_by(objects, *funcs):
         }
 
     If any elements in funcs is a string, it is treated as the name
-    of an attribute, and acts like getattr(object, name).  So
+    of an attribute, and acts like ``getattr(object, name)``.  So
     shorthand for the above two indexes would be::
 
         index1 = index_by(list_of_specs, 'arch', 'compiler')
@@ -67,7 +80,8 @@ def index_by(objects, *funcs):
 
         index1 = index_by(list_of_specs, ('target', 'compiler'))
 
-    Keys in the resulting dict will look like ('gcc', 'skylake').
+    Keys in the resulting dict will look like ``('gcc', 'skylake')``.
+
     """
     if not funcs:
         return objects
@@ -76,7 +90,7 @@ def index_by(objects, *funcs):
     if isinstance(f, str):
         f = lambda x: getattr(x, funcs[0])
     elif isinstance(f, tuple):
-        f = lambda x: tuple(getattr(x, p) for p in funcs[0])
+        f = lambda x: tuple(getattr(x, p, None) for p in funcs[0])
 
     result = {}
     for o in objects:
@@ -89,49 +103,6 @@ def index_by(objects, *funcs):
     return result
 
 
-def caller_locals():
-    """This will return the locals of the *parent* of the caller.
-       This allows a function to insert variables into its caller's
-       scope.  Yes, this is some black magic, and yes it's useful
-       for implementing things like depends_on and provides.
-    """
-    # Passing zero here skips line context for speed.
-    stack = inspect.stack(0)
-    try:
-        return stack[2][0].f_locals
-    finally:
-        del stack
-
-
-def get_calling_module_name():
-    """Make sure that the caller is a class definition, and return the
-       enclosing module's name.
-    """
-    # Passing zero here skips line context for speed.
-    stack = inspect.stack(0)
-    try:
-        # Make sure locals contain __module__
-        caller_locals = stack[2][0].f_locals
-    finally:
-        del stack
-
-    if '__module__' not in caller_locals:
-        raise RuntimeError("Must invoke get_calling_module_name() "
-                           "from inside a class definition!")
-
-    module_name = caller_locals['__module__']
-    base_name = module_name.split('.')[-1]
-    return base_name
-
-
-def attr_required(obj, attr_name):
-    """Ensure that a class has a required attribute."""
-    if not hasattr(obj, attr_name):
-        raise RequiredAttributeError(
-            "No required attribute '%s' in class '%s'"
-            % (attr_name, obj.__class__.__name__))
-
-
 def attr_setdefault(obj, name, value):
     """Like dict.setdefault, but for objects."""
     if not hasattr(obj, name):
@@ -139,92 +110,42 @@ def attr_setdefault(obj, name, value):
     return getattr(obj, name)
 
 
-def has_method(cls, name):
-    for base in inspect.getmro(cls):
-        if base is object:
-            continue
-        if name in base.__dict__:
-            return True
-    return False
-
-
-def union_dicts(*dicts):
-    """Use update() to combine all dicts into one.
-
-    This builds a new dictionary, into which we ``update()`` each element
-    of ``dicts`` in order.  Items from later dictionaries will override
-    items from earlier dictionaries.
-
-    Args:
-        dicts (list): list of dictionaries
-
-    Return: (dict): a merged dictionary containing combined keys and
-        values from ``dicts``.
-
-    """
-    result = {}
-    for d in dicts:
-        result.update(d)
-    return result
-
-
-# Used as a sentinel that disambiguates tuples passed in *args from coincidentally
-# matching tuples formed from kwargs item pairs.
-_kwargs_separator = (object(),)
-
-
-def stable_args(*args, **kwargs):
-    """A key factory that performs a stable sort of the parameters."""
-    key = args
-    if kwargs:
-        key += _kwargs_separator + tuple(sorted(kwargs.items()))
-    return key
-
-
 def memoized(func):
     """Decorator that caches the results of a function, storing them in
     an attribute of that function.
+
+    Example::
+
+        @memoized
+        def expensive_computation(x):
+            # Some expensive computation
+            return result
     """
-    func.cache = {}
-
-    @functools.wraps(func)
-    def _memoized_function(*args, **kwargs):
-        key = stable_args(*args, **kwargs)
-
-        try:
-            return func.cache[key]
-        except KeyError:
-            ret = func(*args, **kwargs)
-            func.cache[key] = ret
-            return ret
-        except TypeError as e:
-            # TypeError is raised when indexing into a dict if the key is unhashable.
-            raise UnhashableArguments(
-                "args + kwargs '{}' was not hashable for function '{}'".format(key, func.__name__),
-            ) from e
-
-    return _memoized_function
+    return functools.lru_cache(maxsize=None)(func)
 
 
 def list_modules(directory, **kwargs):
     """Lists all of the modules, excluding ``__init__.py``, in a
-       particular directory.  Listed packages have no particular
-       order."""
-    list_directories = kwargs.setdefault('directories', True)
+    particular directory.  Listed packages have no particular
+    order."""
+    list_directories = kwargs.setdefault("directories", True)
 
-    for name in os.listdir(directory):
-        if name == '__init__.py':
-            continue
+    ignore = re.compile(ignore_modules)
 
-        path = os.path.join(directory, name)
-        if list_directories and os.path.isdir(path):
-            init_py = os.path.join(path, '__init__.py')
-            if os.path.isfile(init_py):
-                yield name
+    with os.scandir(directory) as it:
+        for entry in it:
+            if entry.name == "__init__.py" or entry.name == "__pycache__":
+                continue
 
-        elif name.endswith('.py'):
-            if not any(re.search(pattern, name) for pattern in ignore_modules):
-                yield re.sub('.py$', '', name)
+            if (
+                list_directories
+                and entry.is_dir()
+                and os.path.isfile(os.path.join(entry.path, "__init__.py"))
+            ):
+                yield entry.name
+
+            elif entry.name.endswith(".py") and entry.is_file() and not ignore.search(entry.name):
+                yield entry.name[:-3]  # strip .py
 
 
 def decorator_with_or_without_args(decorator):
@@ -239,6 +160,7 @@ def decorator_with_or_without_args(decorator):
         @decorator
 
     """
+
     # See https://stackoverflow.com/questions/653368 for more on this
     @functools.wraps(decorator)
     def new_dec(*args, **kwargs):
@@ -254,41 +176,34 @@ def decorator_with_or_without_args(decorator):
 
 def key_ordering(cls):
     """Decorates a class with extra methods that implement rich comparison
-       operations and ``__hash__``.  The decorator assumes that the class
-       implements a function called ``_cmp_key()``.  The rich comparison
-       operations will compare objects using this key, and the ``__hash__``
-       function will return the hash of this key.
+    operations and ``__hash__``.  The decorator assumes that the class
+    implements a function called ``_cmp_key()``.  The rich comparison
+    operations will compare objects using this key, and the ``__hash__``
+    function will return the hash of this key.
 
-       If a class already has ``__eq__``, ``__ne__``, ``__lt__``, ``__le__``,
-       ``__gt__``, or ``__ge__`` defined, this decorator will overwrite them.
+    If a class already has ``__eq__``, ``__ne__``, ``__lt__``, ``__le__``,
+    ``__gt__``, or ``__ge__`` defined, this decorator will overwrite them.
 
-       Raises:
-           TypeError: If the class does not have a ``_cmp_key`` method
+    Raises:
+        TypeError: If the class does not have a ``_cmp_key`` method
     """
+
     def setter(name, value):
         value.__name__ = name
         setattr(cls, name, value)
 
-    if not has_method(cls, '_cmp_key'):
-        raise TypeError("'%s' doesn't define _cmp_key()." % cls.__name__)
+    if not hasattr(cls, "_cmp_key"):
+        raise TypeError(f"'{cls.__name__}' doesn't define _cmp_key().")
 
-    setter('__eq__',
-           lambda s, o:
-           (s is o) or (o is not None and s._cmp_key() == o._cmp_key()))
-    setter('__lt__',
-           lambda s, o: o is not None and s._cmp_key() < o._cmp_key())
-    setter('__le__',
-           lambda s, o: o is not None and s._cmp_key() <= o._cmp_key())
+    setter("__eq__", lambda s, o: (s is o) or (o is not None and s._cmp_key() == o._cmp_key()))
+    setter("__lt__", lambda s, o: o is not None and s._cmp_key() < o._cmp_key())
+    setter("__le__", lambda s, o: o is not None and s._cmp_key() <= o._cmp_key())
 
-    setter('__ne__',
-           lambda s, o:
-           (s is not o) and (o is None or s._cmp_key() != o._cmp_key()))
-    setter('__gt__',
-           lambda s, o: o is None or s._cmp_key() > o._cmp_key())
-    setter('__ge__',
-           lambda s, o: o is None or s._cmp_key() >= o._cmp_key())
+    setter("__ne__", lambda s, o: (s is not o) and (o is None or s._cmp_key() != o._cmp_key()))
+    setter("__gt__", lambda s, o: o is None or s._cmp_key() > o._cmp_key())
+    setter("__ge__", lambda s, o: o is None or s._cmp_key() >= o._cmp_key())
 
-    setter('__hash__', lambda self: hash(self._cmp_key()))
+    setter("__hash__", lambda self: hash(self._cmp_key()))
 
     return cls
 
@@ -299,7 +214,7 @@ done = object()
 
 def tuplify(seq):
     """Helper for lazy_lexicographic_ordering()."""
-    return tuple((tuplify(x) if callable(x) else x) for x in seq())
+    return tuple([(tuplify(x) if callable(x) else x) for x in seq()])
 
 
 def lazy_eq(lseq, rseq):
@@ -313,7 +228,7 @@ def lazy_eq(lseq, rseq):
     # zip_longest is implemented in native code, so use it for speed.
     # use zip_longest instead of zip because it allows us to tell
     # which iterator was longer.
-    for left, right in zip_longest(liter, riter, fillvalue=done):
+    for left, right in itertools.zip_longest(liter, riter, fillvalue=done):
         if (left is done) or (right is done):
             return False
 
@@ -333,7 +248,7 @@ def lazy_lt(lseq, rseq):
     liter = lseq()
     riter = rseq()
 
-    for left, right in zip_longest(liter, riter, fillvalue=done):
+    for left, right in itertools.zip_longest(liter, riter, fillvalue=done):
         if (left is done) or (right is done):
             return left is done  # left was shorter than right
 
@@ -360,16 +275,13 @@ def lazy_lexicographic_ordering(cls, set_hash=True):
 
     This is a lazy version of the tuple comparison used frequently to
     implement comparison in Python. Given some objects with fields, you
-    might use tuple keys to implement comparison, e.g.::
+    might use tuple keys to implement comparison, e.g.:
+
+    .. code-block:: python
 
         class Widget:
             def _cmp_key(self):
-                return (
-                    self.a,
-                    self.b,
-                    (self.c, self.d),
-                    self.e
-                )
+                return (self.a, self.b, (self.c, self.d), self.e)
 
             def __eq__(self, other):
                 return self._cmp_key() == other._cmp_key()
@@ -381,14 +293,16 @@ def lazy_lexicographic_ordering(cls, set_hash=True):
 
     Python would compare ``Widgets`` lexicographically based on their
     tuples. The issue there for simple comparators is that we have to
-    bulid the tuples *and* we have to generate all the values in them up
+    build the tuples *and* we have to generate all the values in them up
     front. When implementing comparisons for large data structures, this
     can be costly.
 
     Lazy lexicographic comparison maps the tuple comparison shown above
     to generator functions. Instead of comparing based on pre-constructed
     tuple keys, users of this decorator can compare using elements from a
-    generator. So, you'd write::
+    generator. So, you'd write:
+
+    .. code-block:: python
 
         @lazy_lexicographic_ordering
         class Widget:
@@ -411,57 +325,89 @@ def lazy_lexicographic_ordering(cls, set_hash=True):
     only has to worry about writing ``_cmp_iter``, and making sure the
     elements in it are also comparable.
 
+    In some cases, you may have a fast way to determine whether two
+    objects are equal, e.g. the ``is`` function or an already-computed
+    cryptographic hash. For this, you can implement your own
+    ``_cmp_fast_eq`` function:
+
+    .. code-block:: python
+
+        @lazy_lexicographic_ordering
+        class Widget:
+            def _cmp_iter(self):
+                yield a
+                yield b
+
+                def cd_fun():
+                    yield c
+                    yield d
+
+                yield cd_fun
+                yield e
+
+            def _cmp_fast_eq(self, other):
+                return self is other or None
+
+    ``_cmp_fast_eq`` should return:
+
+    * ``True`` if ``self`` is equal to ``other``,
+    * ``False`` if ``self`` is not equal to ``other``, and
+    * ``None`` if it's not known whether they are equal, and the full
+      comparison should be done.
+
+    ``lazy_lexicographic_ordering`` uses ``_cmp_fast_eq`` to short-circuit
+    the comparison if the answer can be determined quickly. If you do not
+    implement it, it defaults to ``self is other or None``.
+
     Some things to note:
 
-      * If a class already has ``__eq__``, ``__ne__``, ``__lt__``,
-        ``__le__``, ``__gt__``, ``__ge__``, or ``__hash__`` defined, this
-        decorator will overwrite them.
+    * If a class already has ``__eq__``, ``__ne__``, ``__lt__``,
+      ``__le__``, ``__gt__``, ``__ge__``, or ``__hash__`` defined, this
+      decorator will overwrite them.
 
-      * If ``set_hash`` is ``False``, this will not overwrite
-        ``__hash__``.
+    * If ``set_hash`` is ``False``, this will not overwrite
+      ``__hash__``.
 
-      * This class uses Python 2 None-comparison semantics. If you yield
-        None and it is compared to a non-None type, None will always be
-        less than the other object.
+    * This class uses Python 2 None-comparison semantics. If you yield
+      None and it is compared to a non-None type, None will always be
+      less than the other object.
 
     Raises:
         TypeError: If the class does not have a ``_cmp_iter`` method
 
     """
-    if not has_method(cls, "_cmp_iter"):
-        raise TypeError("'%s' doesn't define _cmp_iter()." % cls.__name__)
+    if not hasattr(cls, "_cmp_iter"):
+        raise TypeError(f"'{cls.__name__}' doesn't define _cmp_iter().")
+
+    # get an equal operation that allows us to short-circuit comparison
+    # if it's not provided, default to `is`
+    _cmp_fast_eq = getattr(cls, "_cmp_fast_eq", lambda x, y: x is y or None)
 
     # comparison operators are implemented in terms of lazy_eq and lazy_lt
     def eq(self, other):
-        if self is other:
-            return True
+        fast_eq = _cmp_fast_eq(self, other)
+        if fast_eq is not None:
+            return fast_eq
         return (other is not None) and lazy_eq(self._cmp_iter, other._cmp_iter)
 
     def lt(self, other):
-        if self is other:
+        if _cmp_fast_eq(self, other) is True:
             return False
         return (other is not None) and lazy_lt(self._cmp_iter, other._cmp_iter)
 
-    def ne(self, other):
-        if self is other:
-            return False
-        return (other is None) or not lazy_eq(self._cmp_iter, other._cmp_iter)
-
     def gt(self, other):
-        if self is other:
+        if _cmp_fast_eq(self, other) is True:
             return False
         return (other is None) or lazy_lt(other._cmp_iter, self._cmp_iter)
 
+    def ne(self, other):
+        return not (self == other)
+
     def le(self, other):
-        if self is other:
-            return True
-        return (other is not None) and not lazy_lt(other._cmp_iter,
-                                                   self._cmp_iter)
+        return not (self > other)
 
     def ge(self, other):
-        if self is other:
-            return True
-        return (other is None) or not lazy_lt(self._cmp_iter, other._cmp_iter)
+        return not (self < other)
 
     def h(self):
         return hash(tuplify(self._cmp_iter))
@@ -472,10 +418,10 @@ def lazy_lexicographic_ordering(cls, set_hash=True):
         setattr(cls, name, func)
 
     add_func_to_class("__eq__", eq)
-    add_func_to_class("__ne__", ne)
     add_func_to_class("__lt__", lt)
-    add_func_to_class("__le__", le)
     add_func_to_class("__gt__", gt)
+    add_func_to_class("__ne__", ne)
+    add_func_to_class("__le__", le)
     add_func_to_class("__ge__", ge)
     if set_hash:
         add_func_to_class("__hash__", h)
@@ -483,78 +429,38 @@ def lazy_lexicographic_ordering(cls, set_hash=True):
     return cls
 
 
+K = TypeVar("K")
+V = TypeVar("V")
+
+
 @lazy_lexicographic_ordering
-class HashableMap(MutableMapping):
+class HashableMap(typing.MutableMapping[K, V]):
     """This is a hashable, comparable dictionary.  Hash is performed on
-       a tuple of the values in the dictionary."""
+    a tuple of the values in the dictionary."""
+
+    __slots__ = ("dict",)
 
     def __init__(self):
-        self.dict = {}
+        self.dict: Dict[K, V] = {}
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: K) -> V:
         return self.dict[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: K, value: V) -> None:
         self.dict[key] = value
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[K]:
         return iter(self.dict)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dict)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: K) -> None:
         del self.dict[key]
 
     def _cmp_iter(self):
-        for _, v in sorted(self.items()):
+        for _, v in sorted(self.dict.items()):
             yield v
-
-    def copy(self):
-        """Type-agnostic clone method.  Preserves subclass type."""
-        # Construct a new dict of my type
-        self_type = type(self)
-        clone = self_type()
-
-        # Copy everything from this dict into it.
-        for key in self:
-            clone[key] = self[key].copy()
-        return clone
-
-
-def in_function(function_name):
-    """True if the caller was called from some function with
-       the supplied Name, False otherwise."""
-    stack = inspect.stack()
-    try:
-        for elt in stack[2:]:
-            if elt[3] == function_name:
-                return True
-        return False
-    finally:
-        del stack
-
-
-def check_kwargs(kwargs, fun):
-    """Helper for making functions with kwargs.  Checks whether the kwargs
-       are empty after all of them have been popped off.  If they're
-       not, raises an error describing which kwargs are invalid.
-
-       Example::
-
-          def foo(self, **kwargs):
-              x = kwargs.pop('x', None)
-              y = kwargs.pop('y', None)
-              z = kwargs.pop('z', None)
-              check_kwargs(kwargs, self.foo)
-
-          # This raises a TypeError:
-          foo(w='bad kwarg')
-    """
-    if kwargs:
-        raise TypeError(
-            "'%s' is an invalid keyword argument for function %s()."
-            % (next(iter(kwargs)), fun.__name__))
 
 
 def match_predicate(*args):
@@ -570,9 +476,10 @@ def match_predicate(*args):
     * any regex in a list or tuple of regexes matches.
     * any predicate in args matches.
     """
+
     def match(string):
         for arg in args:
-            if isinstance(arg, string_types):
+            if isinstance(arg, str):
                 if re.search(arg, string):
                     return True
             elif isinstance(arg, list) or isinstance(arg, tuple):
@@ -582,9 +489,11 @@ def match_predicate(*args):
                 if arg(string):
                     return True
             else:
-                raise ValueError("args to match_predicate must be regex, "
-                                 "list of regexes, or callable.")
+                raise ValueError(
+                    "args to match_predicate must be regex, list of regexes, or callable."
+                )
         return False
+
     return match
 
 
@@ -601,7 +510,7 @@ def dedupe(sequence, key=None):
 
     Examples:
 
-        Dedupe a list of integers:
+        Dedupe a list of integers::
 
             [x for x in dedupe([1, 2, 1, 3, 2])] == [1, 2, 3]
 
@@ -615,17 +524,15 @@ def dedupe(sequence, key=None):
             seen.add(x_key)
 
 
-def pretty_date(time, now=None):
+def pretty_date(time: Union[datetime, int], now: Optional[datetime] = None) -> str:
     """Convert a datetime or timestamp to a pretty, relative date.
 
     Args:
-        time (datetime.datetime or int): date to print prettily
-        now (datetime.datetime): datetime for 'now', i.e. the date the pretty date
-            is relative to (default is datetime.now())
+        time: date to print prettily
+        now: the date the pretty date is relative to (default is ``datetime.now()``)
 
     Returns:
-        (str): pretty string like 'an hour ago', 'Yesterday',
-            '3 months ago', 'just now', etc.
+        pretty string like "an hour ago", "Yesterday", "3 months ago", "just now", etc.
 
     Adapted from https://stackoverflow.com/questions/1551382.
 
@@ -644,57 +551,55 @@ def pretty_date(time, now=None):
     day_diff = diff.days
 
     if day_diff < 0:
-        return ''
+        return ""
 
     if day_diff == 0:
         if second_diff < 10:
             return "just now"
         if second_diff < 60:
-            return str(second_diff) + " seconds ago"
+            return f"{second_diff} seconds ago"
         if second_diff < 120:
             return "a minute ago"
         if second_diff < 3600:
-            return str(second_diff // 60) + " minutes ago"
+            return f"{second_diff // 60} minutes ago"
         if second_diff < 7200:
             return "an hour ago"
         if second_diff < 86400:
-            return str(second_diff // 3600) + " hours ago"
+            return f"{second_diff // 3600} hours ago"
     if day_diff == 1:
         return "yesterday"
     if day_diff < 7:
-        return str(day_diff) + " days ago"
+        return f"{day_diff} days ago"
     if day_diff < 28:
         weeks = day_diff // 7
         if weeks == 1:
             return "a week ago"
         else:
-            return str(day_diff // 7) + " weeks ago"
+            return f"{day_diff // 7} weeks ago"
     if day_diff < 365:
         months = day_diff // 30
         if months == 1:
             return "a month ago"
         elif months == 12:
             months -= 1
-        return str(months) + " months ago"
+        return f"{months} months ago"
 
-    diff = day_diff // 365
-    if diff == 1:
+    year_diff = day_diff // 365
+    if year_diff == 1:
         return "a year ago"
-    else:
-        return str(diff) + " years ago"
+    return f"{year_diff} years ago"
 
 
-def pretty_string_to_date(date_str, now=None):
+def pretty_string_to_date(date_str: str, now: Optional[datetime] = None) -> datetime:
     """Parses a string representing a date and returns a datetime object.
 
     Args:
-        date_str (str): string representing a date. This string might be
+        date_str: string representing a date. This string might be
             in different format (like ``YYYY``, ``YYYY-MM``, ``YYYY-MM-DD``,
             ``YYYY-MM-DD HH:MM``, ``YYYY-MM-DD HH:MM:SS``)
             or be a *pretty date* (like ``yesterday`` or ``two months ago``)
 
-    Returns:
-        (datetime.datetime): datetime object corresponding to ``date_str``
+    Returns: datetime object corresponding to ``date_str``
     """
 
     pattern = {}
@@ -702,65 +607,93 @@ def pretty_string_to_date(date_str, now=None):
     now = now or datetime.now()
 
     # datetime formats
-    pattern[re.compile(r'^\d{4}$')] = lambda x: datetime.strptime(x, '%Y')
-    pattern[re.compile(r'^\d{4}-\d{2}$')] = lambda x: datetime.strptime(
-        x, '%Y-%m'
+    pattern[re.compile(r"^\d{4}$")] = lambda x: datetime.strptime(x, "%Y")
+    pattern[re.compile(r"^\d{4}-\d{2}$")] = lambda x: datetime.strptime(x, "%Y-%m")
+    pattern[re.compile(r"^\d{4}-\d{2}-\d{2}$")] = lambda x: datetime.strptime(x, "%Y-%m-%d")
+    pattern[re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")] = lambda x: datetime.strptime(
+        x, "%Y-%m-%d %H:%M"
     )
-    pattern[re.compile(r'^\d{4}-\d{2}-\d{2}$')] = lambda x: datetime.strptime(
-        x, '%Y-%m-%d'
+    pattern[re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")] = lambda x: datetime.strptime(
+        x, "%Y-%m-%d %H:%M:%S"
     )
-    pattern[re.compile(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$')] = \
-        lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M')
-    pattern[re.compile(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$')] = \
-        lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
-    pretty_regex = re.compile(
-        r'(a|\d+)\s*(year|month|week|day|hour|minute|second)s?\s*ago')
+    pretty_regex = re.compile(r"(a|\d+)\s*(year|month|week|day|hour|minute|second)s?\s*ago")
 
     def _n_xxx_ago(x):
         how_many, time_period = pretty_regex.search(x).groups()
 
-        how_many = 1 if how_many == 'a' else int(how_many)
+        how_many = 1 if how_many == "a" else int(how_many)
 
         # timedelta natively supports time periods up to 'weeks'.
         # To apply month or year we convert to 30 and 365 days
-        if time_period == 'month':
+        if time_period == "month":
             how_many *= 30
-            time_period = 'day'
-        elif time_period == 'year':
+            time_period = "day"
+        elif time_period == "year":
             how_many *= 365
-            time_period = 'day'
+            time_period = "day"
 
-        kwargs = {(time_period + 's'): how_many}
+        kwargs = {(time_period + "s"): how_many}
         return now - timedelta(**kwargs)
 
     pattern[pretty_regex] = _n_xxx_ago
 
     # yesterday
     callback = lambda x: now - timedelta(days=1)
-    pattern[re.compile('^yesterday$')] = callback
+    pattern[re.compile("^yesterday$")] = callback
 
     for regexp, parser in pattern.items():
         if bool(regexp.match(date_str)):
             return parser(date_str)
 
-    msg = 'date "{0}" does not match any valid format'.format(date_str)
-    raise ValueError(msg)
+    raise ValueError(f'date "{date_str}" does not match any valid format')
 
 
-class RequiredAttributeError(ValueError):
+def pretty_seconds_formatter(seconds):
+    if seconds >= 1:
+        multiplier, unit = 1, "s"
+    elif seconds >= 1e-3:
+        multiplier, unit = 1e3, "ms"
+    elif seconds >= 1e-6:
+        multiplier, unit = 1e6, "us"
+    else:
+        multiplier, unit = 1e9, "ns"
+    return lambda s: "%.3f%s" % (multiplier * s, unit)
 
-    def __init__(self, message):
-        super(RequiredAttributeError, self).__init__(message)
+
+def pretty_seconds(seconds):
+    """Seconds to string with appropriate units
+
+    Arguments:
+        seconds (float): Number of seconds
+
+    Returns:
+        str: Time string with units
+    """
+    return pretty_seconds_formatter(seconds)(seconds)
 
 
-class ObjectWrapper(object):
+def pretty_duration(seconds: float) -> str:
+    """Format a duration in seconds as a compact human-readable string (e.g. "1h02m", "3m05s",
+    "45s")."""
+    s = int(seconds)
+    if s < 60:
+        return f"{s}s"
+    m, s = divmod(s, 60)
+    if m < 60:
+        return f"{m}m{s:02d}s"
+    h, m = divmod(m, 60)
+    return f"{h}h{m:02d}m"
+
+
+class ObjectWrapper:
     """Base class that wraps an object. Derived classes can add new behavior
     while staying undercover.
 
     This class is modeled after the stackoverflow answer:
     * http://stackoverflow.com/a/1445289/771663
     """
+
     def __init__(self, wrapped_object):
         wrapped_cls = type(wrapped_object)
         wrapped_name = wrapped_cls.__name__
@@ -780,15 +713,25 @@ class ObjectWrapper(object):
         self.__dict__ = wrapped_object.__dict__
 
 
-class Singleton(object):
-    """Simple wrapper for lazily initialized singleton objects."""
+class Singleton:
+    """Wrapper for lazily initialized singleton objects."""
 
-    def __init__(self, factory):
+    def __init__(self, factory: Callable[[], object]):
         """Create a new singleton to be inited with the factory function.
 
+        Most factories will simply create the object to be initialized and
+        return it.
+
+        In some cases, e.g. when bootstrapping some global state, the singleton
+        may need to be initialized incrementally. If the factory returns a generator
+        instead of a regular object, the singleton will assign each result yielded by
+        the generator to the singleton instance. This allows methods called by
+        the factory in later stages to refer back to the singleton.
+
         Args:
-            factory (function): function taking no arguments that
-                creates the singleton instance.
+            factory (function): function taking no arguments that creates the
+                singleton instance.
+
         """
         self.factory = factory
         self._instance = None
@@ -796,7 +739,23 @@ class Singleton(object):
     @property
     def instance(self):
         if self._instance is None:
-            self._instance = self.factory()
+            try:
+                instance = self.factory()
+
+                if isinstance(instance, types.GeneratorType):
+                    # if it's a generator, assign every value
+                    for value in instance:
+                        self._instance = value
+                else:
+                    # if not, just assign the result like a normal singleton
+                    self._instance = instance
+            except AttributeError as e:
+                # getattr will "absorb" an AttributeError that occurs
+                # during the execution of the factory method: we'd like
+                # to show that so wrap it in something that isn't absorbed
+                raise SingletonInstantiationError(
+                    "AttrbuteError during creation of Singleton instance"
+                ) from e
         return self._instance
 
     def __getattr__(self, name):
@@ -804,8 +763,8 @@ class Singleton(object):
         # requested but not yet set. The final 'getattr' line here requires
         # 'instance'/'_instance' to be defined or it will enter an infinite
         # loop, so protect against that here.
-        if name in ['_instance', 'instance']:
-            raise AttributeError()
+        if name in ["_instance", "instance"]:
+            raise AttributeError(f"cannot create {name}")
         return getattr(self.instance, name)
 
     def __getitem__(self, name):
@@ -827,25 +786,32 @@ class Singleton(object):
         return repr(self.instance)
 
 
-class LazyReference(object):
-    """Lazily evaluated reference to part of a singleton."""
+class SingletonInstantiationError(Exception):
+    """Error that indicates a singleton that cannot instantiate."""
 
-    def __init__(self, ref_function):
-        self.ref_function = ref_function
 
-    def __getattr__(self, name):
-        if name == 'ref_function':
-            raise AttributeError()
-        return getattr(self.ref_function(), name)
+def get_entry_points(*, group: str):
+    """Wrapper for ``importlib.metadata.entry_points``
 
-    def __getitem__(self, name):
-        return self.ref_function()[name]
+    Args:
+        group: entry points to select
 
-    def __str__(self):
-        return str(self.ref_function())
+    Returns:
+        EntryPoints for ``group`` or empty list if unsupported
+    """
 
-    def __repr__(self):
-        return repr(self.ref_function())
+    try:
+        import importlib.metadata  # type: ignore  # novermin
+    except ImportError:
+        return []
+
+    try:
+        return importlib.metadata.entry_points(group=group)
+    except TypeError:
+        # Prior to Python 3.10, entry_points accepted no parameters and always
+        # returned a dictionary of entry points, keyed by group.  See
+        # https://docs.python.org/3/library/importlib.metadata.html#entry-points
+        return importlib.metadata.entry_points().get(group, [])
 
 
 def load_module_from_file(module_name, module_path):
@@ -866,31 +832,28 @@ def load_module_from_file(module_name, module_path):
         ImportError: when the module can't be loaded
         FileNotFoundError: when module_path doesn't exist
     """
+    import importlib.util
+
     if module_name in sys.modules:
         return sys.modules[module_name]
 
     # This recipe is adapted from https://stackoverflow.com/a/67692/771663
-    if sys.version_info[0] == 3 and sys.version_info[1] >= 5:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(  # novm
-            module_name, module_path)
-        module = importlib.util.module_from_spec(spec)  # novm
-        # The module object needs to exist in sys.modules before the
-        # loader executes the module code.
-        #
-        # See https://docs.python.org/3/reference/import.html#loading
-        sys.modules[spec.name] = module
+
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    # The module object needs to exist in sys.modules before the
+    # loader executes the module code.
+    #
+    # See https://docs.python.org/3/reference/import.html#loading
+    sys.modules[spec.name] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
         try:
-            spec.loader.exec_module(module)
-        except BaseException:
-            try:
-                del sys.modules[spec.name]
-            except KeyError:
-                pass
-            raise
-    elif sys.version_info[0] == 2:
-        import imp
-        module = imp.load_source(module_name, module_path)
+            del sys.modules[spec.name]
+        except KeyError:
+            pass
+        raise
     return module
 
 
@@ -919,36 +882,34 @@ def uniq(sequence):
     return uniq_list
 
 
-def star(func):
-    """Unpacks arguments for use with Multiprocessing mapping functions"""
-    def _wrapper(args):
-        return func(*args)
-    return _wrapper
-
-
-class Devnull(object):
-    """Null stream with less overhead than ``os.devnull``.
-
-    See https://stackoverflow.com/a/2929954.
-    """
-    def write(self, *_):
-        pass
-
-
-def elide_list(line_list, max_num=10):
+def elide_list(line_list: List[str], max_num: int = 10) -> List[str]:
     """Takes a long list and limits it to a smaller number of elements,
-       replacing intervening elements with '...'.  For example::
+    replacing intervening elements with ``"..."``.  For example::
 
-           elide_list([1,2,3,4,5,6], 4)
+        elide_list(["1", "2", "3", "4", "5", "6"], 4)
 
-       gives::
+    gives::
 
-           [1, 2, 3, '...', 6]
+        ["1", "2", "3", "...", "6"]
     """
     if len(line_list) > max_num:
-        return line_list[:max_num - 1] + ['...'] + line_list[-1:]
-    else:
-        return line_list
+        return [*line_list[: max_num - 1], "...", line_list[-1]]
+    return line_list
+
+
+if sys.version_info >= (3, 9):
+    PatternStr = re.Pattern[str]
+    PatternBytes = re.Pattern[bytes]
+else:
+    PatternStr = typing.Pattern[str]
+    PatternBytes = typing.Pattern[bytes]
+
+
+def fnmatch_translate_multiple(named_patterns: Dict[str, str]) -> str:
+    """Similar to ``fnmatch.translate``, but takes an ordered dictionary where keys are pattern
+    names, and values are filename patterns. The output is a regex that matches any of the
+    patterns in order, and named capture groups are used to identify which pattern matched."""
+    return "|".join(f"(?P<{n}>{fnmatch.translate(p)})" for n, p in named_patterns.items())
 
 
 @contextlib.contextmanager
@@ -963,28 +924,70 @@ class UnhashableArguments(TypeError):
     """Raise when an @memoized function receives unhashable arg or kwarg values."""
 
 
-def enum(**kwargs):
-    """Return an enum-like class.
+T = TypeVar("T")
+
+
+def stable_partition(
+    input_iterable: Iterable[T], predicate_fn: Callable[[T], bool]
+) -> Tuple[List[T], List[T]]:
+    """Partition the input iterable according to a custom predicate.
 
     Args:
-        **kwargs: explicit dictionary of enums
+        input_iterable: input iterable to be partitioned.
+        predicate_fn: predicate function accepting an iterable item
+            as argument.
+
+    Return:
+        Tuple of the list of elements evaluating to True, and
+        list of elements evaluating to False.
     """
-    return type('Enum', (object,), kwargs)
+    true_items: List[T] = []
+    false_items: List[T] = []
+    for item in input_iterable:
+        if predicate_fn(item):
+            true_items.append(item)
+        else:
+            false_items.append(item)
+    return true_items, false_items
 
 
-class TypedMutableSequence(MutableSequence):
+def ensure_last(lst, *elements):
+    """Performs a stable partition of lst, ensuring that ``elements``
+    occur at the end of ``lst`` in specified order. Mutates ``lst``.
+    Raises ``ValueError`` if any ``elements`` are not already in ``lst``."""
+    for elt in elements:
+        lst.append(lst.pop(lst.index(elt)))
+
+
+class Const:
+    """Class level constant, raises when trying to set the attribute"""
+
+    __slots__ = ["value"]
+
+    def __init__(self, value):
+        self.value = value
+
+    def __get__(self, instance, owner):
+        return self.value
+
+    def __set__(self, instance, value):
+        raise TypeError(f"Const value does not support assignment [value={self.value}]")
+
+
+class TypedMutableSequence(collections.abc.MutableSequence):
     """Base class that behaves like a list, just with a different type.
 
-    Client code can inherit from this base class:
+    Client code can inherit from this base class::
 
         class Foo(TypedMutableSequence):
             pass
 
-    and later perform checks based on types:
+    and later perform checks based on types::
 
         if isinstance(l, Foo):
             # do something
     """
+
     def __init__(self, iterable):
         self.data = list(iterable)
 
@@ -1010,62 +1013,265 @@ class TypedMutableSequence(MutableSequence):
         return str(self.data)
 
 
-class GroupedExceptionHandler(object):
+class GroupedExceptionHandler:
     """A generic mechanism to coalesce multiple exceptions and preserve tracebacks."""
 
     def __init__(self):
-        self.exceptions = []    # type: List[Tuple[str, Exception, List[str]]]
+        self.exceptions: List[Tuple[str, Exception, List[str]]] = []
 
     def __bool__(self):
         """Whether any exceptions were handled."""
         return bool(self.exceptions)
 
-    def forward(self, context):
-        # type: (str) -> GroupedExceptionForwarder
+    def forward(self, context: str, base: type = BaseException) -> "GroupedExceptionForwarder":
         """Return a contextmanager which extracts tracebacks and prefixes a message."""
-        return GroupedExceptionForwarder(context, self)
+        return GroupedExceptionForwarder(context, self, base)
 
-    def _receive_forwarded(self, context, exc, tb):
-        # type: (str, Exception, List[str]) -> None
+    def _receive_forwarded(self, context: str, exc: Exception, tb: List[str]):
         self.exceptions.append((context, exc, tb))
 
-    def grouped_message(self, with_tracebacks=True):
-        # type: (bool) -> str
+    def grouped_message(self, with_tracebacks: bool = True) -> str:
         """Print out an error message coalescing all the forwarded errors."""
         each_exception_message = [
-            '{0} raised {1}: {2}{3}'.format(
-                context,
-                exc.__class__.__name__,
-                exc,
-                '\n{0}'.format(''.join(tb)) if with_tracebacks else '',
+            "\n\t{0} raised {1}: {2}\n{3}".format(
+                context, exc.__class__.__name__, exc, f"\n{''.join(tb)}" if with_tracebacks else ""
             )
             for context, exc, tb in self.exceptions
         ]
-        return 'due to the following failures:\n{0}'.format(
-            '\n'.join(each_exception_message)
-        )
+        return "due to the following failures:\n{0}".format("\n".join(each_exception_message))
 
 
-class GroupedExceptionForwarder(object):
+class GroupedExceptionForwarder:
     """A contextmanager to capture exceptions and forward them to a
     GroupedExceptionHandler."""
 
-    def __init__(self, context, handler):
-        # type: (str, GroupedExceptionHandler) -> None
+    def __init__(self, context: str, handler: GroupedExceptionHandler, base: type):
         self._context = context
         self._handler = handler
+        self._base = base
 
     def __enter__(self):
         return None
 
     def __exit__(self, exc_type, exc_value, tb):
         if exc_value is not None:
-            self._handler._receive_forwarded(
-                self._context,
-                exc_value,
-                traceback.format_tb(tb),
-            )
+            if not issubclass(exc_type, self._base):
+                return False
+            self._handler._receive_forwarded(self._context, exc_value, traceback.format_tb(tb))
 
         # Suppress any exception from being re-raised:
         # https://docs.python.org/3/reference/datamodel.html#object.__exit__.
         return True
+
+
+ClassPropertyType = TypeVar("ClassPropertyType")
+
+
+class classproperty(Generic[ClassPropertyType]):
+    """Non-data descriptor to evaluate a class-level property. The function that performs
+    the evaluation is injected at creation time and takes an owner (i.e., the class that
+    originated the instance).
+    """
+
+    def __init__(self, callback: Callable[[Any], ClassPropertyType]) -> None:
+        self.callback = callback
+        self.__doc__ = callback.__doc__
+
+    def __get__(self, instance, owner) -> ClassPropertyType:
+        return self.callback(owner)
+
+
+#: A type alias that represents either a classproperty descriptor or a constant value of the same
+#: type. This allows derived classes to override a computed class-level property with a constant
+#: value while retaining type compatibility.
+ClassProperty = Union[ClassPropertyType, classproperty[ClassPropertyType]]
+
+
+class DeprecatedProperty:
+    """Data descriptor to error or warn when a deprecated property is accessed.
+
+    Derived classes must define a factory method to return an adaptor for the deprecated
+    property, if the descriptor is not set to error.
+    """
+
+    __slots__ = ["name"]
+
+    #: 0 - Nothing
+    #: 1 - Warning
+    #: 2 - Error
+    error_lvl = 0
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        if self.error_lvl == 1:
+            warnings.warn(
+                f"accessing the '{self.name}' property of '{instance}', which is deprecated"
+            )
+        elif self.error_lvl == 2:
+            raise AttributeError(f"cannot access the '{self.name}' attribute of '{instance}'")
+
+        return self.factory(instance, owner)
+
+    def __set__(self, instance, value):
+        raise TypeError(
+            f"the deprecated property '{self.name}' of '{instance}' does not support assignment"
+        )
+
+    def factory(self, instance, owner):
+        raise NotImplementedError("must be implemented by derived classes")
+
+
+KT = TypeVar("KT")
+VT = TypeVar("VT")
+
+
+class PriorityOrderedMapping(Mapping[KT, VT]):
+    """Mapping that iterates over key according to an integer priority. If the priority is
+    the same for two keys, insertion order is what matters.
+
+    The priority is set when the key/value pair is added. If not set, the highest current priority
+    is used.
+    """
+
+    _data: Dict[KT, VT]
+    _priorities: List[Tuple[int, KT]]
+
+    def __init__(self) -> None:
+        self._data = {}
+        # Tuple of (priority, key)
+        self._priorities = []
+
+    def __getitem__(self, key: KT) -> VT:
+        return self._data[key]
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __iter__(self):
+        yield from (key for _, key in self._priorities)
+
+    def __reversed__(self):
+        yield from (key for _, key in reversed(self._priorities))
+
+    def reversed_keys(self):
+        """Iterates over keys from the highest priority, to the lowest."""
+        return reversed(self)
+
+    def reversed_values(self):
+        """Iterates over values from the highest priority, to the lowest."""
+        yield from (self._data[key] for _, key in reversed(self._priorities))
+
+    def priority_values(self, priority: int):
+        """Iterate over values of a given priority."""
+        if not any(p == priority for p, _ in self._priorities):
+            raise KeyError(f"No such priority in PriorityOrderedMapping: {priority}")
+        yield from (self._data[k] for p, k in self._priorities if p == priority)
+
+    def _highest_priority(self) -> int:
+        if not self._priorities:
+            return 0
+        result, _ = self._priorities[-1]
+        return result
+
+    def add(self, key: KT, *, value: VT, priority: Optional[int] = None) -> None:
+        """Adds a key/value pair to the mapping, with a specific priority.
+
+        If the priority is None, then it is assumed to be the highest priority value currently
+        in the container.
+
+        Raises:
+              ValueError: when the same priority is already in the mapping
+        """
+        if priority is None:
+            priority = self._highest_priority()
+
+        if key in self._data:
+            self.remove(key)
+
+        self._priorities.append((priority, key))
+        # We rely on sort being stable
+        self._priorities.sort(key=lambda x: x[0])
+        self._data[key] = value
+        assert len(self._data) == len(self._priorities)
+
+    def remove(self, key: KT) -> VT:
+        """Removes a key from the mapping.
+
+        Returns:
+            The value associated with the key being removed
+
+        Raises:
+            KeyError: if the key is not in the mapping
+        """
+        if key not in self._data:
+            raise KeyError(f"cannot find {key}")
+
+        popped_item = self._data.pop(key)
+        self._priorities = [(p, k) for p, k in self._priorities if k != key]
+        assert len(self._data) == len(self._priorities)
+        return popped_item
+
+
+def union_dicts(*dicts):
+    """Use update() to combine all dicts into one.
+
+    This builds a new dictionary, into which we ``update()`` each element
+    of ``dicts`` in order.  Items from later dictionaries will override
+    items from earlier dictionaries.
+
+    Args:
+        dicts (list): list of dictionaries
+
+    Return: (dict): a merged dictionary containing combined keys and
+        values from ``dicts``.
+
+    """
+    result = {}
+    for d in dicts:
+        result.update(d)
+    return result
+
+
+def caller_locals():
+    """This will return the locals of the *parent* of the caller.
+       This allows a function to insert variables into its caller's
+       scope.  Yes, this is some black magic, and yes it's useful
+       for implementing things like depends_on and provides.
+    """
+    import inspect
+    # Passing zero here skips line context for speed.
+    stack = inspect.stack(0)
+    try:
+        return stack[2][0].f_locals
+    finally:
+        del stack
+
+
+class LazyReference(object):
+    """Lazily evaluated reference to part of a singleton."""
+
+    def __init__(self, ref_function):
+        self.ref_function = ref_function
+
+    def __getattr__(self, name):
+        if name == 'ref_function':
+            raise AttributeError()
+        return getattr(self.ref_function(), name)
+
+
+def enum(**kwargs):
+    """Return an enum-like class.
+
+    Args:
+        **kwargs: explicit dictionary of enums
+    """
+    return type('Enum', (object,), kwargs)
+
+
+
+
