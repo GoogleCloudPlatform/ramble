@@ -246,3 +246,56 @@ ramble:
         assert "#SBATCH --exclusive" not in content
         assert "#SBATCH --gpus-per-task" not in content
         assert "#SBATCH -N 1" in content
+
+
+def test_slurm_archive_patterns(make_workspace_from_config):
+    test_config = """
+ramble:
+  variants:
+    workflow_manager: slurm
+  variables:
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            test: {}
+"""
+    ws, _ = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+    experiment_dir = os.path.join(
+        ws.experiment_dir, "hostname", "local", "test"
+    )
+    assert os.path.exists(
+        os.path.join(experiment_dir, "slurm_experiment_sbatch")
+    )
+
+    slurm_files = [
+        ".slurm_job",
+        ".slurm_job_info",
+        ".slurm_config",
+        ".slurm_script_end_time",
+    ]
+    for filename in slurm_files:
+        filepath = os.path.join(experiment_dir, filename)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(f"Content of {filename}")
+
+    workspace("archive", global_args=["-D", ws.root])
+
+    assert os.path.exists(ws.latest_archive_path)
+
+    for filename in slurm_files:
+        archived_path = os.path.join(
+            ws.latest_archive_path,
+            "experiments",
+            "hostname",
+            "local",
+            "test",
+            filename,
+        )
+        assert os.path.isfile(archived_path)

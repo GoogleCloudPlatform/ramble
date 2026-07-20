@@ -176,6 +176,8 @@ class Slurm(WorkflowManagerBase):
         dest_path="batch_helpers",
     )
 
+    archive_pattern("{experiment_run_dir}/.slurm_*")
+
     @property
     def template_render_vars(self):
         vars = {}

@@ -3337,13 +3337,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     shutil.copy(file, archive_experiment_dir)
 
             # Copy all archive patterns
-            archive_patterns = set(self.archive_patterns.keys())
-            if self.package_manager:
-                for pattern in self.package_manager.archive_patterns:
-                    archive_patterns.add(pattern)
-
-            for mod in self._modifier_instances:
-                for pattern in mod.archive_patterns:
+            archive_patterns = set()
+            for _, obj_inst in self.objects():
+                for pattern in getattr(obj_inst, "archive_patterns", {}):
                     archive_patterns.add(pattern)
 
             for pattern in archive_patterns:
