@@ -2191,8 +2191,7 @@ config:
     test_var: '1'
 """
 
-    test_config = (
-        """
+    test_config = """
 ramble:
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
@@ -2217,9 +2216,7 @@ ramble:
   software:
     packages: {}
     environments: {}
-"""
-        % inc_file
-    )
+""" % inc_file
 
     with open(inc_file, "w+", encoding="utf-8") as f:
         f.write(test_include)

@@ -24,8 +24,7 @@ def test_workspace_bootstrap_utilities(mutable_config, mutable_mock_workspace_pa
 
     os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
     with open(ws.config_file_path, "w", encoding="utf-8") as f:
-        f.write(
-            """ramble:
+        f.write("""ramble:
   variables:
     mpi_command: mpirun
     batch_submit: '{execute_experiment}'
@@ -44,8 +43,7 @@ def test_workspace_bootstrap_utilities(mutable_config, mutable_mock_workspace_pa
     spack:
       git: https://github.com/my/ext_dep.git
       commit: v2.0
-"""
-        )
+""")
     ws._re_read()
 
     # In order to test bootstrap, we need an object with required_utilities

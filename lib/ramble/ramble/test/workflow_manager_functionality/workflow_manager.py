@@ -82,13 +82,11 @@ ramble:
         # Overwrite execute_experiment.tpl to contain #SBATCH
         tpl_path = os.path.join(ws.config_dir, "execute_experiment.tpl")
         with open(tpl_path, "w+", encoding="utf-8") as f:
-            f.write(
-                """{workflow_banner}
+            f.write("""{workflow_banner}
 #SBATCH --custom-header
 cd "{experiment_run_dir}"
 {command}
-"""
-            )
+""")
 
         ws._re_read()
 

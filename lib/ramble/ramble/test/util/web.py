@@ -7,7 +7,6 @@
 # except according to those terms.
 """Perform tests of the util/web functions"""
 
-
 import pytest
 
 from ramble.util import web

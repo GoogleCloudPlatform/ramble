@@ -105,11 +105,9 @@ def test_spack_auxiliary_files(request):
         "w+",
         encoding="utf-8",
     ) as f:
-        f.write(
-            """packages:
+        f.write("""packages:
   all:
-    target: ['{opt_target}']"""
-        )
+    target: ['{opt_target}']""")
 
     ws._re_read()
 

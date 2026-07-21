@@ -31,8 +31,7 @@ def test_large_template_expansion(
 
     app_dir = repo_dir.mkdir("applications").mkdir("template")
     with open(os.path.join(str(app_dir), "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """
+        f.write("""
 from ramble.appkit import *
 
 class Template(ExecutableApplication):
@@ -45,8 +44,7 @@ class Template(ExecutableApplication):
     register_template(name="expansion_test_path",
                       src_path="{src_script_path}",
                       dest_path="{experiment_run_dir}/expansion_script.sh")
-"""
-        )
+""")
 
     repo = ramble.repository.Repo(
         str(repo_dir), object_type=ramble.repository.ObjectTypes.applications
