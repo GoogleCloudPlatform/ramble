@@ -59,11 +59,12 @@ class SpackLightweight(PackageManagerBase):
 
     @property
     def runner(self):
-        if self._runner is None:
-            env = None
-            app_inst = self._get_app_inst()
-            if hasattr(app_inst, "experiment_runner_env"):
-                env = app_inst.experiment_runner_env
+        env = None
+        app_inst = self._get_app_inst()
+        if hasattr(app_inst, "experiment_runner_env"):
+            env = app_inst.experiment_runner_env
+
+        if self._runner is None or self._runner.env != env:
             self._runner = SpackRunner(env=env)
         return self._runner
 

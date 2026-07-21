@@ -44,11 +44,12 @@ class CommandRunner:
         if command is None:
             self.command = None
         else:
+            search_path = path if path is not None else (env.get("PATH") if env else None)
             try:
-                if path is None:
-                    self.command = which(command, required=required)
+                if search_path is not None:
+                    self.command = which(command, required=required, path=search_path)
                 else:
-                    self.command = which(command, required=required, path=path)
+                    self.command = which(command, required=required)
             except CommandNotFoundError:
                 raise RunnerError(f"Command {name} is not found in path") from None
 
