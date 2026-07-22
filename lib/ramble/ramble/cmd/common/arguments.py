@@ -56,10 +56,8 @@ def allows_unknown_args(command):
     indicate they can handle unknown args. This checks that the
     command allows `unknown_args` as an input argument.
     """
-    info = dict(inspect.getmembers(command))
-    varnames = info["__code__"].co_varnames
-    argcount = info["__code__"].co_argcount
-    return argcount >= 2 and "unknown_args" in varnames
+    params = inspect.signature(command).parameters
+    return "unknown_args" in params
 
 
 def validate_unknown_args(command, unknown_args):

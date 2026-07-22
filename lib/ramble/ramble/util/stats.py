@@ -123,9 +123,7 @@ class StatsCoefficientOfVariation(StatsBase):
         # calculate anyway and leave the interpretation to individual experiments.
         if not mean:
             return NA
-        return round(
-            statistics.stdev(values) / statistics.mean(values), _max_decimal_places(values)
-        )
+        return round(statistics.stdev(values) / mean, _max_decimal_places(values))
 
     def get_unit(self, unit: str) -> str:
         # `unit` unused

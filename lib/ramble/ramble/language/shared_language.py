@@ -517,7 +517,7 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
         if package_manager is not None:
             logger.warn(
                 "The `package_manager` argument of the package_manager_config "
-                f"directive in object {obj.name} is depreacated. Please "
+                f"directive in object {obj.name} is deprecated. Please "
                 "transition this to use the `when` argument instead."
             )
 
@@ -548,7 +548,7 @@ def required_package(name, package_manager=None, when=None, **kwargs):
         if package_manager is not None:
             logger.warn(
                 "The `package_manager` argument of the required_package "
-                f"directive in object {obj.name} is depreacated. Please "
+                f"directive in object {obj.name} is deprecated. Please "
                 "transition this to use the `when` argument instead."
             )
 

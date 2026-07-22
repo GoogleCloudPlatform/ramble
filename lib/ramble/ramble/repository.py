@@ -198,6 +198,10 @@ type_definitions = {
     },
 }
 
+_ALL_ACCEPTED_CONFIGS = {
+    cfg for obj_info in type_definitions.values() for cfg in obj_info["accepted_configs"]
+}
+
 
 def _apps(repo_dirs=None):
     """Get the applications singleton RepoPath instance for Ramble."""
@@ -501,10 +505,7 @@ class FastObjectChecker(Mapping):
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
-                if not obj_name.startswith(".") and not any(
-                    obj_name in obj_info["accepted_configs"]
-                    for obj_info in type_definitions.values()
-                ):
+                if not obj_name.startswith(".") and obj_name not in _ALL_ACCEPTED_CONFIGS:
                     logger.warn(
                         f"Skipping {self.object_type} "
                         f'at {obj_dir}. "{obj_name}" is not '

@@ -705,7 +705,7 @@ def mock_file_auto_create(monkeypatch):
 
     def open_or_create_inmem(path, *args, **kwargs):
         if not os.path.exists(path) and is_dry_run_path(path):
-            if path.endswith(".yaml") or path.endswith(".yml"):
+            if path.endswith((".yaml", ".yml")):
                 content = "{}"
             else:
                 content = ""
