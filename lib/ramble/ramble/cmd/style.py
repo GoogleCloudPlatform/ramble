@@ -16,6 +16,7 @@ import shlex
 import shutil
 import sys
 import tempfile
+from typing import Callable, Dict
 
 from llnl.util.filesystem import mkdirp, working_dir
 
@@ -148,7 +149,7 @@ pattern_exemptions = {
 # Tools run in the given order
 tool_names = ["isort", "black", "flake8", "mypy", "ruff"]
 
-tools = {}
+tools: Dict[str, Callable] = {}
 
 
 # decorator for adding tools to the list

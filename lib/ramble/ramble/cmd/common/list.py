@@ -11,6 +11,7 @@ import argparse
 import math
 import os
 import sys
+from typing import Callable, Dict
 
 from llnl.util.tty.colify import colify
 
@@ -19,7 +20,7 @@ from ramble.cmd.common import arguments
 from ramble.util import object_utils
 from ramble.util.logger import logger
 
-formatters = {}
+formatters: Dict[str, Callable] = {}
 
 
 def formatter(func):

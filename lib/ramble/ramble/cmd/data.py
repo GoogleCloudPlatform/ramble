@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import Callable, Dict
+
 description = "manage data and databases"
 section = "data"
 level = "short"
@@ -55,7 +57,7 @@ def data_create_db(args):
 
 
 #: Dictionary mapping subcommand names and aliases to functions
-subcommand_functions = {}
+subcommand_functions: Dict[str, Callable] = {}
 
 
 def sanitize_arg_name(base_name):

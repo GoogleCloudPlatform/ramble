@@ -9,6 +9,7 @@
 
 import argparse
 import inspect
+from typing import Callable, Dict
 
 from ramble.util.logger import logger
 
@@ -17,7 +18,7 @@ from spack.util.pattern import Args
 __all__ = ["add_common_arguments", "allows_unknown_args", "validate_unknown_args"]
 
 #: dictionary of argument-generating functions, keyed by name
-_arguments = {}
+_arguments: Dict[str, Callable[[], Args]] = {}
 
 
 def arg(fn):
