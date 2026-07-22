@@ -74,15 +74,9 @@ class StressNg(ExecutableApplication):
         description="Extra arguments",
         workload_defaults={
             "cpu": "",
-            "matrix": "--matrix-method mult",
+            "matrix": "--matrix-method {matrix_method}",
             "vecmath": "",
         },
-    )
-    workload_variable(
-        "cpu_list",
-        default="",
-        description="Taskset core list",
-        workloads=["cpu", "matrix", "vecmath"],
     )
     workload_variable(
         "matrix_method",
@@ -108,7 +102,8 @@ class StressNg(ExecutableApplication):
         "Bogo Ops",
         fom_regex=metrics_regex,
         group_name="bogo_ops",
-        units="",
+        units="ops",
+        fom_type=FomType.MEASURE,
     )
 
     figure_of_merit(
@@ -116,4 +111,5 @@ class StressNg(ExecutableApplication):
         fom_regex=metrics_regex,
         group_name="bogo_ops_per_s_real",
         units="ops/s",
+        fom_type=FomType.THROUGHPUT,
     )
