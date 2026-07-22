@@ -166,6 +166,143 @@ def test_nonunique_vector_errors(workspace_name, capsys):
         assert "is not unique." in captured
 
 
+def test_collision_across_different_blocks(workspace_name, capsys):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+
+        experiment_context1 = ramble.context.Context()
+        experiment_context1.context_name = "collision_{my_var1}"
+        experiment_context1.variables = {"my_var1": "foo", "my_var2": "bar"}
+
+        experiment_context2 = ramble.context.Context()
+        experiment_context2.context_name = "collision_{my_var2}"
+        experiment_context2.variables = {
+            "my_var1": "baz",
+            "my_var2": "foo",
+            "unique_to_right": "yes",
+        }
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+
+        # Ingest the first experiment
+        exp_set.set_experiment_context(experiment_context1)
+
+        # Ingest the second experiment, which should trigger collision
+        with pytest.raises(SystemExit):
+            exp_set.set_experiment_context(experiment_context2)
+
+        captured = capsys.readouterr().err
+        assert "is not unique." in captured
+        assert (
+            "Collision Origin: Across different YAML "
+            "experiment blocks: 'collision_{my_var1}' vs 'collision_{my_var2}'" in captured
+        )
+
+        assert "Variables unique to newly defined experiment:" in captured
+        assert "unique_to_right" in captured
+
+
+def test_collision_static_definition(workspace_name, capsys):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+
+        experiment_context1 = ramble.context.Context()
+        experiment_context1.context_name = "static_collision"
+
+        experiment_context2 = ramble.context.Context()
+        experiment_context2.context_name = "static_collision"
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+
+        # Ingest the first experiment
+        exp_set.set_experiment_context(experiment_context1)
+
+        # Ingest the second experiment, which should trigger collision
+        with pytest.raises(SystemExit):
+            exp_set.set_experiment_context(experiment_context2)
+
+        captured = capsys.readouterr().err
+        assert "is not unique." in captured
+        assert (
+            "Collision Origin: Static definition (No Matrix/Vector expansion active)" in captured
+        )
+        assert (
+            "Multiple distinct experiment blocks in your YAML are using the same literal name."
+            in captured
+        )
+
+
+def test_collision_matrix_and_zip(workspace_name, capsys):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+
+        experiment_context = ramble.context.Context()
+        # Name template does not use the matrix/zip variables, so they will collide
+        experiment_context.context_name = "collision_matrix"
+        experiment_context.variables = {
+            "var_a": ["1", "2"],
+            "var_b": ["a", "b"],
+            "var_c": ["x", "y"],
+        }
+        experiment_context.zips = {"my_zip": ["var_b", "var_c"]}
+        experiment_context.matrices = [["var_a", "my_zip"]]
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+
+        with pytest.raises(SystemExit):
+            exp_set.set_experiment_context(experiment_context)
+
+        captured = capsys.readouterr().err
+        assert "is not unique." in captured
+        assert "var_b" in captured
+        assert "var_c" in captured
+
+
 def test_zipped_vector_experiments(workspace_name):
     workspace("create", workspace_name)
 
