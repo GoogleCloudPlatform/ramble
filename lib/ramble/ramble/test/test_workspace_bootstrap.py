@@ -8,6 +8,7 @@
 
 import os
 
+import ramble.config
 import ramble.filters
 import ramble.pipeline
 import ramble.workspace
@@ -67,7 +68,8 @@ def test_workspace_bootstrap_utilities(mutable_config, mutable_mock_workspace_pa
         }
 
         ws.dry_run = True
-        setup_pipeline.run()
+        with ramble.config.override("config:bootstrap_utilities", True):
+            setup_pipeline.run()
 
     print(
         "app_inst.required_utilities:",
