@@ -317,6 +317,7 @@ class WhenDirectives(ExecutableApplication):
             executables=["test_exec2"],
         )
         workload_group("all_workloads", workloads=["test_wl", "test_wl2"])
+        workload_group("active_group", workloads=["test_wl"])
 
         workload_variable(
             "test_variable2",
@@ -340,6 +341,7 @@ class WhenDirectives(ExecutableApplication):
             executables=["test_exec3"],
         )
         workload_group("all_workloads", workloads=["test_wl", "test_wl3"])
+        workload_group("active_group", workloads=["test_wl2"])
 
         workload_variable(
             "test_variable3",
@@ -368,6 +370,14 @@ class WhenDirectives(ExecutableApplication):
             value="APP_ENV_VAR_SET",
             description="Test app environment variable",
             workload_group="test_wl_group",
+        )
+
+    with when("workload_group=active_group"):
+        environment_variable(
+            "GROUP_VARIANT_ENV_VAR",
+            value="TEST_WL_GROUP_SET",
+            description="Test app environment variable with workload_group variant",
+            workload="test_wl",
         )
 
     variant(

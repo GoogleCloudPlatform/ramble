@@ -23,6 +23,7 @@ reserved_variants = {
     "platform",
     "version",
     "workflow_manager",
+    "workload_group",
     "is_repeat_child",
     "is_repeat_parent",
     "repeat_index",

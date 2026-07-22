@@ -39,6 +39,7 @@ default_keys = {
     "workload_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "workload_namespace": {"type": key_type.reserved, "level": output_level.key},
     "simplified_workload_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "workload_group": {"type": key_type.reserved, "level": output_level.key},
     "license_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "experiments_file": {"type": key_type.reserved, "level": output_level.key},
     "experiment_name": {"type": key_type.reserved, "level": output_level.key},
@@ -127,6 +128,7 @@ class Keywords:
     workload_input_dir: str
     workload_namespace: str
     simplified_workload_namespace: str
+    workload_group: str
     license_input_dir: str
     experiments_file: str
     experiment_name: str
