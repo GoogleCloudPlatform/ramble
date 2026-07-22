@@ -27,10 +27,10 @@ from llnl.util.compat import Mapping
 import ramble.config
 import ramble.error
 import ramble.fetch_strategy as fs
+from ramble.util import json_util
 from ramble.util.logger import logger
 
 import spack.url
-import spack.util.spack_json
 import spack.util.spack_yaml
 from spack.util.spack_yaml import syaml_dict
 
@@ -65,7 +65,7 @@ class Mirror:
         return self._fetch_url == other._fetch_url and self._push_url == other._push_url
 
     def to_json(self, stream=None):
-        return spack.util.spack_json.dump(self.to_dict(), stream)
+        return json_util.dump(self.to_dict(), stream)
 
     def to_yaml(self, stream=None):
         return spack.util.spack_yaml.dump(self.to_dict(), stream)
@@ -81,10 +81,10 @@ class Mirror:
     @staticmethod
     def from_json(stream, name=None):
         try:
-            d = spack.util.spack_json.load(stream)
+            d = json_util.load(stream)
             return Mirror.from_dict(d, name)
         except Exception as e:
-            raise spack.util.spack_json.SpackJSONError("error parsing JSON mirror:", str(e)) from e
+            raise MirrorError(f"error parsing JSON mirror: {e}") from e
 
     def to_dict(self):
         return syaml_dict(
@@ -180,7 +180,7 @@ class MirrorCollection(Mapping):
         return self._mirrors == other._mirrors
 
     def to_json(self, stream=None):
-        return spack.util.spack_json.dump(self.to_dict(True), stream)
+        return json_util.dump(self.to_dict(True), stream)
 
     def to_yaml(self, stream=None):
         return spack.util.spack_yaml.dump(self.to_dict(True), stream)

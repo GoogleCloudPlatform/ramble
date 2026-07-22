@@ -61,7 +61,7 @@ from ramble.language.shared_language import (
     register_phase,
     variant,
 )
-from ramble.util import cleaner, conversions
+from ramble.util import cleaner, conversions, json_util
 from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -72,7 +72,6 @@ from ramble.workspace import LICENSE_INC_NAME, TEMPLATE_EXTENSION, namespace
 import spack.util.compression
 import spack.util.environment
 import spack.util.executable
-import spack.util.spack_json
 
 ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
@@ -3130,7 +3129,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         existing_hash = None
         if os.path.exists(inventory_file) and not force:
             with open(inventory_file, encoding="utf-8") as f:
-                existing_inventory = spack.util.spack_json.load(f)
+                existing_inventory = json_util.load(f)
             existing_hash = ramble.util.hashing.hash_json(existing_inventory)
 
         # Clean up variables before hashing
@@ -3263,7 +3262,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if changed and writable:
             with lk.WriteTransaction(self.experiment_lock):
                 with open(inventory_file, "w+", encoding="utf-8") as f:
-                    spack.util.spack_json.dump(self.hash_inventory, f)
+                    json_util.dump(self.hash_inventory, f)
 
         return changed
 
@@ -4246,7 +4245,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, encoding="utf-8") as f:
-                    status_data = spack.util.spack_json.load(f)
+                    status_data = json_util.load(f)
                     self.set_status(
                         ExperimentStatus(
                             status_data[self.keywords.experiment_status]
@@ -4305,7 +4304,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, "w+", encoding="utf-8") as f:
-                    spack.util.spack_json.dump(status_data, f)
+                    json_util.dump(status_data, f)
 
     register_phase(
         "write_results_cache",

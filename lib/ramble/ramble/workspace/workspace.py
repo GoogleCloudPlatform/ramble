@@ -40,11 +40,11 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
+from ramble.util import json_util
 from ramble.util.conversions import list_str_to_list, strip_quotes
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
 
-import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
 import spack.util.url as url_util
 import spack.util.web as web_util
@@ -1822,7 +1822,7 @@ ramble:
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+", encoding="utf-8") as f:
-                sjson.dump(results, f)
+                json_util.dump(results, f)
             self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
         if "yaml" in output_formats:

@@ -7,10 +7,9 @@
 # except according to those terms.
 
 import hashlib
-import json
-from typing import Any, Dict
+from typing import Any
 
-import spack.util.spack_json as sjson
+from ramble.util import json_util
 
 BLOCK_SIZE = 1024 * 1024
 
@@ -31,9 +30,6 @@ def hash_string(string):
 
 
 def hash_json(in_json: Any) -> str:
-    _json_dump_args: Dict[str, Any] = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
-
-    data = sjson._strify(in_json)
-    json_data = json.dumps(data, **_json_dump_args)
+    json_data = json_util.dumps(in_json, sort_keys=True)
 
     return hashlib.sha256(json_data.encode("UTF-8")).hexdigest()

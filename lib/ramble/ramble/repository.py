@@ -35,9 +35,8 @@ import ramble.spec
 import ramble.util.imp
 import ramble.util.naming as nm
 import ramble.util.path
+from ramble.util import json_util
 from ramble.util.logger import logger
-
-import spack.util.spack_json as sjson
 
 global_namespace = "ramble"
 
@@ -559,11 +558,11 @@ class TagIndex(Mapping):
         self._tag_dict = collections.defaultdict(list)
 
     def to_json(self, stream):
-        sjson.dump({"tags": self._tag_dict}, stream)
+        json_util.dump({"tags": self._tag_dict}, stream)
 
     @staticmethod
     def from_json(stream, object_type):
-        d = sjson.load(stream)
+        d = json_util.load(stream)
 
         r = TagIndex(object_type=object_type)
 
