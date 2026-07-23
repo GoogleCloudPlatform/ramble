@@ -97,10 +97,11 @@ cd "{experiment_run_dir}"
             # Assert logger.warn was called with the specific message
             assert mock_warn.called
             expected_msg = (
-                "In experiment hostname.local.test_default:\n"
+                "Validator 'check_sbatch_in_execute_experiment' (defined in 'slurm') "
+                "fails with message: 'In experiment hostname.local.test_default:\n"
                 "  `execute_experiment` contains `#SBATCH` directives, "
                 "which will be ignored.\n"
                 "  Custom headers should be added to `extra_sbatch_headers` "
-                "in the workspace configuration instead."
+                "in the workspace configuration instead.'"
             )
             mock_warn.assert_any_call(expected_msg)

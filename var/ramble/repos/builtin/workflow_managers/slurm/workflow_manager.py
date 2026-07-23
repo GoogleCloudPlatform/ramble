@@ -344,23 +344,18 @@ class Slurm(WorkflowManagerBase):
         formula="'{value}' == 'COMPLETE'",
     )
 
-    def validate_experiment(self):
-        super().validate_experiment()
-        exp_run_dir = self.app_inst.expander.experiment_run_dir
-        exec_path = os.path.join(exp_run_dir, "execute_experiment")
-        if os.path.isfile(exec_path):
-            with open(exec_path, encoding="utf-8") as f:
-                content = f.read()
-                for line in content.splitlines():
-                    if line.strip().startswith("#SBATCH"):
-                        logger.warn(
-                            f"In experiment {self.app_inst.expander.experiment_namespace}:\n"
-                            f"  `execute_experiment` contains `#SBATCH` directives, "
-                            f"which will be ignored.\n"
-                            f"  Custom headers should be added to `extra_sbatch_headers` "
-                            f"in the workspace configuration instead."
-                        )
-                        break
+    register_validator(
+        name="check_sbatch_in_execute_experiment",
+        predicate="not file_contains('{workspace_configs}/execute_experiment.tpl', '(?m)^[ \\t]*#SBATCH')",
+        message=(
+            "In experiment {experiment_namespace}:\n"
+            "  `execute_experiment` contains `#SBATCH` directives, "
+            "which will be ignored.\n"
+            "  Custom headers should be added to `extra_sbatch_headers` "
+            "in the workspace configuration instead."
+        ),
+        fail_on_invalid=False,
+    )
 
 
 class SlurmRunner:

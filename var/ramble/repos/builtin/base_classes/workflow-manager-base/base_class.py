@@ -123,7 +123,3 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     def template_render_vars(self):
         """Define variables to be used in template rendering"""
         return {}
-
-    def validate_experiment(self):
-        """Validate experiment files after creation"""
-        pass

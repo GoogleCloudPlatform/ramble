@@ -3016,9 +3016,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             self._render_object_templates(exec_vars)
 
-            if self.workflow_manager:
-                self.workflow_manager.validate_experiment()
-
             experiment_script = workspace.experiments_script
             experiment_script.write(
                 self.expander.expand_var("{batch_submit}\n")
