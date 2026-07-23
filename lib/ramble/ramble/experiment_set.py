@@ -355,6 +355,57 @@ class ExperimentSet:
         app_inst.set_success_list(context.success_criteria)
         return app_inst.build_used_variables()
 
+    def _prepare_repeat_experiment(
+        self,
+        base_app_inst,
+        exp_template_name,
+        cur_repeats,
+    ):
+        """Derive a repeated experiment instance from an existing base experiment instance.
+
+        Avoids re-running the full _setup_experiment_minimal pipeline.
+        """
+        app_inst = base_app_inst.clone_for_repeat(cur_repeats, self)
+
+        experiment_suffix = f".{cur_repeats.repeat_index}"
+        final_exp_name = app_inst.expander.expand_var(
+            exp_template_name + experiment_suffix, allow_passthrough=False
+        )
+
+        app_inst.define_variable(
+            self.keywords.experiment_template_name, exp_template_name + experiment_suffix
+        )
+        app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
+
+        app_inst.define_variable(
+            self.keywords.experiment_run_dir,
+            os.path.join(
+                Expander.expansion_str(self.keywords.workload_run_dir),
+                Expander.expansion_str(self.keywords.experiment_name),
+            ),
+        )
+
+        app_inst.define_variable(
+            self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
+        )
+
+        app_inst.define_variable(
+            self.keywords.simplified_experiment_namespace,
+            naming.simplify_name(
+                app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
+            ),
+        )
+
+        for name, value in self._workspace.workspace_paths().items():
+            app_inst.define_variable(name, value)
+
+        app_inst.define_variables_for_template_path()
+
+        experiment_namespace = app_inst.expander.experiment_namespace
+        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
+
+        return app_inst
+
     def _process_render_object(
         self,
         render_item,
@@ -366,10 +417,9 @@ class ExperimentSet:
         """Helper to render a base and its repeated experiments, for parallel execution."""
         experiment_vars, repeats = render_item
         processed_experiments = []
-        # Expand and prepare base and repeated experiments
-        # TODO: Exploit the relationship between base and repeated experiments,
-        # to save up redundant works.
-        # For instance, caching may be enabled for expanders across these experiments.
+        # Expand and prepare base and repeated experiments by reusing the base application
+        # instance across repeat children to eliminate redundant setup overhead.
+        base_app_inst = None
         for n in range(repeats.n_repeats + 1):
             cur_repeats = ramble.repeats.Repeats()
             if repeats.is_repeat_base:
@@ -378,13 +428,21 @@ class ExperimentSet:
                 else:
                     cur_repeats.set_repeat_index(n)
 
-            app_inst = self._prepare_experiment(
-                workload_template_name,
-                experiment_template_name,
-                experiment_vars.copy(),
-                final_context,
-                cur_repeats,
-            )
+            if n == 0 or base_app_inst is None:
+                app_inst = self._prepare_experiment(
+                    workload_template_name,
+                    experiment_template_name,
+                    experiment_vars.copy(),
+                    final_context,
+                    cur_repeats,
+                )
+                base_app_inst = app_inst
+            else:
+                app_inst = self._prepare_repeat_experiment(
+                    base_app_inst,
+                    experiment_template_name,
+                    cur_repeats,
+                )
 
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
             final_exp_namespace = app_inst.expander.expand_var_name(

@@ -2052,6 +2052,10 @@ def test_repeated_experiments(workspace_name):
         assert base_exp.repeats.is_repeat_base
         assert base_exp.repeats.n_repeats == 2
         assert repeat1_exp.repeats.repeat_index == 1
+        assert repeat1_exp.variables["is_repeat_child"] is True
+        assert repeat1_exp.variables["is_repeat_parent"] is False
+        assert repeat1_exp.variables["repeat_index"] == 1
+        assert repeat1_exp.expander.expand_var("{experiment_name}") == "test.1"
 
 
 def test_validation_in_render_repeat_experiments(workspace_name):

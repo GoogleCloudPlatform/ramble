@@ -332,6 +332,60 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return new_clone
 
+    def clone_for_repeat(self, cur_repeats, experiment_set=None):
+        """Clone an application instance for a repeated experiment.
+
+        Reuses the initialized base application state (workloads, executables,
+        modifiers, package manager, internals) and updates only repeat-specific
+        variables and variants.
+        """
+        child_clone = copy.copy(self)
+        self.generated_experiments.append(child_clone)
+
+        child_clone.variables = self.variables.copy()
+        child_clone.variables[self.keywords.is_repeat_parent] = False
+        child_clone.variables[self.keywords.is_repeat_child] = True
+        child_clone.variables[self.keywords.repeat_index] = (
+            cur_repeats.repeat_index
+        )
+        child_clone.variables[self.keywords.experiment_run_dir] = os.path.join(
+            ramble.expander.Expander.expansion_str(
+                self.keywords.workload_run_dir
+            ),
+            ramble.expander.Expander.expansion_str(
+                self.keywords.experiment_name
+            ),
+        )
+
+        if (
+            hasattr(self, "object_variants")
+            and self.object_variants is not None
+        ):
+            child_clone.object_variants = self.object_variants.copy()
+            child_clone.object_variants.experiment_variant(
+                self.keywords.is_repeat_parent, False
+            )
+            child_clone.object_variants.experiment_variant(
+                self.keywords.is_repeat_child, True
+            )
+            child_clone.object_variants.experiment_variant(
+                self.keywords.repeat_index, cur_repeats.repeat_index
+            )
+            child_clone.clear_variant_cache()
+
+        child_clone.expander = ramble.expander.Expander(
+            child_clone.variables, experiment_set or self.experiment_set
+        )
+        child_clone.repeats = cur_repeats
+        child_clone._fom_map = {}
+        child_clone._exp_lock = None
+        child_clone._template_paths_defined = False
+        child_clone.result = ramble.experiment_result.ExperimentResult(
+            child_clone
+        )
+
+        return child_clone
+
     @property
     def is_actionable(self):
         """Determine if an experiment should be actioned in pipelines
