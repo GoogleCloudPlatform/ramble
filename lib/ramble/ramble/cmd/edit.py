@@ -58,6 +58,97 @@ def edit_object(name, obj_type_name, repo_path, namespace):
         logger.die("No valid editor was found.")
 
 
+def normalize_type_name(type_name):
+    if not type_name:
+        return None
+
+    # Map aliases
+    aliases = {
+        "test": "test",
+        "tests": "test",
+        "command": "command",
+        "commands": "command",
+        "docs": "docs",
+        "doc": "docs",
+        "module": "module",
+        "modules": "module",
+    }
+    if type_name in aliases:
+        return aliases[type_name]
+
+    # Map singular to plural for ObjectTypes
+    norm_type = type_name.lower().replace("-", " ").replace("_", " ")
+    for obj_type in ramble.repository.ObjectTypes:
+        if norm_type == obj_type.name.lower().replace("_", " "):
+            return obj_type.name
+        if obj_type in ramble.repository.type_definitions:
+            singular = ramble.repository.type_definitions[obj_type]["singular"]
+            if norm_type == singular.lower().replace("_", " ").replace("-", " "):
+                return obj_type.name
+
+    return type_name
+
+
+def object_exists(name, obj_type_name, repo_path=None, namespace=None):
+    try:
+        obj_type = ramble.repository.ObjectTypes[obj_type_name]
+        if repo_path:
+            repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+        elif namespace:
+            repo = ramble.repository.paths[obj_type].get_repo(namespace)
+        else:
+            repo = ramble.repository.paths[obj_type]
+        # Check if the filename for the object name exists
+        path = repo.filename_for_object_name(name)
+        return os.path.exists(path)
+    except Exception:
+        return False
+
+
+def non_object_exists(name, type_name):
+    type_to_path = {
+        "test": ramble.paths.test_path,
+        "command": ramble.paths.command_path,
+        "docs": os.path.join(ramble.paths.lib_path, "docs"),
+        "module": ramble.paths.module_path,
+    }
+    path = type_to_path[type_name]
+    # convert command names to python module name
+    if path == ramble.paths.command_path:
+        name = ramble.cmd.python_name(name)
+
+    path = os.path.join(path, name)
+    if os.path.exists(path):
+        return True
+
+    # Otherwise do a glob check (excluding backups/pyc)
+    files = glob.glob(path + ".*")
+    exclude_list = [".pyc", "~"]
+    files = list(filter(lambda x: all(s not in x for s in exclude_list), files))
+    return len(files) > 0
+
+
+def deduce_type(name, repo_path=None, namespace=None):
+    # Try default type first (applications)
+    default_type = ramble.repository.default_type.name
+    if object_exists(name, default_type, repo_path, namespace):
+        return default_type
+
+    # Search all other object types
+    for obj_type_name in ramble.repository.OBJECT_NAMES:
+        if obj_type_name == default_type:
+            continue
+        if object_exists(name, obj_type_name, repo_path, namespace):
+            return obj_type_name
+
+    # Search non-object types
+    for type_name in ["test", "command", "module", "docs"]:
+        if non_object_exists(name, type_name):
+            return type_name
+
+    return None
+
+
 def setup_parser(subparser):
     # Edits object (application) files by default
     extra_types = ["test", "command", "docs", "module"]
@@ -65,8 +156,9 @@ def setup_parser(subparser):
     subparser.add_argument(
         "-t",
         "--type",
-        default=f"{ramble.repository.default_type.name}",
-        help=f"Type of object to edit. Defaults to '{ramble.repository.default_type.name}'. "
+        default=None,
+        help="Type of object to edit. Defaults to automatic deduction with fallback to "
+        f"'{ramble.repository.default_type.name}'. "
         f"Allowed types are {', '.join(allowed_types)}",
     )
 
@@ -85,16 +177,25 @@ def edit(parser, args):
     # By default, edit object files
     path = ramble.paths.builtin_path
 
+    # Normalize input type if specified
+    if args.type:
+        args.type = normalize_type_name(args.type)
+
+    if name and not args.type:
+        detected_type = deduce_type(name, args.repo, args.namespace)
+        if detected_type:
+            args.type = detected_type
+
+    # Default type if still not set
+    if not args.type:
+        args.type = ramble.repository.default_type.name
+
     # Map type arguments to paths if they aren't standard object types
     type_to_path = {
         "test": ramble.paths.test_path,
-        "tests": ramble.paths.test_path,
         "command": ramble.paths.command_path,
-        "commands": ramble.paths.command_path,
         "docs": os.path.join(ramble.paths.lib_path, "docs"),
-        "doc": os.path.join(ramble.paths.lib_path, "docs"),
         "module": ramble.paths.module_path,
-        "modules": ramble.paths.module_path,
     }
 
     if args.type in type_to_path:
@@ -106,7 +207,7 @@ def edit(parser, args):
 
             path = os.path.join(path, name)
             if not os.path.exists(path):
-                files = glob.glob(path + "*")
+                files = glob.glob(path + ".*")
                 exclude_list = [".pyc", "~"]  # exclude binaries and backups
                 files = list(filter(lambda x: all(s not in x for s in exclude_list), files))
                 if len(files) > 1:
