@@ -112,6 +112,15 @@ def _re_search(regex, s):
     return re.search(regex, s) is not None
 
 
+def _file_contains(file_path, pattern):
+    import os
+
+    if os.path.isfile(file_path):
+        with open(file_path, encoding="utf-8") as f:
+            return re.search(pattern, f.read(), re.MULTILINE) is not None
+    return False
+
+
 def _str_replace(s, *args, **kwargs):
     return str(s).replace(*args, **kwargs)
 
@@ -196,6 +205,7 @@ supported_scalar_function_pointers = {
     "simplify_str": naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
+    "file_contains": _file_contains,
     "replace": _str_replace,
 }
 

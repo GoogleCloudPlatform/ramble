@@ -115,7 +115,7 @@ def test_object_precedence_ordering(
     workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
     exec_file = os.path.join(
-        ws.experiment_dir, "basic", "test_wl2", "generated", "slurm_experiment_sbatch"
+        ws.experiment_dir, "basic", "test_wl2", "generated", "execute_experiment"
     )
     assert os.path.isfile(exec_file)
     with open(exec_file, encoding="utf-8") as f:

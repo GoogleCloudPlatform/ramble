@@ -55,8 +55,8 @@ class Slurm(WorkflowManagerBase):
         default="""# ****************************************************
 # * Workflow manager: slurm
 # * Execution script is: {slurm_experiment_sbatch}
-# * If this file is not the same as the above path, it is unlikely that this script
-# * is used when `ramble on` executes experiments.
+# * Note: `execute_experiment` is sourced by the execution script.
+# * Do not add `#SBATCH` headers to `execute_experiment`, as they will be ignored.
 # ****************************************************
 """,
         description="Banner to describe the workflow within execution templates",
@@ -344,6 +344,19 @@ class Slurm(WorkflowManagerBase):
         mode="fom_comparison",
         fom_name="job-status",
         formula="'{value}' == 'COMPLETE'",
+    )
+
+    register_validator(
+        name="check_sbatch_in_execute_experiment",
+        predicate="not file_contains('{workspace_configs}/execute_experiment.tpl', '(?m)^[ \\t]*#SBATCH')",
+        message=(
+            "In experiment {experiment_namespace}:\n"
+            "  `execute_experiment` contains `#SBATCH` directives, "
+            "which will be ignored.\n"
+            "  Custom headers should be added to `extra_sbatch_headers` "
+            "in the workspace configuration instead."
+        ),
+        fail_on_invalid=False,
     )
 
 

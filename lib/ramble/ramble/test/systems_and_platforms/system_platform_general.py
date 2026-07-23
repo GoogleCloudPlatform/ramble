@@ -77,8 +77,15 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems, ens
     with open(exec_file, encoding="utf-8") as f:
         data = f.read()
         assert "SBATCH" in data
+
+    payload_file = os.path.join(
+        ws.experiment_dir, "gromacs", "lignocellulose", "generated", "execute_experiment"
+    )
+    assert os.path.isfile(payload_file)
+    with open(payload_file, encoding="utf-8") as f:
+        payload_data = f.read()
         # Ensure cores_per_node=4 propagated, and srun is used from slurm
-        assert "srun -n 4" in data
+        assert "srun -n 4" in payload_data
     # Verify command variables were "defined"
     log_file = os.path.join(ws.log_dir, "setup.latest", "gromacs.lignocellulose.generated.out")
     expected = "max_nodes = 4 (dry-run) from 'sinfo -p " "mock-partition -O 'Nodes' | tail -n 1'"

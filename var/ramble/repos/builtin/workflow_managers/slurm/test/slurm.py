@@ -60,6 +60,7 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
+        assert "slurm_experiment_sbatch" in files
         with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             assert "slurm_experiment_sbatch" in content
@@ -67,6 +68,11 @@ ramble:
             assert ".slurm_job" in content
             assert "sbatch" in content
             assert "batch_submit" not in content
+        with open(
+            os.path.join(path, "slurm_experiment_sbatch"), encoding="utf-8"
+        ) as f:
+            content = f.read()
+            assert "execute_experiment" in content
 
 
 def test_slurm_workflow():
@@ -156,6 +162,7 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
+        assert "slurm_experiment_sbatch" in files
         with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             # Assert the user-defined `batch_submit` is included
@@ -168,7 +175,6 @@ ramble:
         ) as f:
             content = f.read()
             assert "scontrol show hostnames" in content
-            assert "scontrol show config" in content
             assert "#SBATCH -N 1" in content
             assert "#SBATCH -J hostname_local_test_slurm" in content
             assert "#SBATCH --ntasks-per-node 1" in content
@@ -176,6 +182,14 @@ ramble:
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
+            assert "execute_experiment" in content
+        with open(
+            os.path.join(path, "execute_experiment"), encoding="utf-8"
+        ) as f:
+            exec_content = f.read()
+            assert "scontrol show config" in exec_content
+            for line in exec_content.splitlines():
+                assert not line.strip().startswith("#SBATCH")
         with open(os.path.join(path, "batch_query"), encoding="utf-8") as f:
             content = f.read()
             assert "squeue" in content
@@ -207,7 +221,8 @@ ramble:
         ) as f:
             content = f.read()
             # Since it uses the default execute_experiment tpl, no slurm content is present
-            assert "#SBATCH" not in content
+            for line in content.splitlines():
+                assert not line.strip().startswith("#SBATCH")
             assert "scontrol show hostnames" not in content
 
 
