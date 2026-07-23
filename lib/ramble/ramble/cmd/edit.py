@@ -60,48 +60,17 @@ def edit_object(name, obj_type_name, repo_path, namespace):
 
 def setup_parser(subparser):
     # Edits object (application) files by default
+    extra_types = ["test", "command", "docs", "module"]
+    allowed_types = ramble.repository.OBJECT_NAMES + extra_types
     subparser.add_argument(
+        "-t",
         "--type",
         default=f"{ramble.repository.default_type.name}",
         help=f"Type of object to edit. Defaults to '{ramble.repository.default_type.name}'. "
-        f"Allowed types are {', '.join(ramble.repository.OBJECT_NAMES)}",
+        f"Allowed types are {', '.join(allowed_types)}",
     )
 
     excl_args = subparser.add_mutually_exclusive_group()
-
-    # Various types of Ramble files that can be edited
-    excl_args.add_argument(
-        "-c",
-        "--command",
-        dest="path",
-        action="store_const",
-        const=ramble.paths.command_path,
-        help="edit the command with the supplied name",
-    )
-    excl_args.add_argument(
-        "-d",
-        "--docs",
-        dest="path",
-        action="store_const",
-        const=os.path.join(ramble.paths.lib_path, "docs"),
-        help="edit the docs with the supplied name",
-    )
-    excl_args.add_argument(
-        "-t",
-        "--test",
-        dest="path",
-        action="store_const",
-        const=ramble.paths.test_path,
-        help="edit the test with the supplied name",
-    )
-    excl_args.add_argument(
-        "-m",
-        "--module",
-        dest="path",
-        action="store_const",
-        const=ramble.paths.module_path,
-        help="edit the main ramble module with the supplied name",
-    )
 
     # Options for editing applications
     excl_args.add_argument("-r", "--repo", default=None, help="path to repo to edit object in")
@@ -116,9 +85,20 @@ def edit(parser, args):
     # By default, edit object files
     path = ramble.paths.builtin_path
 
-    # If `--command`, `--test`, or `--module` is chosen, edit those instead
-    if args.path:
-        path = args.path
+    # Map type arguments to paths if they aren't standard object types
+    type_to_path = {
+        "test": ramble.paths.test_path,
+        "tests": ramble.paths.test_path,
+        "command": ramble.paths.command_path,
+        "commands": ramble.paths.command_path,
+        "docs": os.path.join(ramble.paths.lib_path, "docs"),
+        "doc": os.path.join(ramble.paths.lib_path, "docs"),
+        "module": ramble.paths.module_path,
+        "modules": ramble.paths.module_path,
+    }
+
+    if args.type in type_to_path:
+        path = type_to_path[args.type]
         if name:
             # convert command names to python module name
             if path == ramble.paths.command_path:

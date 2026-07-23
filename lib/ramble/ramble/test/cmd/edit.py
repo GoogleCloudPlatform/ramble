@@ -34,35 +34,35 @@ def mock_editor(monkeypatch):
 
 
 def test_edit_command(mock_editor):
-    """Test `ramble edit --command <cmd>`"""
-    edit("--command", "edit")
+    """Test `ramble edit -t command <cmd>`"""
+    edit("-t", "command", "edit")
     assert len(mock_editor) == 1
     assert "ramble/cmd/edit.py" in mock_editor[0]
 
 
 def test_edit_test(mock_editor):
-    """Test `ramble edit --test <test>`"""
-    edit("--test", "cmd/edit")
+    """Test `ramble edit -t test <test>`"""
+    edit("-t", "test", "cmd/edit")
     assert len(mock_editor) == 1
     assert "ramble/test/cmd/edit.py" in mock_editor[0]
 
 
 def test_edit_module(mock_editor):
-    """Test `ramble edit --module <module>`"""
-    edit("--module", "config")
+    """Test `ramble edit -t module <module>`"""
+    edit("-t", "module", "config")
     assert len(mock_editor) == 1
     assert "ramble/config.py" in mock_editor[0]
 
 
 def test_edit_docs(mock_editor):
-    """Test `ramble edit --docs <doc>`"""
-    edit("--docs", "index.rst")
+    """Test `ramble edit -t docs <doc>`"""
+    edit("-t", "docs", "index.rst")
     assert len(mock_editor) == 1
     assert "docs/index.rst" in mock_editor[0]
 
 
 def test_edit_file_not_found():
-    output = edit("--command", "non-existent-cmd", fail_on_error=False)
+    output = edit("-t", "command", "non-existent-cmd", fail_on_error=False)
     assert "No file for 'non_existent_cmd' was found" in output
 
 
@@ -73,6 +73,6 @@ def test_edit_application(mock_applications, mock_editor):
 
 
 def test_edit_modifier(mock_modifiers, mock_editor):
-    edit("info", "--type", "modifiers")
+    edit("info", "-t", "modifiers")
     assert len(mock_editor) == 1
     assert "repos/builtin.mock/modifiers/info/modifier.py" in mock_editor[0]
