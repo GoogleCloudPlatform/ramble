@@ -16,7 +16,6 @@ import random
 import re
 import string
 import sys
-import warnings
 from contextlib import contextmanager
 from typing import Dict, FrozenSet, List, Optional, Union
 
@@ -45,6 +44,17 @@ _AST_STR = getattr(ast, "Str", _DUMMY_TYPE)
 def _get_source_segment(source, node):
     """Retrieve the source segment for an AST node, with compatibility for Python < 3.8"""
     if hasattr(ast, "get_source_segment"):
+        if (
+            "\n" not in source
+            and hasattr(node, "end_col_offset")
+            and node.end_col_offset is not None
+            and hasattr(node, "col_offset")
+            and node.col_offset is not None
+            # Only apply the fast path for ascii-only strings
+            and hasattr(source, "isascii")
+            and source.isascii()
+        ):
+            return source[node.col_offset : node.end_col_offset]
         return ast.get_source_segment(source, node)
 
     # Fallback for Python < 3.8 which lacks end_lineno/end_col_offset
@@ -983,34 +993,29 @@ class Expander:
 
         self._math_str_stack.append(in_str)
         try:
-            with warnings.catch_warnings(record=True) as wal:
-                try:
-                    body = math_ast.body
-                    out_str = self.eval_math(body, expansion_vars=expansion_vars)
+            try:
+                body = math_ast.body
+                out_str = self.eval_math(body, expansion_vars=expansion_vars)
 
-                    # If the AST is just a literal, check if it is formatted specially.
-                    # This preserves formatting like underscores in version numbers (e.g. 1_01)
-                    # and keeps hex formatting (e.g. 0x10) for numbers.
-                    if isinstance(body, (_AST_CONSTANT, _AST_NUM)) and isinstance(
-                        out_str, (int, float)
-                    ):
-                        source = _get_source_segment(in_str, body)
-                        if source and str(out_str) != source:
-                            return source
+                # If the AST is just a literal, check if it is formatted specially.
+                # This preserves formatting like underscores in version numbers (e.g. 1_01)
+                # and keeps hex formatting (e.g. 0x10) for numbers.
+                if isinstance(body, (_AST_CONSTANT, _AST_NUM)) and isinstance(
+                    out_str, (int, float)
+                ):
+                    source = _get_source_segment(in_str, body)
+                    if source and str(out_str) != source:
+                        return source
 
-                    return out_str
-                except MathEvaluationError as e:
-                    logger.debug(f'   Math input is: "{in_str}"')
-                    logger.debug(e)
-                except RambleSyntaxError as e:
-                    raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
-                except SyntaxError as e:
-                    logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
-                    logger.debug(e)
-
-                for warn in wal:
-                    if r"invalid escape sequence '\{'" not in str(warn.message):
-                        logger.warn(str(warn.message))
+                return out_str
+            except MathEvaluationError as e:
+                logger.debug(f'   Math input is: "{in_str}"')
+                logger.debug(e)
+            except RambleSyntaxError as e:
+                raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
+            except SyntaxError as e:
+                logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
+                logger.debug(e)
 
             return in_str
         finally:
