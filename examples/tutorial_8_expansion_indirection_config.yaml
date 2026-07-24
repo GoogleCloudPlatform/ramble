@@ -50,7 +50,7 @@ ramble:
         pkg_spec: intel-oneapi-mpi@2021.17.2
         compiler: gcc14
       openmpi:
-        pkg_spec: openmpi@5.0.8 +orterunprefix
+        pkg_spec: openmpi@5.0.8
         compiler: gcc14
       wrfv4-{application::wrf::version}:
         pkg_spec: wrf@{application::wrf::version} build_type=dm+sm compile_type=em_real
