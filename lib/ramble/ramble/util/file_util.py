@@ -19,7 +19,7 @@ def get_file_path(path: str, workspace) -> str:
         workspace (ramble.workspace.Workspace): A ramble workspace
 
     Returns:
-        (str): A file path
+        str: A file path
     """
     if not workspace.dry_run or is_dry_run_path(path):
         return path
@@ -49,8 +49,8 @@ def get_newest_experiment_file(base_directory):
         base_directory (str): Directory to search newest file for
 
     Returns:
-        (str): Path to newest file (or None if not found)
-        (int): Timestamp of file in seconds (or None if no file is found)
+        str | None: Path to newest file (or None if not found)
+        int | None: Timestamp of file in seconds (or None if no file is found)
     """
     newest_file = None
     max_mtime = -1.0

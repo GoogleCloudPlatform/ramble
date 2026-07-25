@@ -279,7 +279,7 @@ class ExpansionNode:
             relative_to (ExpansionNode): node to shift current node's indices relative to
 
         Returns:
-            (tuple) indices of shifted match set
+            tuple: indices of shifted match set
         """
         return (self.left - relative_to.left, self.right - relative_to.left)
 
@@ -832,7 +832,7 @@ class Expander:
             extra_vars: Variable definitions to use with highest precedence
 
         Returns:
-            bool: True or False, based on the evaluation of in_str
+            bool: ``True`` or ``False`` based on the evaluation of ``in_str``
         """
 
         evaluated = self.expand_var(
@@ -871,8 +871,8 @@ class Expander:
                                set of used variables or not.
 
         Returns:
-            (bool): True or False, based if the experiment's variants satisfy
-                     the input requirement.
+            bool: ``True`` or ``False`` based if the experiment's variants satisfy
+            the input requirement.
         """
         if reqs is None:
             return True
@@ -928,7 +928,7 @@ class Expander:
                                          as part of expansion or not.
 
         returns:
-          in_str (str): Expanded version of input string
+          str: Expanded version of ``in_str``
         """
 
         if replace_escaped_braces is None:
@@ -967,7 +967,7 @@ class Expander:
             in_str (str): string representing math to attempt to evaluate
 
         Returns:
-            (str) either the evaluation of in_str (if successful) or in_str
+            str: either the evaluation of ``in_str`` (if successful) or ``in_str``
             unmodified (if unsuccessful)
 
         """

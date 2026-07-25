@@ -635,7 +635,7 @@ class Configuration:
             ValueError: if ``scope`` is not valid
 
         Returns:
-            ConfigScope: a valid ConfigScope if ``scope`` is ``None`` or valid
+            ramble.config.ConfigScope: A valid ConfigScope if ``scope`` is ``None`` or valid
         """
         if scope is None:
             # default to the scope with highest precedence.
@@ -1378,7 +1378,7 @@ def _update_in_memory(data, section):
         section (str): section of the configuration to update
 
     Returns:
-        True if the data was changed, False otherwise
+        bool: ``True`` if the data was changed, ``False`` otherwise
     """
     update_fn = ensure_latest_format_fn(section)
     changed = update_fn(data[section])
@@ -1411,7 +1411,8 @@ def use_configuration(*scopes_or_paths):
         *scopes_or_paths: scope objects or paths to be used
 
     Returns:
-        Configuration object associated with the scopes passed as arguments
+        ramble.config.Configuration: Configuration object associated with the scopes
+        passed as arguments
     """
     global config
 

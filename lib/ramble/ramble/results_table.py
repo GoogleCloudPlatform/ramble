@@ -68,7 +68,7 @@ class ResultsColumn:
             app_inst: Instance of an application class to expand name with
 
         Returns:
-            (str): Expanded column name
+            str: Expanded column name
         """
         return app_inst.expander.expand_var(self.name)
 
@@ -250,7 +250,7 @@ class ResultsTable:
             app_inst: Instance of an application class
 
         Returns:
-            (str): Name of table
+            str: Name of table
         """
 
         return app_inst.expander.expand_var(self.name)
@@ -277,7 +277,7 @@ class ResultsTable:
             app_inst: Instance of an application class
 
         Returns:
-            (bool): True if the app_inst is included in table, False otherwise
+            bool: ``True`` if the app_inst is included in table, ``False`` otherwise
         """
 
         include_experiment = True
@@ -507,7 +507,7 @@ class ResultsTables:
                                assuming table schema from tables.py
 
         Returns:
-            (ResultsTable): New table instance
+            ramble.results_table.ResultsTable: New table instance
         """
         new_table = ResultsTable(table_conf)
         self.table_templates.append(new_table)

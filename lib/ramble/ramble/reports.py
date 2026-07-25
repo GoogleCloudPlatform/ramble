@@ -476,14 +476,15 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
     """Extracts data from the experiments dicts and returns it as a Pandas DataFrame.
 
     Args:
-        experiments: List of experiment dictionaries containing results to extract
-        foms: List of FOMs to extract from experiments
-        variables: List of variables to extract from experiments
-        where_query: Pandas query to constrain results
+        experiments (list[dict]): List of experiment dictionaries containing results to extract
+        foms (list[str]): List of FOMs to extract from experiments
+        variables (list[str]): List of variables to extract from experiments
+        where_query (str | None): Pandas query to constrain results
 
     Returns:
-        Pandas DataFrame containing extracted data
+        pandas.core.frame.DataFrame: Pandas DataFrame containing extracted data
     """
+    pd = import_pandas()
     extracted_data = []
     for exp in experiments:
         for context in exp["CONTEXTS"]:

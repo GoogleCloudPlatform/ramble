@@ -105,11 +105,9 @@ def edit_file(
 
     Defines a new executable that uses Ramble's helper script to edit a file.
 
-    Required Args:
+    Args:
         name (str): Name of the executable
         file_path (str): Path to the file to edit
-
-    Optional Args:
         match (str): Regex pattern to match
         replace (str): Replacement string
         append (str): String to append to the end of the file
@@ -244,12 +242,10 @@ def patch_file(
 
     Defines a new executable that uses Ramble's helper script to apply a patch.
 
-    Required Args:
+    Args:
         name (str): Name of the executable
         file_path (str): Path to the file to patch
         patch_file (str): Path to the patch file
-
-    Optional Args:
         fail_on_error (bool): If true, the experiment fails if the patch fails.
                               Defaults to True.
         when (list | None): List of when conditions to apply to directive

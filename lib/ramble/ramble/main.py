@@ -704,7 +704,7 @@ class RambleCommand:
                 simulates ``ramble [global_args] [command] [*argv]``
 
         Returns:
-            (str): combined output and error as a string
+            str: combined output and error as a string
 
         On return, if ``fail_on_error`` is False, return value of command
         is set in ``returncode`` property, and the error is set in the
@@ -861,7 +861,7 @@ def resolve_alias(cmd_name, cmd):
         cmd: command line arguments.
 
     Returns:
-        new command name and arguments.
+        tuple[str, list[str]]: new command name and arguments.
     """
     all_commands = ramble.cmd.all_commands()
     aliases = ramble.config.get("config:aliases")

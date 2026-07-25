@@ -145,8 +145,8 @@ class AttributeGraph:
             key (str): Name of key to find in the graph
 
         Returns:
-            (ramble.util.graph.GraphNode): Node representing the key
-                requested. Returns None if the key isn't found.
+            ramble.util.graph.GraphNode | None: Node representing the key requested or
+            ``None`` if the key isn't found.
         """
         node = self.node_definitions.get(key)
         if node is not None and node in self.adj_list:

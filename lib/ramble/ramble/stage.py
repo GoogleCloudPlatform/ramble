@@ -178,7 +178,7 @@ class InputStage:
         Entering a stage context will create the stage directory
 
         Returns:
-            self
+            InputStage: self
         """
         if self._lock is not None:
             self._lock.acquire_write(timeout=60)
@@ -195,7 +195,7 @@ class InputStage:
             exc_tb: exception traceback
 
         Returns:
-            Boolean
+            bool: Always returns ``False`` to prevent exception suppression
         """
         if self._lock is not None:
             self._lock.release_write()

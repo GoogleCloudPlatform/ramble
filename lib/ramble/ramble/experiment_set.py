@@ -267,7 +267,7 @@ class ExperimentSet:
             repeats (Repeats): Repeats object for this experiment
 
         Returns:
-            (Application): Instance of an application class for this experiment
+            list: Instance of an application class for this experiment
         """
 
         experiment_suffix = ""
@@ -460,7 +460,7 @@ class ExperimentSet:
             chained (bool): Whether the experiments are chained experiments or not
 
         Returns:
-            (list): List of application instances from the rendered set of experiments
+            list: List of application instances from the rendered set of experiments
         """
         app_context = ramble.context.Context()
         app_context.context_name = app_name
@@ -495,7 +495,7 @@ class ExperimentSet:
                             experiments list.
 
         Returns:
-            (list): List of application instances that are rendered
+            list: List of application instances that are rendered
         """
 
         no_var_contexts = [
@@ -861,7 +861,7 @@ class ExperimentSet:
         """Aggregate all tags from experiments in this experiment set
 
         Returns:
-            (set): A set of all tags from the experiment set.
+            set[str]: A set of all tags from the experiment set.
         """
         all_tags = set()
         for _, inst, _ in self.all_experiments():

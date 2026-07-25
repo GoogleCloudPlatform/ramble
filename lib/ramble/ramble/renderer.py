@@ -84,11 +84,11 @@ class RenderGroup:
             }
 
         Args:
-            name_template: The name template for the objects this group represents
-            in_dict: A dictionary representing the group definitions
+            name_template (str): The name template for the objects this group represents
+            in_dict (dict): A dictionary representing the group definitions
 
         Returns:
-            bool: True if anything was extracted from the dictionary
+            bool: ``True`` if anything was extracted from the dictionary
         """
 
         extracted = False

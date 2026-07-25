@@ -83,7 +83,7 @@ class VariantSet:
             verbose: Print verbose
 
         Returns:
-            (str): Representation of this variant set
+            str: Representation of this variant set
         """
         to_print = list(self.default_variants.values())
 
@@ -336,7 +336,7 @@ class VariantSet:
             name: Name of variant to determine value for
 
         Returns:
-            Value of variant if found, otherwise None.
+            Any | None: Value of variant if found, otherwise None.
         """
 
         if name in self.experiment_variants:
@@ -354,7 +354,8 @@ class VariantSet:
             name: Name of the variant to determine version of
 
         Returns:
-            ramble.definitions.versions.ObjectVersion: Version of the variant
+            ramble.definitions.versions.ObjectVersion | None: ObjectVersion of the variant
+            if found, otherwise None.
         """
         if name in self.version_variants:
             return self.version_variants[name].default
@@ -369,7 +370,11 @@ class VariantSet:
             for_output (bool): If True, returns expanded set for output formatting.
 
         Returns:
+<<<<<<< HEAD
             (set): Set of expanded variant definitions
+=======
+            set[str]: Set of exanded variant definitions
+>>>>>>> fd3f15757 (Documentation cleanups and clarifications)
         """
         cache = self._output_set_cache if for_output else self._set_cache
         has_templates = (
@@ -399,8 +404,17 @@ class VariantSet:
             for_output (bool): If True, only include primary variant definitions
                                (e.g., +name or ~name for boolean variants) for display/output.
 
+<<<<<<< HEAD
         Returns:
             set: A set consisting of strings with the variant definitions
+=======
+        Args:
+            expander (ramble.expander.Expander): Expander to use when expanding
+                                                 variant definitions
+
+        Returns:
+            set[str]: A set consisting of strings with the variant definitions
+>>>>>>> fd3f15757 (Documentation cleanups and clarifications)
         """
         cache = self._output_set_cache if for_output else self._set_cache
         if cache is not None:
@@ -532,7 +546,7 @@ class Variant:
         against when clauses.
 
         Returns:
-            tuple: String definitions for this variant
+            tuple[str]: String definitions for this variant
         """
         return self._definitions
 

@@ -174,10 +174,11 @@ def executable_modifier(name, usage_filter=None, when=None, **kwargs):
         when (list | None): List of when conditions this executable modifier should apply in
 
     Each executable modifier needs to return:
-      prepend_execs (list(CommandExecutable)): List of executables to inject
-                                               before the base executable
-      append_execs (list(CommandExecutable)): List of executables to inject
-                                              after the base executable
+
+     * **prepend_execs (list(CommandExecutable)):** List of executables to inject
+       before the base executable
+     * **append_execs (list(CommandExecutable)):** List of executables to inject
+       after the base executable
     """
 
     def _executable_modifier(mod):
