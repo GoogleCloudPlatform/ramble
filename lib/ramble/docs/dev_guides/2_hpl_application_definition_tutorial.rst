@@ -128,14 +128,15 @@ HPL requires an ``HPL.dat`` input file to run. Ramble has directives for
 downloading input files from websites. However, given this is a basic text
 file, Ramble can generate this file from a template. We use the
 ``register_template`` directive to tell Ramble how to generate this file for
-us.
+us. The documentation for the ``register_template`` directive can be found at
+:py:meth:`ramble.language.shared_language.register_template`.
 
 .. code-block:: python
 
         register_template(
             "hpl.dat.in",
-            template_file="templates/HPL.dat.tpl",
-            destination="HPL.dat"
+            src_path="templates/HPL.dat.tpl",
+            dest_path="HPL.dat"
         )
 
 Now, let's populate the template file
@@ -305,8 +306,8 @@ Our complete application definition at this point is as follows:
 
         register_template(
             "hpl.dat.in",
-            template_file="templates/HPL.dat.tpl",
-            destination="HPL.dat"
+            src_path="templates/HPL.dat.tpl",
+            dest_path="HPL.dat"
         )
 
         executable(
@@ -367,6 +368,7 @@ and ranks. For HPL, the number of ranks should equal PxQ.
 .. code-block:: console
 
   $ ramble workspace manage experiments hpl --overwrite \
+      -V package_manager=spack \
       -v n_nodes=1 \
       -v n_ranks=4 \
       -v Ps=2 \
@@ -378,11 +380,14 @@ Now, to complete the test we can execute:
 
 .. code-block:: console
 
+  $ ramble workspace concretize
   $ ramble workspace setup
   $ ramble on
   $ ramble workspace analyze
 
-The ``ramble workspace setup`` command will build HPL using Spack (if not
+The ``ramble workspace concretize`` will pull the default software environment
+and package specs from the HPL application and add it to the config. The 
+``ramble workspace setup`` command will build HPL using Spack (if not
 already installed), which can take some time. Then, the ``ramble on`` command
 will run the experiment. After analysis, the result of these commands should be
 the creation of a ``results.latest.txt`` file that contains the Gflops of your

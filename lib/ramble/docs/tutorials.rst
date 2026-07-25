@@ -33,5 +33,6 @@ various features.
     tutorials/mirrors
     tutorials/EESSI_package_manager
     tutorials/Workspace_config_command
+    tutorials/Workspace_manage_experiments_command
 
 
