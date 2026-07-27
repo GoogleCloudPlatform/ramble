@@ -76,7 +76,7 @@ if ($?_RAMBLE_PYTHON && "$RAMBLE_PYTHON" != "$_RAMBLE_PYTHON") then
     echo "         in RAMBLE_PYTHON and re-source this file"
 endif
 
-foreach cmd ("$RAMBLE_PYTHON" python3 python python2)
+foreach cmd ("$RAMBLE_PYTHON" python3 python)
     command -v "$cmd" >& /dev/null
     if ($status == 0) then
         setenv _RAMBLE_PYTHON `command -v "$cmd"`

@@ -348,7 +348,7 @@ if [ -n "${RAMBLE_PYTHON:-}" ]; then
   fi
 fi
 
-for cmd in "${RAMBLE_PYTHON:-}" python3 python python2; do
+for cmd in "${RAMBLE_PYTHON:-}" python3 python; do
     if command -v > /dev/null "$cmd"; then
         export _RAMBLE_PYTHON="$(command -v "$cmd")"
         break

@@ -12,6 +12,7 @@ import copy
 import os
 import re
 import sys
+from typing import Callable, Dict
 
 import llnl.util.filesystem as fs
 from llnl.util.argparsewriter import ArgparseCompletionWriter, ArgparseRstWriter, ArgparseWriter
@@ -30,7 +31,7 @@ level = "long"
 
 
 #: list of command formatters
-formatters = {}
+formatters: Dict[str, Callable] = {}
 
 
 #: standard arguments for updating completion scripts

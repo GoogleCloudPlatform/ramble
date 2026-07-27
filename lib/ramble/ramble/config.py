@@ -57,6 +57,7 @@ import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
 import ramble.schema.base_platform_repos
 import ramble.schema.base_system_repos
+import ramble.schema.base_utility_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
@@ -76,6 +77,7 @@ import ramble.schema.software
 import ramble.schema.success_criteria
 import ramble.schema.system_repos
 import ramble.schema.tables
+import ramble.schema.utility_repos
 import ramble.schema.variables
 import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
@@ -107,6 +109,7 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "variables": ramble.schema.variables.schema,
     "variants": ramble.schema.variants.schema,
     "zips": ramble.schema.zips.schema,
+    "utilities": ramble.schema.utilities.schema,
     "repos": ramble.schema.repos.schema,
     "modifier_repos": ramble.schema.modifier_repos.schema,
     "package_manager_repos": ramble.schema.package_manager_repos.schema,
@@ -120,6 +123,8 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "base_workflow_manager_repos": ramble.schema.base_workflow_manager_repos.schema,
     "base_system_repos": ramble.schema.base_system_repos.schema,
     "base_platform_repos": ramble.schema.base_platform_repos.schema,
+    "utility_repos": ramble.schema.utility_repos.schema,
+    "base_utility_repos": ramble.schema.base_utility_repos.schema,
 }
 
 # Same as above, but including keys for workspaces
@@ -1419,9 +1424,21 @@ def use_configuration(*scopes_or_paths):
 
     saved_config, config = config, configuration
 
+    import ramble.repository
+
+    saved_instances = {}
+    for obj_type, singleton in ramble.repository.paths.items():
+        saved_instances[obj_type] = singleton._instance
+        singleton._instance = None
+    saved_meta_path = list(sys.meta_path)
+
     try:
         yield configuration
     finally:
+        for obj_type, instance in saved_instances.items():
+            ramble.repository.paths[obj_type]._instance = instance
+        sys.meta_path = saved_meta_path
+
         # Restore previous config files
         spack.compilers._cache_config_file = saved_compiler_cache
         config = saved_config

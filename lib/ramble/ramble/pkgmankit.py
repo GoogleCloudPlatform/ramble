@@ -24,7 +24,6 @@ from ramble.software_info import SoftwareInfo
 from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )

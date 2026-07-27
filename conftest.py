@@ -580,7 +580,7 @@ def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
         yield mock_path
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def workspace_deactivate():
     """Deactivates any active workspace after a test."""
     ramble.workspace.deactivate()
@@ -705,7 +705,7 @@ def mock_file_auto_create(monkeypatch):
 
     def open_or_create_inmem(path, *args, **kwargs):
         if not os.path.exists(path) and is_dry_run_path(path):
-            if path.endswith(".yaml") or path.endswith(".yml"):
+            if path.endswith((".yaml", ".yml")):
                 content = "{}"
             else:
                 content = ""
@@ -739,6 +739,12 @@ def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_work
 
 
 def pytest_generate_tests(metafunc):
+    defaults_path = os.path.join(ramble.paths.etc_path, "ramble", "defaults")
+    with ramble.config.use_configuration(defaults_path):
+        _pytest_generate_tests_impl(metafunc)
+
+
+def _pytest_generate_tests_impl(metafunc):
     import re
 
     name_regex = re.compile(r"\s*(?P<name>[a-z0-9\-\_]+)\s*$")

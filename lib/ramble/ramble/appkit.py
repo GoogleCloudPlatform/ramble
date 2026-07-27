@@ -22,7 +22,6 @@ from ramble.repository import get_base_class
 from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )

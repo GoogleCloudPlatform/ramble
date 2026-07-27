@@ -34,7 +34,7 @@ import re
 import shutil
 import sys
 import urllib.parse
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from llnl.util import tty
 from llnl.util.filesystem import (
@@ -58,7 +58,7 @@ from spack.util.executable import CommandNotFoundError, which
 from spack.version import ver
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
-all_strategies = []
+all_strategies: List[Type["FetchStrategy"]] = []
 
 CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE = (
     "The contents of {subject} look like {content_type}.  Either the URL"

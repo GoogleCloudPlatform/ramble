@@ -83,7 +83,7 @@ def test_editor_visual(good_exe):
     ed.editor("/path/to/file", _exec_func=assert_exec)
 
 
-def test_editor_visual_bad(good_exe, bad_exe):
+def test_editor_visual_bad(good_exe, bad_exe, config):
     os.environ["VISUAL"] = bad_exe
     os.environ["EDITOR"] = good_exe
 

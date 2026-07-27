@@ -11,6 +11,7 @@ import argparse
 import math
 import os
 import sys
+from typing import Callable, Dict
 
 from llnl.util.tty.colify import colify
 
@@ -19,7 +20,7 @@ from ramble.cmd.common import arguments
 from ramble.util import object_utils
 from ramble.util.logger import logger
 
-formatters = {}
+formatters: Dict[str, Callable] = {}
 
 
 def formatter(func):
@@ -108,9 +109,7 @@ def html(obj_names, out, object_type):
         for name in row:
             out.write("<td>\n")
             if name is not None:
-                out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
-            else:
-                out.write("</td>\n")
+                out.write(f'<a class="reference internal" href="#{name}">{name}</a>')
             out.write("</td>\n")
         out.write("</tr>\n")
     out.write("</tbody>\n")

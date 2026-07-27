@@ -209,7 +209,7 @@ def test_env_view_link_types(tmpdir, request, link_type, mutable_config):
             pytest.skip("%s" % e)
 
 
-def test_default_concretize_flags(tmpdir, capsys, request):
+def test_default_concretize_flags(tmpdir, capsys, request, config):
     try:
         env_path = tmpdir.join(request.node.name)
         sr = SpackRunner(dry_run=True)

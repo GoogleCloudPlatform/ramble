@@ -144,6 +144,7 @@ directory = "htmlcov"
 # Use a common version (3.10 is the lowest supported version)
 # Otherwise mypy uses the running python's version
 python_version = "3.10"
+no_site_packages = true
 # TODO: Add in more files for type-checking
 # For now, only type-check the util directory
 files = [
@@ -157,6 +158,11 @@ allow_redefinition = true
 # Only enable ramble modules
 module = "ramble.*"
 ignore_errors = false
+
+[[tool.mypy.overrides]]
+# Ignore numpy type stubs since they use 3.12 syntax
+module = "numpy.*"
+follow_imports = "skip"
 
 [[tool.mypy.overrides]]
 # TODO: Add more modules here for exhaustive type-checking
@@ -208,6 +214,7 @@ select = [
 # These are used to enforce the gradual moving away from vendored Spack dependencies
 "spack.util.naming" = { msg = "Core Ramble code should not rely on spack.util.naming." }
 "spack.util.cpus" = { msg = "Core Ramble code should not rely on spack.util.cpus." }
+"spack.util.spack_json" = { msg = "Core Ramble code should not rely on spack.util.spack_json." }
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]

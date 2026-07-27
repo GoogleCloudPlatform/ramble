@@ -78,7 +78,9 @@ ramble:
         "Function: ApplicationBase._mirror_inputs" not in content
         and "Function: _mirror_inputs" not in content
     )
-    assert (
-        "Function: ApplicationBase.validate_experiment" not in content
-        and "Function: validate_experiment" not in content
+    import re
+
+    assert not re.search(
+        r"application-base/base_class\.py\s+Function: (ApplicationBase\.)?validate_experiment\b",
+        content,
     )

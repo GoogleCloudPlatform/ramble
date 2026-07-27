@@ -10,6 +10,8 @@ import pytest
 
 from ramble.main import RambleCommand
 
+pytestmark = pytest.mark.usefixtures("mutable_config")
+
 list = RambleCommand("list")
 
 

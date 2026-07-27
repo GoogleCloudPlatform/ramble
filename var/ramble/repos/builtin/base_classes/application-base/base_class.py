@@ -59,8 +59,9 @@ from ramble.language.shared_language import (
     archive_pattern,
     register_builtin,
     register_phase,
+    variant,
 )
-from ramble.util import cleaner, conversions
+from ramble.util import cleaner, conversions, json_util
 from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -69,8 +70,8 @@ from ramble.util.shell_utils import source_str
 from ramble.workspace import LICENSE_INC_NAME, TEMPLATE_EXTENSION, namespace
 
 import spack.util.compression
+import spack.util.environment
 import spack.util.executable
-import spack.util.spack_json
 
 ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
@@ -162,6 +163,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     pipelines = [
         "analyze",
         "archive",
+        "bootstrap",
         "mirror",
         "setup",
         "pushdeployment",
@@ -170,6 +172,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         "logs",
     ]
     _language_classes = [ApplicationMeta, SharedMeta]
+
+    variant(
+        "inject_modifiers_from_directives",
+        default=True,
+        description="Whether to include automatically injected modifiers",
+    )
 
     license_names: List[str] = []
 
@@ -191,6 +199,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.object_variants.default_variant(**var_args)
 
         self.keywords = ramble.keywords.keywords.copy()
+        self.object_variants.default_variant(
+            name=self.keywords.is_repeat_parent,
+            default=False,
+            description="Whether this is the parent of a set of repeats or not",
+        )
+        self.object_variants.default_variant(
+            name=self.keywords.is_repeat_child,
+            default=False,
+            description="Whether this is a child in a set of repeats or not",
+        )
+        self.object_variants.default_variant(
+            name=self.keywords.repeat_index,
+            default=0,
+            description="Index of this experiment, in repeat space",
+        )
 
         self._vars_are_expanded = False
         self.expander = None
@@ -499,16 +522,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
 
             added_defaults = False
-            for variant in ["platform", "package_manager", "workflow_manager"]:
-                if self.experiment_variants().value(variant) is None:
+            for var_name in [
+                "platform",
+                "package_manager",
+                "workflow_manager",
+            ]:
+                if (
+                    self.experiment_variants(allow_caching=False).value(
+                        var_name
+                    )
+                    is None
+                ):
                     default_value = getattr(
-                        self.system, f"system_default_{variant}", None
+                        self.system, f"system_default_{var_name}", None
                     )
                     if default_value:
-                        self.object_variants.default_variant(
-                            variant,
+                        self.experiment_variants(
+                            allow_caching=False
+                        ).default_variant(
+                            var_name,
                             default=default_value,
-                            description=f"{variant} selection variant",
+                            description=f"{var_name} selection variant",
                         )
                         added_defaults = True
             if added_defaults:
@@ -706,11 +740,28 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 description=self.expander.application_spec,
             )
 
+        # Define variants from repeats
+        added_variants = False
+        for keyword in [
+            self.keywords.is_repeat_parent,
+            self.keywords.is_repeat_child,
+            self.keywords.repeat_index,
+        ]:
+            if keyword in variables:
+                self.object_variants.experiment_variant(
+                    keyword,
+                    self.expander.expand_var(variables[keyword], typed=True),
+                )
+                added_variants = True
+
         # Define experiment variants
         if variants:
             for name, value in variants.items():
                 expanded_value = self.expander.expand_var(value, typed=True)
                 self.object_variants.experiment_variant(name, expanded_value)
+                added_variants = True
+
+        if added_variants:
             self.clear_variant_cache()
 
         # Set up remaining variants
@@ -884,19 +935,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # Define variant variables for Spack-like syntax expansion
             for (
                 name,
-                variant,
+                var_val,
             ) in obj.object_variants.experiment_variants.items():
                 self.define_variable(
                     f"{obj.origin_type}::variant::{name}",
-                    variant.as_definition(),
+                    var_val.as_definition(),
                 )
                 var_precedence[f"{obj.origin_type}::variant::{name}"] = prec
 
-            for name, variant in obj.object_variants.default_variants.items():
+            for name, _var_val in obj.object_variants.default_variants.items():
                 if name not in obj.object_variants.experiment_variants:
                     self.define_variable(
                         f"{obj.origin_type}::variant::{name}",
-                        variant.as_definition(),
+                        _var_val.as_definition(),
                     )
                     var_precedence[f"{obj.origin_type}::variant::{name}"] = (
                         prec
@@ -929,17 +980,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 for obj, when_keys in when_map.items():
                     to_remove = set()
                     obj_prec = obj_precedence[obj]
-                    for when_key in when_keys:
+                    for when_idx, when_key in enumerate(reversed(when_keys)):
                         if obj.satisfy_when(when_key):
                             to_remove.add(when_key)
                             variable_dict = getattr(obj, variable_set_attr, {})
                             if when_key in variable_dict:
                                 for var in reversed(variable_dict[when_key]):
                                     if var.name not in original_variables:
+                                        # Use a tuple for precedence: (obj_prec, when_idx)
+                                        # Lower tuple means higher precedence.
+                                        current_prec = (obj_prec, when_idx)
+                                        best_prec = var_precedence.get(
+                                            var.name, (999, 999)
+                                        )
+
+                                        # Convert existing scalar precedence to tuple if necessary
+                                        if not isinstance(best_prec, tuple):
+                                            best_prec = (best_prec, 999)
+
                                         if (
                                             var.name not in to_define
-                                            and obj_prec
-                                            < var_precedence.get(var.name, 999)
+                                            and current_prec < best_prec
                                         ):
                                             if isinstance(
                                                 var, CommandVariable
@@ -954,7 +1015,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     var.default
                                                 )
 
-                                            var_precedence[var.name] = obj_prec
+                                            var_precedence[var.name] = (
+                                                current_prec
+                                            )
                                             changed_definitions = True
 
                     # Remove any satisfied when_keys, as we won't need to check
@@ -987,7 +1050,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
-            self.build_modifier_instances()
+        self.build_modifier_instances()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -1459,15 +1522,76 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         application instance
         """
         if not self.modifiers:
-            return
+            self.modifiers = []
 
         self._modifier_instances = []
+        checked_objects = set()
 
         mod_type = ramble.repository.ObjectTypes.modifiers
+        mod_idx = 0
 
-        for mod in self.modifiers:
+        _existing_mod_base_names = {
+            m["name"].partition("@")[0] for m in self.modifiers
+        }
+
+        while True:
+            # Get the latest variants once per iteration to handle modifiers adding variants
+            exp_variants = self.experiment_variants(allow_caching=False)
+
+            # Check global toggle once per iteration
+            try:
+                var_val = exp_variants.value(
+                    "inject_modifiers_from_directives"
+                )
+                include_mods_global = (
+                    (var_val.lower() == "true")
+                    if isinstance(var_val, str)
+                    else bool(var_val)
+                )
+            except KeyError:
+                include_mods_global = True
+
+            # Gather object_modifiers from all available objects
+            for _, obj in self.objects():
+                if id(obj) in checked_objects:
+                    continue
+                checked_objects.add(id(obj))
+
+                if (
+                    include_mods_global
+                    and hasattr(obj, "object_modifiers")
+                    and obj.object_modifiers
+                ):
+                    for when_key, mod_def_list in obj.object_modifiers.items():
+                        if self.expander.satisfies(
+                            when_key, variant_set=exp_variants
+                        ):
+                            for mod_def in mod_def_list:
+                                mod_name = mod_def["name"]
+                                base_mod_name = mod_name.partition("@")[0]
+                                # Add if not already explicitly in self.modifiers
+                                if (
+                                    base_mod_name
+                                    not in _existing_mod_base_names
+                                ):
+                                    mod_dict = {"name": mod_name}
+                                    mod_dict.update(
+                                        {
+                                            k: v
+                                            for k, v in mod_def.items()
+                                            if k not in ["name", "when"]
+                                        }
+                                    )
+                                    self.modifiers.append(mod_dict)
+                                    _existing_mod_base_names.add(base_mod_name)
+
+            if mod_idx >= len(self.modifiers):
+                break
+
+            mod = self.modifiers[mod_idx]
+            mod_idx += 1
+
             mod_name, _, maybe_mod_ver = mod["name"].partition("@")
-
             mod_inst = ramble.repository.get(mod_name, mod_type).copy()
 
             if "on_executable" in mod:
@@ -2390,6 +2514,333 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     workspace.input_mirror_cache, workspace.input_mirror_stats
                 )
 
+    register_phase("bootstrap_utilities", pipeline="bootstrap")
+    register_phase(
+        "bootstrap_utilities",
+        pipeline="setup",
+        run_before=["get_inputs"],
+    )
+
+    def _bootstrap_utilities(self, workspace, app_inst=None):
+        """Bootstrap external dependencies for this experiment"""
+        if not ramble.config.get("config:bootstrap_utilities", True):
+            logger.debug(
+                "Bootstrapping external dependencies is disabled by config."
+            )
+            return
+
+        ext_dep_paths = {}
+        ext_dep_instances = {}
+        ext_dep_versions = {}
+        objects_to_check = [self]
+        if hasattr(self, "package_manager") and self.package_manager:
+            objects_to_check.append(self.package_manager)
+        if hasattr(self, "system") and self.system:
+            objects_to_check.append(self.system)
+        if hasattr(self, "platform") and self.platform:
+            objects_to_check.append(self.platform)
+        if hasattr(self, "workflow_manager") and self.workflow_manager:
+            objects_to_check.append(self.workflow_manager)
+        if hasattr(self, "_modifiers") and self._modifiers:
+            objects_to_check.extend(self._modifiers)
+
+        ws_ext_deps = (
+            workspace._get_workspace_dict()
+            .get("ramble", {})
+            .get("utilities", {})
+        )
+
+        for obj in objects_to_check:
+            if not hasattr(obj, "required_utilities"):
+                continue
+
+            for (
+                when_key,
+                ext_deps,
+            ) in obj.required_utilities.items():
+                if obj.satisfy_when(when_key):
+                    for ext_dep_name, ext_dep_conf in ext_deps.items():
+                        try:
+                            # Instantiate the external dependency
+                            ext_dep_inst = ramble.repository.paths[
+                                ramble.repository.ObjectTypes.utilities
+                            ].get(ext_dep_name)
+                            ext_dep_instances[ext_dep_name] = ext_dep_inst
+                        except Exception as e:
+                            logger.warn(
+                                f"Failed to find external dependency {ext_dep_name}: {e}"
+                            )
+                            continue
+
+                        # Variables merging logic: object -> workspace
+                        fetch_kwargs = {}
+
+                        for (
+                            when_cond,
+                            vars_list,
+                        ) in ext_dep_inst.object_variables.items():
+                            if obj.satisfy_when(when_cond):
+                                for var_info in vars_list:
+                                    var_name = var_info.name
+                                    if hasattr(self, "expander"):
+                                        expanded_val = (
+                                            self.expander.expand_var(
+                                                f"{{{var_name}}}"
+                                            )
+                                        )
+                                        if expanded_val != f"{{{var_name}}}":
+                                            fetch_kwargs[var_name] = (
+                                                expanded_val
+                                            )
+                                            continue
+
+                                    fetch_kwargs[var_name] = var_info.default
+
+                        if ext_dep_name in ws_ext_deps:
+                            fetch_kwargs.update(ws_ext_deps[ext_dep_name])
+                        else:
+                            fetch_kwargs.update(ext_dep_conf)
+
+                        if hasattr(ext_dep_inst, "map_fetch_kwargs"):
+                            fetch_kwargs = ext_dep_inst.map_fetch_kwargs(
+                                fetch_kwargs
+                            )
+
+                        if "when" in fetch_kwargs:
+                            del fetch_kwargs["when"]
+
+                        min_version = fetch_kwargs.pop("min_version", None)
+                        max_version = fetch_kwargs.pop("max_version", None)
+
+                        origin_name = obj.name
+                        origin_type = getattr(obj, "origin_type", "object")
+
+                        ext_dep_versions[ext_dep_name] = {
+                            "min_version": min_version,
+                            "max_version": max_version,
+                            "origin_name": origin_name,
+                            "origin_type": origin_type,
+                        }
+
+                        for k, v in fetch_kwargs.items():
+                            if isinstance(v, str):
+                                fetch_kwargs[k] = self.expander.expand_var(v)
+
+                        version_str = (
+                            fetch_kwargs.get("commit")
+                            or fetch_kwargs.get("version")
+                            or fetch_kwargs.get("tag")
+                            or fetch_kwargs.get("branch")
+                            or fetch_kwargs.get("revision")
+                            or "latest"
+                        )
+                        ext_dep_dir = os.path.join(
+                            workspace.shared_dir,
+                            "bootstrapped_utilities",
+                            ext_dep_name,
+                            version_str,
+                        )
+                        ext_dep_paths[ext_dep_name] = os.path.join(
+                            ext_dep_dir, "source"
+                        )
+
+                        sorted_kwargs_str = str(sorted(fetch_kwargs.items()))
+                        cache_tuple = (
+                            f"utility-bootstrap-{ext_dep_name}",
+                            sorted_kwargs_str,
+                        )
+
+                        if not hasattr(obj, "variables"):
+                            obj.variables = {}
+                        obj.variables[f"utility::{ext_dep_name}::path"] = (
+                            ext_dep_paths[ext_dep_name]
+                        )
+
+                        if not ramble.config.get(
+                            "config:bootstrap_utilities",
+                            True,
+                        ):
+                            logger.debug(
+                                f"External dependency bootstrapping is disabled globally. Using system {ext_dep_name}."
+                            )
+                            ext_dep_paths[ext_dep_name] = "system"
+                            continue
+
+                        if hasattr(
+                            ext_dep_inst, "is_available"
+                        ) and ext_dep_inst.is_available(
+                            workspace,
+                            min_version=min_version,
+                            max_version=max_version,
+                        ):
+                            logger.debug(
+                                f"External dependency {ext_dep_name} is already available in the environment, skipping fetch."
+                            )
+                            ext_dep_paths[ext_dep_name] = "system"
+                            continue
+
+                        is_bootstrappable = True
+                        if hasattr(ext_dep_inst, "bootstrappable"):
+                            for (
+                                when_cond,
+                                b_list,
+                            ) in ext_dep_inst.bootstrappable.items():
+                                if obj.satisfy_when(when_cond):
+                                    for b_info in b_list:
+                                        is_bootstrappable = b_info[
+                                            "is_bootstrappable"
+                                        ]
+
+                        if not is_bootstrappable:
+                            error_message = f"External dependency '{ext_dep_name}' is not available on the system and is marked as non-bootstrappable."
+                            custom_message = None
+                            if hasattr(ext_dep_inst, "missing_error_messages"):
+                                for (
+                                    when_cond,
+                                    m_list,
+                                ) in (
+                                    ext_dep_inst.missing_error_messages.items()
+                                ):
+                                    if obj.satisfy_when(when_cond):
+                                        for m_info in m_list:
+                                            custom_message = m_info["message"]
+
+                            if custom_message:
+                                error_message = custom_message
+                            elif (
+                                hasattr(ext_dep_inst, "availability_error")
+                                and ext_dep_inst.availability_error
+                            ):
+                                error_message += f"\nReason: {ext_dep_inst.availability_error}"
+                            logger.die(error_message)
+
+                        if not workspace.check_cache(cache_tuple):
+                            if not workspace.dry_run:
+                                try:
+                                    if hasattr(ext_dep_inst, "install"):
+                                        ext_dep_inst.install(workspace)
+
+                                    fetcher_kwargs = {
+                                        k: v
+                                        for k, v in fetch_kwargs.items()
+                                        if k
+                                        in [
+                                            "git",
+                                            "url",
+                                            "commit",
+                                            "tag",
+                                            "branch",
+                                            "revision",
+                                            "version",
+                                            "checksum",
+                                            "sha256",
+                                            "svn",
+                                            "hg",
+                                        ]
+                                    }
+                                    fetcher = (
+                                        ramble.fetch_strategy.from_kwargs(
+                                            **fetcher_kwargs
+                                        )
+                                    )
+                                    stage = ramble.stage.InputStage(
+                                        fetcher,
+                                        name=ext_dep_name,
+                                        path=ext_dep_dir,
+                                    )
+                                    with stage:
+                                        stage.set_subdir("source")
+                                        stage.fetch()
+                                        stage.expand_archive()
+
+                                    if hasattr(
+                                        ext_dep_inst, "modify_bootstrap"
+                                    ):
+                                        ext_dep_inst.modify_bootstrap(
+                                            workspace,
+                                            obj,
+                                        )
+                                except Exception as e:
+                                    logger.die(
+                                        f"Failed to bootstrap external dependency {ext_dep_name}: {e}"
+                                    )
+
+                            workspace.add_to_cache(cache_tuple)
+
+        self._bootstrapped_utility_paths = ext_dep_paths
+
+        for obj in objects_to_check:
+            exp_env_mod = spack.util.environment.EnvironmentModifications()
+            source_scripts_commands = []
+
+            if hasattr(obj, "scripts_to_source"):
+                for script_info in obj.scripts_to_source:
+                    when_cond = script_info.get("when", [])
+                    if obj.satisfy_when(when_cond):
+                        script_path = script_info["path"]
+                        source_scripts_commands.append(f"source {script_path}")
+                        exp_env_mod.extend(
+                            spack.util.environment.EnvironmentModifications.from_sourcing_file(
+                                script_path
+                            )
+                        )
+
+            if not hasattr(obj, "variables"):
+                obj.variables = {}
+            if source_scripts_commands:
+                obj.variables["source_scripts_command"] = "\n".join(
+                    source_scripts_commands
+                )
+            else:
+                obj.variables["source_scripts_command"] = ""
+
+            for ext_dep_name, ext_dep_path in ext_dep_paths.items():
+                ext_dep_inst = ext_dep_instances[ext_dep_name]
+
+                obj.variables[f"utility::{ext_dep_name}::path"] = ext_dep_path
+
+                if hasattr(ext_dep_inst, "get_experiment_activation_command"):
+                    act_cmd = ext_dep_inst.get_experiment_activation_command(
+                        workspace, obj
+                    )
+                    obj.variables[
+                        f"utility::{ext_dep_name}::activation_command"
+                    ] = act_cmd
+
+                if hasattr(ext_dep_inst, "setup_runner_environment"):
+                    env_mod = ext_dep_inst.setup_runner_environment(
+                        workspace, obj
+                    )
+                    if env_mod:
+                        exp_env_mod.extend(env_mod)
+
+            exp_env = os.environ.copy()
+            exp_env_mod.apply_modifications(exp_env)
+            obj.experiment_runner_env = exp_env
+
+            for ext_dep_name, ext_dep_inst in ext_dep_instances.items():
+                if hasattr(ext_dep_inst, "validate_versions"):
+                    versions = ext_dep_versions.get(ext_dep_name, {})
+                    min_v = versions.get("min_version")
+                    max_v = versions.get("max_version")
+                    origin_name = versions.get("origin_name")
+                    origin_type = versions.get("origin_type")
+
+                    if not workspace.dry_run:
+                        if not ext_dep_inst.validate_versions(
+                            min_version=min_v,
+                            max_version=max_v,
+                            env=exp_env,
+                            origin_name=origin_name,
+                            origin_type=origin_type,
+                        ):
+                            logger.die(
+                                f"Version validation failed for {ext_dep_name} after bootstrap:\n{ext_dep_inst.availability_error}"
+                            )
+
+            if hasattr(obj, "bootstrap_utility"):
+                obj.bootstrap_utility(workspace, ext_dep_paths)
+
     register_phase("get_inputs", pipeline="setup")
 
     def _get_inputs(self, workspace, app_inst=None):
@@ -2554,12 +3005,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 fs.mkdirp(os.path.dirname(expand_path))
 
+                rendered_content = self.expander.expand_var(
+                    template_conf["contents"], extra_vars=exec_vars
+                )
+
                 with open(expand_path, "w+", encoding="utf-8") as f:
-                    f.write(
-                        self.expander.expand_var(
-                            template_conf["contents"], extra_vars=exec_vars
-                        )
-                    )
+                    f.write(rendered_content)
                 os.chmod(expand_path, _DEFAULT_CONTENT_PERM)
 
             self._render_object_templates(exec_vars)
@@ -2678,7 +3129,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         existing_hash = None
         if os.path.exists(inventory_file) and not force:
             with open(inventory_file, encoding="utf-8") as f:
-                existing_inventory = spack.util.spack_json.load(f)
+                existing_inventory = json_util.load(f)
             existing_hash = ramble.util.hashing.hash_json(existing_inventory)
 
         # Clean up variables before hashing
@@ -2811,7 +3262,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if changed and writable:
             with lk.WriteTransaction(self.experiment_lock):
                 with open(inventory_file, "w+", encoding="utf-8") as f:
-                    spack.util.spack_json.dump(self.hash_inventory, f)
+                    json_util.dump(self.hash_inventory, f)
 
         return changed
 
@@ -2885,13 +3336,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     shutil.copy(file, archive_experiment_dir)
 
             # Copy all archive patterns
-            archive_patterns = set(self.archive_patterns.keys())
-            if self.package_manager:
-                for pattern in self.package_manager.archive_patterns:
-                    archive_patterns.add(pattern)
-
-            for mod in self._modifier_instances:
-                for pattern in mod.archive_patterns:
+            archive_patterns = set()
+            for _, obj_inst in self.objects():
+                for pattern in getattr(obj_inst, "archive_patterns", {}):
                     archive_patterns.add(pattern)
 
             for pattern in archive_patterns:
@@ -3798,7 +4245,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, encoding="utf-8") as f:
-                    status_data = spack.util.spack_json.load(f)
+                    status_data = json_util.load(f)
                     self.set_status(
                         ExperimentStatus(
                             status_data[self.keywords.experiment_status]
@@ -3857,7 +4304,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, "w+", encoding="utf-8") as f:
-                    spack.util.spack_json.dump(status_data, f)
+                    json_util.dump(status_data, f)
 
     register_phase(
         "write_results_cache",

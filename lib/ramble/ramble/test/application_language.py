@@ -12,6 +12,8 @@ from typing import FrozenSet
 import deprecation
 import pytest
 
+import ramble.expander
+import ramble.language.language_helpers
 from ramble.appkit import *  # noqa
 from ramble.error import DirectiveError
 
@@ -613,3 +615,45 @@ def test_non_reserved_variables(app_class):
     assert "user_var1" not in non_reserved
     assert "user_var2" in non_reserved
     assert len(non_reserved) == 2
+
+
+class MockObject:
+    def __init__(self, name):
+        self.name = name
+        self.validators = {}
+
+
+@pytest.mark.parametrize(
+    "var_value,expected_result",
+    [
+        ("1", True),
+        (1, True),
+        ("4", False),
+        (4, False),
+    ],
+)
+def test_add_variable_validator_numeric_conversion(var_value, expected_result):
+    obj = MockObject("test_obj")
+    var_name = "test_var"
+    var_values = [0, 1, 2, 3]  # Integers in allowed values
+    when_list = []
+
+    ramble.language.language_helpers.add_variable_validator(obj, var_name, var_values, when_list)
+
+    assert len(obj.validators) == 1
+    when_set = next(iter(obj.validators.keys()))
+    assert when_set == frozenset()
+
+    validators = obj.validators[when_set]
+    assert len(validators) == 1
+    val_name = next(iter(validators.keys()))
+    assert val_name == "validate_values_for_test_var_obj_test_obj"
+
+    val_def = validators[val_name]
+    predicate = val_def["predicate"]
+
+    # The predicate should compare string representations
+    assert predicate == "'{test_var}' in ['0', '1', '2', '3']"
+
+    expander = ramble.expander.Expander({"test_var": var_value}, None)
+    assert expander.evaluate_predicate(predicate) == expected_result

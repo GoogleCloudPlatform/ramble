@@ -11,10 +11,9 @@ from enum import Enum
 
 from ramble.namespace import namespace
 from ramble.software_info import SoftwareInfo
+from ramble.util import json_util
 from ramble.util.file_util import get_newest_experiment_file
 from ramble.util.logger import logger
-
-import spack.util.spack_json as sjson
 
 
 # Can use auto() once we're at >= python 3.11
@@ -90,7 +89,7 @@ class ExperimentResult:
             return False
 
         with open(cache_file, encoding="utf-8") as f:
-            cache_dict = sjson.load(f)
+            cache_dict = json_util.load(f)
 
         if (
             "experiment_hash" not in cache_dict
@@ -120,7 +119,7 @@ class ExperimentResult:
             out_dict[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
 
         with open(cache_file, "w+", encoding="utf-8") as f:
-            sjson.dump(out_dict, f)
+            json_util.dump(out_dict, f)
 
     def finalize(self, workspace):
         app_inst = self._app_inst
@@ -176,24 +175,11 @@ class ExperimentResult:
         import copy
 
         output = {}
-        obj_keys = {}
-
-        # Remove app_inst to prevent pickle issues
-        app_inst = self._app_inst
-        del self._app_inst
-
-        obj_dict = copy.deepcopy(self.__dict__)
-
-        if "keys" in obj_dict:
-            obj_keys = obj_dict["keys"]
 
         for lookup_key, output_val in _OUTPUT_MAPPING.items():
             if lookup_key == "keys":
-                output.update(obj_keys)
+                output.update(copy.deepcopy(self.keys or {}))
             else:
-                output[output_val] = obj_dict[lookup_key]
-
-        # Add app_inst back into object
-        self._app_inst = app_inst
+                output[output_val] = copy.deepcopy(getattr(self, lookup_key, None))
 
         return output

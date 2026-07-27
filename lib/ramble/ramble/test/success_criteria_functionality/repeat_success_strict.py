@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.util.foms import SummaryFoms
 
@@ -21,9 +20,7 @@ workspace = RambleCommand("workspace")
 ramble_on = RambleCommand("on")
 
 
-def test_repeat_success_strict(
-    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
-):
+def test_repeat_success_strict(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:
   config:
@@ -46,52 +43,45 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace("setup", global_args=["-w", ws_name])
+    ramble_on(global_args=["-w", ws_name])
+    workspace("analyze", global_args=["-w", ws_name])
 
-        with open(config_path, "w+", encoding="utf-8") as f:
-            f.write(test_config)
-        ws._re_read()
+    with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+        data = f.read()
+        assert "FAILED" not in data
+        assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+        assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
 
-        workspace("setup", global_args=["-w", workspace_name])
-        ramble_on(global_args=["-w", workspace_name])
-        workspace("analyze", global_args=["-w", workspace_name])
+    # Write mock output to fail one of the experiments
+    result_path = os.path.join(
+        ws.experiment_dir, "basic", "working_wl", "test_exp.1", "test_exp.1.out"
+    )
+    with open(result_path, "w+", encoding="utf-8") as f:
+        f.write("")
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-            data = f.read()
-            assert "FAILED" not in data
-            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
-            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
+    workspace("analyze", global_args=["-w", ws_name])
 
-        # Write mock output to fail one of the experiments
-        result_path = os.path.join(
-            ws.experiment_dir, "basic", "working_wl", "test_exp.1", "test_exp.1.out"
-        )
-        with open(result_path, "w+", encoding="utf-8") as f:
-            f.write("")
+    with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+        data = f.read()
+        assert "SUCCESS" in data
+        assert "FAILED" in data
+        assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+        assert f"summary::{SummaryFoms.N_SUCCESS.value} = 1 repeats" in data
 
-        workspace("analyze", global_args=["-w", workspace_name])
+    # Write mock output to fail the second experiment
+    result_path = os.path.join(
+        ws.experiment_dir, "basic", "working_wl", "test_exp.2", "test_exp.2.out"
+    )
+    with open(result_path, "w+", encoding="utf-8") as f:
+        f.write("")
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-            data = f.read()
-            assert "SUCCESS" in data
-            assert "FAILED" in data
-            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
-            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 1 repeats" in data
+    workspace("analyze", global_args=["-w", ws_name])
 
-        # Write mock output to fail the second experiment
-        result_path = os.path.join(
-            ws.experiment_dir, "basic", "working_wl", "test_exp.2", "test_exp.2.out"
-        )
-        with open(result_path, "w+", encoding="utf-8") as f:
-            f.write("")
-
-        workspace("analyze", global_args=["-w", workspace_name])
-
-        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-            data = f.read()
-            assert "SUCCESS" not in data
-            assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data
-            assert f"summary::{SummaryFoms.N_SUCCESS.value}" not in data
+    with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+        data = f.read()
+        assert "SUCCESS" not in data
+        assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data
+        assert f"summary::{SummaryFoms.N_SUCCESS.value}" not in data

@@ -637,7 +637,8 @@ class ExperimentSet:
             logger.debug(f"   Final name: {final_exp_namespace}")
 
             if final_exp_namespace in self.rendered_experiments:
-                left_vars = self.experiments[final_exp_namespace].variables
+                left_inst = self.get_experiment(final_exp_namespace)
+                left_vars = left_inst.variables
                 right_vars = app_inst.variables
                 lkeys = set(left_vars.keys())
                 rkeys = set(right_vars.keys())
@@ -647,7 +648,54 @@ class ExperimentSet:
                 right_unique_vars = rkeys - lkeys
                 common_vars = lkeys & rkeys
 
+                independent_vars = set()
+                for matrix in render_group.matrices:
+                    for var_or_zip in matrix:
+                        if var_or_zip in render_group.zips:
+                            independent_vars.update(render_group.zips[var_or_zip])
+                        else:
+                            independent_vars.add(var_or_zip)
+                for zip_vars in render_group.zips.values():
+                    independent_vars.update(zip_vars)
+
+                for var, val in final_context.variables.items():
+                    if isinstance(val, list):
+                        independent_vars.add(var)
+
+                differing_independent_vars = [
+                    var
+                    for var in independent_vars
+                    if var in left_vars and var in right_vars and left_vars[var] != right_vars[var]
+                ]
+
+                missing_vars = [
+                    var
+                    for var in differing_independent_vars
+                    if var not in app_inst.expander._used_variables
+                ]
+
                 logger.warn(f"Two experiments are defined with the name {final_exp_namespace}")
+
+                exp_template_var = self.keywords.experiment_template_name
+                prev_block = left_vars.get(exp_template_var, "unknown")
+                new_block = right_vars.get(exp_template_var, "unknown")
+
+                if prev_block != new_block:
+                    logger.warn(
+                        "  -> Collision Origin: Across different YAML "
+                        f"experiment blocks: '{prev_block}' vs '{new_block}'"
+                    )
+                elif independent_vars:
+                    logger.warn(
+                        "  -> Collision Origin: Within the same YAML "
+                        f"experiment block: '{prev_block}' "
+                        "(Matrix/Vector Expansion)"
+                    )
+                else:
+                    logger.warn(
+                        "  -> Collision Origin: Static definition "
+                        "(No Matrix/Vector expansion active)"
+                    )
 
                 # Print warnings about experiment differences
                 if left_unique_vars:
@@ -669,6 +717,33 @@ class ExperimentSet:
 
                         diff = {"previous": left_vars[var], "new": right_vars[var]}
                         logger.warn(f"  - {var}: {diff}")
+
+                if missing_vars:
+                    logger.warn("")
+                    logger.warn(
+                        "==> SUGGESTION: Your experiment name template "
+                        "does not distinguish between parallel expansions."
+                    )
+                    logger.warn(
+                        "    To make the namespaces unique, add one or more "
+                        "of these differing matrix variables into your "
+                        f"'{prev_block}' template:"
+                    )
+                    for var in missing_vars:
+                        logger.warn(f"    -> {{{var}}}")
+                    logger.warn("")
+                elif not independent_vars and prev_block == new_block:
+                    logger.warn("")
+                    logger.warn(
+                        "==> SUGGESTION: Multiple distinct experiment "
+                        "blocks in your YAML are using the same literal name."
+                    )
+                    logger.warn(
+                        "    Rename one of the "
+                        f"'{prev_block}' experiment blocks in your "
+                        "YAML file."
+                    )
+                    logger.warn("")
 
                 logger.die(f"Experiment {final_exp_namespace} is not unique.")
 

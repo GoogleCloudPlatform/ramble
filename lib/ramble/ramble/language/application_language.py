@@ -230,7 +230,7 @@ def input_file(
         if when_set not in app.inputs:
             app.inputs[when_set] = {}
 
-        app.inputs[when_set][name] = {
+        input_dict = {
             "url": url,
             "description": description,
             "target_dir": target_dir,
@@ -239,6 +239,8 @@ def input_file(
             "expand": expand,
             "when": when_list,
         }
+        input_dict.update(kwargs)
+        app.inputs[when_set][name] = input_dict
 
     return _execute_input_file
 

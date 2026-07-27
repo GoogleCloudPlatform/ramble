@@ -43,10 +43,12 @@ object_types = [
     ("applications", "application"),
     ("modifiers", "modifier"),
     ("package_managers", "package_manager"),
+    ("utilities", "utility"),
     ("workflow_managers", "workflow_manager"),
     ("base_applications", "base_application"),
     ("base_modifiers", "base_modifier"),
     ("base_package_managers", "base_package_manager"),
+    ("base_utilities", "base_utility"),
     ("base_workflow_managers", "base_workflow_manager"),
 ]
 
@@ -210,7 +212,6 @@ nitpick_ignore = [
     ("py:class", "func"),
     ("py:class", "module"),
     ("py:class", "_io.BufferedReader"),
-    ("py:class", "ramble.repository._PrependFileLoader"),
     ("py:class", "unittest.case.TestCase"),
     ("py:class", "_frozen_importlib_external.SourceFileLoader"),
     ("py:class", "clingo.Control"),

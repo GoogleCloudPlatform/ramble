@@ -239,6 +239,8 @@ This workflow details how to create a workspace, configure it for a single exper
 * Encourage users to provide their Ramble configuration files and any error messages for debugging.
 * When making Python code changes, consult `bin/ramble` to determine the officially supported Python versions.
 * Ensure all Python code is compatible with the full range of supported versions. Avoid using APIs that have been deprecated or removed in newer Python versions. When necessary, use feature detection (`hasattr`) or version checks (`sys.version_info`) to maintain broad compatibility.
+* **Implementing Directives & Mock Tests**: When adding new directives (which are processed by `DirectiveMeta` in `ramble.language`), keep in mind that directives are processed lazily based on the module namespace. If you create a mock class inside a unit test to test a directive, you **must** explicitly set its `__module__` attribute to a valid Ramble namespace (e.g. `__module__ = "ramble.app"` or `__module__ = "ramble.mod"`). Without this, `DirectiveMeta` will silently skip processing the directives for your test class.
+* **Mock Objects and Style Checks**: When creating mock applications or modifiers (e.g., in `var/ramble/repos/builtin.mock/`), ensure these files contain valid Python syntax and conform to Ramble's style guide (including copyright headers). The `ramble style` command runs on the entire repository, and poorly formatted or syntactically invalid mock files will cause the style checker to fail.
 
 
 ## Running Unit Tests
@@ -261,6 +263,32 @@ Ramble uses `pytest` for its unit tests. Tests **must** be run using the `ramble
     ```
 
 Using `-k` is particularly useful for running only newly added tests.
+
+*   **Writing Unit Tests & Using Test Fixtures**:
+    *   **Workspace Creation**: **ALWAYS** use the `make_workspace_from_config` fixture from `conftest.py` when creating and configuring workspaces in unit tests. Avoid manually creating workspace directories via `tmpdir` or writing YAML files manually.
+    *   **`make_workspace_from_config(config_str=None, name=None, activate=False)`**:
+        *   Accepts a raw YAML configuration string (`config_str`) defining the `ramble:` dictionary.
+        *   Automatically isolates workspace files under `mutable_mock_workspace_path` and mocks configuration scopes (`mutable_config`).
+        *   Returns `(ws, ws_name)` where `ws` is the `ramble.workspace.Workspace` object and `ws_name` is the string name of the workspace (auto-generated from test function name if `name` is omitted).
+        *   Pass `activate=True` if the test requires an activated workspace environment (`ramble.workspace.activate(ws)`).
+        *   *Example*:
+            ```python
+            def test_my_workspace_feature(make_workspace_from_config):
+                test_config = """
+            ramble:
+              variables:
+                mpi_command: 'mpirun -n {n_ranks}'
+              applications:
+                hostname:
+                  workloads:
+                    local:
+                      experiments:
+                        test_exp: {}
+            """
+                ws, ws_name = make_workspace_from_config(test_config, activate=True)
+                # Test logic using ws or ws_name
+            ```
+    *   **Other Fixtures**: Look up available fixtures in `conftest.py` for other testing needs (such as configuration overrides, mock executables, or mock repositories).
 
 *   **Getting Help:**
     *   For help with the `ramble unit-test` command itself: `ramble unit-test --help`

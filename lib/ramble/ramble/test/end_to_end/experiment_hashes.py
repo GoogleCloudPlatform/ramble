@@ -11,8 +11,7 @@ import os
 import ramble.repository
 import ramble.workspace
 from ramble.main import RambleCommand
-
-import spack.util.spack_json as sjson
+from ramble.util import json_util
 
 ApplicationBase = ramble.repository.get_obj_class(
     "application-base", object_type=ramble.repository.ObjectTypes.base_classes
@@ -59,7 +58,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     # Test experiment inventory
     assert os.path.isfile(experiment_inventory)
     with open(experiment_inventory, encoding="utf-8") as f:
-        data = sjson.load(f)
+        data = json_util.load(f)
 
     assert "object_configuration" in data
     assert data["object_configuration"] != []
@@ -123,7 +122,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     # Test workspace inventory
     assert os.path.isfile(workspace_inventory)
     with open(workspace_inventory, encoding="utf-8") as f:
-        data = sjson.load(f)
+        data = json_util.load(f)
 
     # Test experiments
     expected_experiments = {"gromacs.water_bare.unit_test"}

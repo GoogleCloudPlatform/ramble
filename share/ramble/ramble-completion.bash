@@ -266,16 +266,16 @@ complete -o bashdefault -o default -F _bash_completion_ramble ramble
 _ramble() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -A --aggregate-warnings -S --suppress-warnings -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo --resolve-variables-in-subprocesses -k --insecure -l --enable-locks -L --disable-locks -m --mock --overwrite-inventories --mock-applications --mock-modifiers --mock-package-managers --mock-workflow-managers --mock-systems --mock-platforms --mock-base-classes --mock-base-applications --mock-base-modifiers --mock-base-package-managers --mock-base-workflow-managers --mock-base-systems --mock-base-platforms -p --profile --sorted-profile --lines --profile-restrictions -v --verbose --stacktrace -V --version"
+        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -A --aggregate-warnings -S --suppress-warnings -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo --resolve-variables-in-subprocesses -k --insecure -l --enable-locks -L --disable-locks -m --mock --overwrite-inventories --mock-applications --mock-modifiers --mock-package-managers --mock-workflow-managers --mock-systems --mock-platforms --mock-base-classes --mock-base-applications --mock-base-modifiers --mock-base-package-managers --mock-base-workflow-managers --mock-base-systems --mock-base-platforms --mock-utilities --mock-base-utilities -p --profile --sorted-profile --lines --profile-restrictions -v --verbose --stacktrace -V --version"
     else
-        RAMBLE_COMPREPLY="attributes clean commands config data debug deployment docs edit filter-groups help info license list mirror on python repo results software-definitions style unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config create data debug deployment docs edit filter-groups help info license list mirror on python repo results software-definitions style unit-test workspace"
     fi
 }
 
 _ramble_attributes() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --package_managers --workflow_managers --systems --platforms --base_classes --base_applications --base_modifiers --base_package_managers --base_workflow_managers --base_systems --base_platforms --maintainers --tags"
+        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --package_managers --workflow_managers --systems --platforms --base_classes --base_applications --base_modifiers --base_package_managers --base_workflow_managers --base_systems --base_platforms --utilities --base_utilities --maintainers --tags"
     else
         RAMBLE_COMPREPLY=""
     fi
@@ -367,6 +367,15 @@ _ramble_config_revert() {
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
         _config_sections
+    fi
+}
+
+_ramble_create() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -r --repo -b --base -m --maintainers -t --tags -i --interactive"
+    else
+        RAMBLE_COMPREPLY=""
     fi
 }
 
@@ -649,7 +658,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize config setup analyze push-to-cache info edit mirror experiment-logs list remove generate-config manage"
+        RAMBLE_COMPREPLY="activate archive bootstrap deactivate create concretize config setup analyze push-to-cache info edit mirror experiment-logs list remove generate-config manage"
     fi
 }
 
@@ -664,6 +673,10 @@ _ramble_workspace_activate() {
 
 _ramble_workspace_archive() {
     RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase --profile-phase-output --dry-run"
+}
+
+_ramble_workspace_bootstrap() {
+    RAMBLE_COMPREPLY="-h --help --where --exclude-where --filter-tags --dry-run"
 }
 
 _ramble_workspace_deactivate() {
@@ -700,7 +713,7 @@ _ramble_workspace_push_to_cache() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --where --exclude-where --filter-tags --fg --filter-group --efg --exclude-filter-group -v --verbose --dry-run"
+    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --utilities --where --exclude-where --filter-tags --fg --filter-group --efg --exclude-filter-group -v --verbose --dry-run"
 }
 
 _ramble_workspace_edit() {

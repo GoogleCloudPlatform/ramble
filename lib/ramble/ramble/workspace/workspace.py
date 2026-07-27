@@ -40,11 +40,11 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
+from ramble.util import json_util
 from ramble.util.conversions import list_str_to_list, strip_quotes
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
 
-import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
 import spack.util.url as url_util
 import spack.util.web as web_util
@@ -564,11 +564,8 @@ class Workspace:
             ext_len = len(TEMPLATE_EXTENSION)
             if os.path.exists(self.config_dir):
                 for root, _, files in os.walk(self.config_dir):
-                    processed_root = root.replace(self.config_dir, "")
-                    if len(processed_root) > 1 and processed_root[0] == os.sep:
-                        processed_root = processed_root[1:]
-                    if len(processed_root) > 1:
-                        processed_root += os.sep
+                    rel_root = os.path.relpath(root, self.config_dir)
+                    processed_root = "" if rel_root == "." else rel_root + os.sep
                     for filename in files:
                         if filename.endswith(TEMPLATE_EXTENSION):
                             read_default_script = False
@@ -1822,7 +1819,7 @@ ramble:
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+", encoding="utf-8") as f:
-                sjson.dump(results, f)
+                json_util.dump(results, f)
             self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
         if "yaml" in output_formats:
@@ -2701,6 +2698,10 @@ ramble:
     def get_workspace_tables(self):
         """Return a dict of workspace tables"""
         return ramble.config.config.get_config(namespace.tables)
+
+    def get_workspace_utilities(self):
+        """Return a dict of workspace utilities"""
+        return ramble.config.config.get_config(namespace.utilities)
 
     def get_applications(self):
         """Get the dictionary of applications"""

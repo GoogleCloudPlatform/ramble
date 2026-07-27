@@ -235,41 +235,6 @@ class Hpl(ExecutableApplication):
     )
 
     workload_variable(
-        "pfact",
-        default="0",
-        description="PFACT for optimized calculator",
-        workload_group="calculator",
-    )
-
-    workload_variable(
-        "nbmin",
-        default="2",
-        description="NBMIN for optimized calculator",
-        workload_group="calculator",
-    )
-
-    workload_variable(
-        "rfact",
-        default="0",
-        description="RFACT for optimized calculator",
-        workload_group="calculator",
-    )
-
-    workload_variable(
-        "bcast",
-        default="0",
-        description="BCAST for optimized calculator",
-        workload_group="calculator",
-    )
-
-    workload_variable(
-        "depth",
-        default="0",
-        description="DEPTH for optimized calculator",
-        workload_group="calculator",
-    )
-
-    workload_variable(
         "NPFACTs",
         default="1",
         description="Number of PFACTs",

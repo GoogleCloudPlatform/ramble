@@ -23,6 +23,7 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 """
 
+from collections import deque
 from typing import Any, Dict, Union
 
 from ruamel import yaml
@@ -62,18 +63,16 @@ def all_config_options(config_data: Dict):
     """
 
     all_configs = set()
-    option_parts = []
-    for top_level, val in config_data.items():
-        option_parts.append((top_level, val))
+    option_parts = deque(config_data.items())
 
     while option_parts:
-        cur_part = option_parts.pop(0)
+        cur_part = option_parts.popleft()
 
         if isinstance(cur_part[1], dict):
             for level in cur_part[1]:
-                option_parts.insert(0, (f"{cur_part[0]}.{level}", cur_part[1][level]))
+                option_parts.appendleft((f"{cur_part[0]}.{level}", cur_part[1][level]))
         else:
-            if len(cur_part[0].split(".")) > 1:
+            if "." in cur_part[0]:
                 all_configs.add(cur_part[0])
 
     return all_configs

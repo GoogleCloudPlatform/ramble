@@ -517,7 +517,7 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
         if package_manager is not None:
             logger.warn(
                 "The `package_manager` argument of the package_manager_config "
-                f"directive in object {obj.name} is depreacated. Please "
+                f"directive in object {obj.name} is deprecated. Please "
                 "transition this to use the `when` argument instead."
             )
 
@@ -548,7 +548,7 @@ def required_package(name, package_manager=None, when=None, **kwargs):
         if package_manager is not None:
             logger.warn(
                 "The `package_manager` argument of the required_package "
-                f"directive in object {obj.name} is depreacated. Please "
+                f"directive in object {obj.name} is deprecated. Please "
                 "transition this to use the `when` argument instead."
             )
 
@@ -1025,6 +1025,36 @@ def register_validator(
     return _define_validator
 
 
+@shared_directive("required_utilities")
+def requires_utility(
+    name: str,
+    when=None,
+    **kwargs,
+):
+    """Directive to declare an external dependency.
+
+    Args:
+        name: Name of the external dependency required (e.g. spack)
+        when: List of when conditions to apply to directive
+        **kwargs: Optional configuration overrides for the dependency (e.g. version). Also
+            supports ``min_version`` and ``max_version`` to constrain the required version.
+    """
+
+    def _define_requires_utility(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "requires_utility"
+        )
+        when_key = frozenset(when_list)
+
+        if when_key not in obj.required_utilities:
+            obj.required_utilities[when_key] = {}
+
+        obj.required_utilities[when_key][name] = kwargs.copy()
+        obj.required_utilities[when_key][name]["when"] = when_list
+
+    return _define_requires_utility
+
+
 @shared_directive("conflicts")
 def conflict(
     conflict_spec: str,
@@ -1072,6 +1102,7 @@ def variable(
     when=None,
     error_context="variable",
     environment_variable_name: Optional[str] = None,
+    scoped: bool = False,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -1095,8 +1126,12 @@ def variable(
     def _define_variable(obj):
         import ramble.definitions.variables
 
+        var_name = name
+        if scoped:
+            var_name = f"{obj.origin_type}::{obj.name}::{name}"
+
         when_list = ramble.language.language_helpers.build_when_list(
-            when, obj, name, error_context
+            when, obj, var_name, error_context
         )
 
         when_set = frozenset(when_list)
@@ -1106,7 +1141,7 @@ def variable(
 
         obj.object_variables[when_set].append(
             ramble.definitions.variables.Variable(
-                name,
+                var_name,
                 default=default,
                 description=description,
                 values=values,
@@ -1117,7 +1152,9 @@ def variable(
         )
 
         if strict and values is not None:
-            ramble.language.language_helpers.add_variable_validator(obj, name, values, when_list)
+            ramble.language.language_helpers.add_variable_validator(
+                obj, var_name, values, when_list
+            )
 
         if environment_variable_name is not None:
             if when_set not in obj.object_environment_variables:
@@ -1126,7 +1163,7 @@ def variable(
             obj.object_environment_variables[when_set].append(
                 ramble.definitions.variables.EnvironmentVariable(
                     environment_variable_name,
-                    value=f"{{{name}}}",
+                    value=f"{{{var_name}}}",
                     description=description,
                     method="set",
                     when=when_list,
@@ -1284,6 +1321,28 @@ def variant(
         obj.class_variants[name] = args_dict
 
     return _define_variant
+
+
+@shared_directive("scripts_to_source")
+def source_script(
+    script_path: str,
+    when=None,
+    **kwargs,
+):
+    """Add a script that should be sourced before executing
+
+    Args:
+        script_path (str): Path to the script to source
+        when (list | None): List of when conditions to apply to directive
+    """
+
+    def _execute_source_script(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, script_path, "source_script"
+        )
+        obj.scripts_to_source.append({"path": script_path, "when": when_list})
+
+    return _execute_source_script
 
 
 @shared_directive("known_versions")
@@ -1493,3 +1552,39 @@ def default_args(**kwargs):
     ramble.language.language_base.DirectiveMeta.push_default_args(kwargs)
     yield
     ramble.language.language_base.DirectiveMeta.pop_default_args()
+
+
+@shared_directive("object_modifiers")
+def modifier(
+    name: str,
+    mode: Optional[str] = None,
+    on_executable: Optional[List[str]] = None,
+    when=None,
+    **kwargs,
+):
+    """Automatically include a modifier when this object is used
+
+    Adds a modifier to be included in experiments that use this object.
+
+    Args:
+        name: Name of the modifier to include
+        mode: Mode to apply for the modifier
+        on_executable: List of executables the modifier should be applied to
+        when: Condition or conditions when this modifier should be included
+        **kwargs: Additional configuration parameters for the modifier
+    """
+
+    def _execute_modifier(obj):
+        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "modifier")
+        mod_dict = {"name": name}
+        if mode is not None:
+            mod_dict["mode"] = mode
+        if on_executable is not None:
+            mod_dict["on_executable"] = on_executable
+        mod_dict.update(kwargs)
+        when_key = frozenset(when_list)
+        if when_key not in obj.object_modifiers:
+            obj.object_modifiers[when_key] = []
+        obj.object_modifiers[when_key].append(mod_dict)
+
+    return _execute_modifier

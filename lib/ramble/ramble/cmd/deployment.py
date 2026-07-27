@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+from typing import Callable, Dict
 
 import llnl.util.filesystem as fs
 
@@ -20,9 +21,9 @@ import ramble.stage
 import ramble.util.path
 from ramble.cmd.common import arguments
 from ramble.main import RambleCommand
+from ramble.util import json_util
 from ramble.util.logger import logger
 
-import spack.util.spack_json as sjson
 import spack.util.url as surl
 
 description = "manage workspace deployments"
@@ -146,7 +147,7 @@ def deployment_pull(args):
             )
 
         with open(local_index_path, encoding="utf-8") as f:
-            index_data = sjson.load(f)
+            index_data = json_util.load(f)
 
         for file in index_data[push_cls.index_namespace]:
             src = surl.join(deployment_path, file)
@@ -191,7 +192,7 @@ def deployment_run_pipeline(args, pipeline):
 
 
 #: Dictionary mapping subcommand names and aliases to functions
-subcommand_functions = {}
+subcommand_functions: Dict[str, Callable] = {}
 
 
 def sanitize_arg_name(base_name):

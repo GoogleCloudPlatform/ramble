@@ -47,7 +47,7 @@ steps:
         echo "Spack version is $(spack --version)"
         echo "Python version is $(python3 --version)"
 
-        ramble style -U
+        ramble style -a -U
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         style_err=$$?

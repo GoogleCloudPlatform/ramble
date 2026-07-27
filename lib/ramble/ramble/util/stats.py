@@ -12,7 +12,7 @@ import math
 import statistics
 from typing import List, Tuple, Union
 
-from scipy.stats import t
+from scipy.stats import norm, t
 
 NA = "NA"
 
@@ -123,9 +123,7 @@ class StatsCoefficientOfVariation(StatsBase):
         # calculate anyway and leave the interpretation to individual experiments.
         if not mean:
             return NA
-        return round(
-            statistics.stdev(values) / statistics.mean(values), _max_decimal_places(values)
-        )
+        return round(statistics.stdev(values) / mean, _max_decimal_places(values))
 
     def get_unit(self, unit: str) -> str:
         # `unit` unused
@@ -146,16 +144,7 @@ def _calculate_margin_of_error(values: List[float], cl: ConfidenceLevel) -> floa
         return t_score * (stdev / math.sqrt(n))
     else:
         # Using z-score for confidence.
-        if cl == ConfidenceLevel.CL_99:
-            z_score = 2.576
-        elif cl == ConfidenceLevel.CL_95:
-            z_score = 1.96
-        elif cl == ConfidenceLevel.CL_90:
-            z_score = 1.645
-        elif cl == ConfidenceLevel.CL_50:
-            z_score = 0.674
-        else:
-            raise ValueError("Unsupported confidence level")
+        z_score = float(norm.ppf(1 - (1 - cl.value) / 2))
         return z_score * (stdev / math.sqrt(n))
 
 

@@ -12,6 +12,7 @@ import platform
 import ramble.util.version
 
 import spack.platforms
+import spack.spec
 
 description = "debugging commands for troubleshooting Ramble"
 section = "developer"

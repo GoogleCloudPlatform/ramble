@@ -673,7 +673,7 @@ if test -n "$RAMBLE_PYTHON"
     echo "         in RAMBLE_PYTHON and re-source this file"
   end
 end
-for cmd in "$RAMBLE_PYTHON" python3 python python2
+for cmd in "$RAMBLE_PYTHON" python3 python
     set -l _rmb_python (command -v "$cmd")
     if test $status -eq 0
         set -x _RAMBLE_PYTHON $_rmb_python

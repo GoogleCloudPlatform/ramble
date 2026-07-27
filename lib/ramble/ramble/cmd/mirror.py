@@ -65,7 +65,7 @@ def setup_parser(subparser):
         "--scope",
         choices=scopes,
         metavar=scopes_metavar,
-        default=ramble.config.default_modify_scope(),
+        default=ramble.config.default_list_scope(),
         help="configuration scope to modify",
     )
 

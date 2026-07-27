@@ -15,6 +15,7 @@ from llnl.util.filesystem import mkdirp
 from llnl.util.symlink import symlink
 
 import ramble.config
+import ramble.fetch_strategy
 import ramble.paths
 import ramble.util.file_cache
 import ramble.util.path

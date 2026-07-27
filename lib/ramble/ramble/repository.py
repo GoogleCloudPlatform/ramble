@@ -35,9 +35,8 @@ import ramble.spec
 import ramble.util.imp
 import ramble.util.naming as nm
 import ramble.util.path
+from ramble.util import json_util
 from ramble.util.logger import logger
-
-import spack.util.spack_json as sjson
 
 global_namespace = "ramble"
 
@@ -65,6 +64,8 @@ ObjectTypes = Enum(
         "base_workflow_managers",
         "base_systems",
         "base_platforms",
+        "utilities",
+        "base_utilities",
     ],
 )
 
@@ -179,6 +180,26 @@ type_definitions = {
         "accepted_configs": ["base_platform_repo.yaml", unified_config],
         "singular": "base platform",
     },
+    ObjectTypes.utilities: {
+        "file_name": "utility.py",
+        "dir_name": "utilities",
+        "abbrev": "utility",
+        "config_section": "utility_repos",
+        "accepted_configs": ["utility_repo.yaml", unified_config],
+        "singular": "external dependency",
+    },
+    ObjectTypes.base_utilities: {
+        "file_name": "base_utility.py",
+        "dir_name": "base_utilities",
+        "abbrev": "base_utility",
+        "config_section": "base_utility_repos",
+        "accepted_configs": ["base_utility_repo.yaml", unified_config],
+        "singular": "base external dependency",
+    },
+}
+
+_ALL_ACCEPTED_CONFIGS = {
+    cfg for obj_info in type_definitions.values() for cfg in obj_info["accepted_configs"]
 }
 
 
@@ -247,6 +268,16 @@ def _base_platforms(repo_dirs=None):
     return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_platforms)
 
 
+def _utilities(repo_dirs=None):
+    """Get the external dependencies singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.utilities)
+
+
+def _base_utilities(repo_dirs=None):
+    """Get the base external dependencies singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_utilities)
+
+
 paths = {
     ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
     ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
@@ -261,6 +292,8 @@ paths = {
     ObjectTypes.base_workflow_managers: llnl.util.lang.Singleton(_base_workflow_managers),
     ObjectTypes.base_systems: llnl.util.lang.Singleton(_base_systems),
     ObjectTypes.base_platforms: llnl.util.lang.Singleton(_base_platforms),
+    ObjectTypes.utilities: llnl.util.lang.Singleton(_utilities),
+    ObjectTypes.base_utilities: llnl.util.lang.Singleton(_base_utilities),
 }
 
 
@@ -369,18 +402,6 @@ def set_path(repo, object_type=default_type):
 
 
 @contextlib.contextmanager
-def additional_repository(repository, object_type=default_type):
-    """Adds temporarily a repository to the default one.
-
-    Args:
-        repository: repository to be added
-    """
-    paths[object_type].put_first(repository)
-    yield
-    paths[object_type].remove(repository)
-
-
-@contextlib.contextmanager
 def use_repositories(*paths_and_repos, object_type=default_type):
     """Use the repositories passed as arguments within the context manager.
 
@@ -465,11 +486,6 @@ class FastObjectChecker(Mapping):
         #: Reference to the appropriate entry in the global cache
         self._objects_to_stats = self._paths_cache[objects_path]
 
-    def invalidate(self):
-        """Regenerate cache for this checker."""
-        self._paths_cache[self.objects_path] = self._create_new_cache()
-        self._objects_to_stats = self._paths_cache[self.objects_path]
-
     def _create_new_cache(self):
         """Create a new cache for objects in a repo.
 
@@ -489,10 +505,7 @@ class FastObjectChecker(Mapping):
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
-                if not obj_name.startswith(".") and not any(
-                    obj_name in obj_info["accepted_configs"]
-                    for obj_info in type_definitions.values()
-                ):
+                if not obj_name.startswith(".") and obj_name not in _ALL_ACCEPTED_CONFIGS:
                     logger.warn(
                         f"Skipping {self.object_type} "
                         f'at {obj_dir}. "{obj_name}" is not '
@@ -546,11 +559,11 @@ class TagIndex(Mapping):
         self._tag_dict = collections.defaultdict(list)
 
     def to_json(self, stream):
-        sjson.dump({"tags": self._tag_dict}, stream)
+        json_util.dump({"tags": self._tag_dict}, stream)
 
     @staticmethod
     def from_json(stream, object_type):
-        d = sjson.load(stream)
+        d = json_util.load(stream)
 
         r = TagIndex(object_type=object_type)
 
@@ -597,9 +610,6 @@ class Indexer(metaclass=abc.ABCMeta):
 
     def create(self):
         self.index = self._create()
-
-    def set_object_type(self, object_type):
-        self.object_type = object_type
 
     @abc.abstractmethod
     def _create(self):
@@ -855,10 +865,6 @@ class RepoPath:
     def all_objects(self):
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def find_module(self, fullname, path=None):
         """Implements precedence for overlaid namespaces.
@@ -1261,10 +1267,6 @@ class Repo:
         # Install the object's .py file itself.
         fs.install(self.filename_for_object_name(spec.name), path)
 
-    def purge(self):
-        """Clear entire object instance cache."""
-        self._instances.clear()
-
     @property
     def index(self):
         """Construct the index for this repo lazily."""
@@ -1342,14 +1344,6 @@ class Repo:
         """
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        """Iterator over all object *classes* in the repository.
-
-        Use this with care, because loading objects is slow.
-        """
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def exists(self, obj_name):
         """Whether a object with the supplied name exists."""
@@ -1522,14 +1516,6 @@ def create_repo(
     return full_path, namespace
 
 
-def create_or_construct(path, namespace=None):
-    """Create a repository, or just return a Repo if it already exists."""
-    if not os.path.exists(path):
-        fs.mkdirp(path)
-        create_repo(path, namespace)
-    return Repo(path)
-
-
 def create(configuration, object_type=default_type):
     """Create a RepoPath from a configuration object.
 
@@ -1567,37 +1553,15 @@ class RepositoryNamespace(types.ModuleType):
         return getattr(self, name)
 
 
-class _PrependFileLoader(importlib.machinery.SourceFileLoader):
-    def __init__(self, fullname, path, prepend=None):
-        super().__init__(fullname, path)
-        self.prepend = prepend
-
-    def path_stats(self, path):
-        stats = super().path_stats(path)
-        if self.prepend:
-            stats["size"] += len(self.prepend) + 1
-        return stats
-
-    def get_data(self, path):
-        data = super().get_data(path)
-        if path != self.path or self.prepend is None:
-            return data
-        else:
-            return self.prepend.encode() + b"\n" + data
-
-
-class RepoLoader(_PrependFileLoader):
+class RepoLoader(importlib.machinery.SourceFileLoader):
     """Loads a Python module associated with a object in specific repository"""
-
-    #: Code in ``_object_prepend`` is prepended to imported objects.
-    _object_prepend = "from __future__ import absolute_import;"
 
     def __init__(self, fullname, repo, object_name):
         self.repo = repo
         self.object_name = object_name
         self.object_py = repo.filename_for_object_name(object_name)
         self.fullname = fullname
-        super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
+        super().__init__(self.fullname, self.object_py)
 
     def is_package(self, fullname):
         # Since every Ramble object already has a containing directory,

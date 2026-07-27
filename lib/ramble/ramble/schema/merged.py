@@ -38,6 +38,7 @@ import ramble.schema.software
 import ramble.schema.success_criteria
 import ramble.schema.system_repos
 import ramble.schema.tables
+import ramble.schema.utilities
 import ramble.schema.variables
 import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
@@ -73,6 +74,7 @@ properties = union_dicts(
     ramble.schema.modifiers.properties,
     ramble.schema.workflow_manager_repos.properties,
     ramble.schema.zips.properties,
+    ramble.schema.utilities.properties,
 )
 
 #: Full schema with metadata
