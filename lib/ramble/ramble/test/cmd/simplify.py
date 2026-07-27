@@ -215,6 +215,58 @@ class Testapp3(ExecutableApplication):
         assert "orca_path" not in out
 
 
+def test_simplify_environment_variable_references(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("test_repo_env_vars"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testns_env_vars\n")
+
+    app_dir = os.path.join(repo_path, "applications", "testapp_env")
+    os.makedirs(app_dir)
+    app_file = os.path.join(app_dir, "application.py")
+
+    original_code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class TestappEnv(ExecutableApplication):
+    name = "testapp_env"
+    executable('foo', 'bar', use_mpi=False)
+    workload('test_wl', executable='foo')
+    workload_variable(
+        'var_in_env_val',
+        environment_variable_name='MY_ENV_VAR',
+        default='1.0',
+        workload='test_wl'
+    )
+    workload_variable(
+        'var_in_env_name',
+        environment_variable_name='MY_ENV_{var_in_env_name_ref}',
+        default='2.0',
+        workload='test_wl'
+    )
+    workload_variable(
+        'var_in_env_name_ref',
+        default='suffix',
+        workload='test_wl'
+    )
+"""
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(original_code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "applications", "testapp_env")
+        # Assert none of the variables are reported as unused
+        assert "Unused Variables" not in out
+        assert "Found 0 unused variables" in out
+
+
 def test_simplify_repo_filter(tmpdir, mutable_config):
     repo_path = str(tmpdir.join("test_repo4"))
     os.makedirs(os.path.join(repo_path, "applications"))

@@ -432,6 +432,69 @@ def analyze_object(name, obj_type):
                     ):
                         broken_template_refs.add(r)
 
+    # Extract from object environment variables
+    if hasattr(cls, "object_environment_variables") and cls.object_environment_variables:
+        for env_vars_list in cls.object_environment_variables.values():
+            for env_var in env_vars_list:
+                refs = set()
+                if env_var.name:
+                    refs.update(extract_referenced_names(env_var.name))
+                if env_var.value:
+                    refs.update(extract_referenced_names(str(env_var.value)))
+                all_referenced_names.update(refs)
+                for r in refs:
+                    if not is_valid_reference(
+                        r,
+                        defined_variables,
+                        defined_inputs,
+                        defined_software_specs,
+                        cleaned_code,
+                    ):
+                        broken_template_refs.add(r)
+
+    # Extract from workload group environment variables
+    if hasattr(cls, "workload_group_env_vars") and cls.workload_group_env_vars:
+        for env_vars_list in cls.workload_group_env_vars.values():
+            for env_var in env_vars_list:
+                refs = set()
+                if env_var.name:
+                    refs.update(extract_referenced_names(env_var.name))
+                if env_var.value:
+                    refs.update(extract_referenced_names(str(env_var.value)))
+                all_referenced_names.update(refs)
+                for r in refs:
+                    if not is_valid_reference(
+                        r,
+                        defined_variables,
+                        defined_inputs,
+                        defined_software_specs,
+                        cleaned_code,
+                    ):
+                        broken_template_refs.add(r)
+
+    # Extract from workload environment variables
+    if hasattr(cls, "workloads") and cls.workloads:
+        for app_workloads in cls.workloads.values():
+            for wl_obj in app_workloads.values():
+                if hasattr(wl_obj, "environment_variables") and wl_obj.environment_variables:
+                    for env_vars_list in wl_obj.environment_variables.values():
+                        for env_var in env_vars_list:
+                            refs = set()
+                            if env_var.name:
+                                refs.update(extract_referenced_names(env_var.name))
+                            if env_var.value:
+                                refs.update(extract_referenced_names(str(env_var.value)))
+                            all_referenced_names.update(refs)
+                            for r in refs:
+                                if not is_valid_reference(
+                                    r,
+                                    defined_variables,
+                                    defined_inputs,
+                                    defined_software_specs,
+                                    cleaned_code,
+                                ):
+                                    broken_template_refs.add(r)
+
     # Extract from inputs url/description
     if hasattr(cls, "inputs") and cls.inputs:
         for inputs_dict in cls.inputs.values():
