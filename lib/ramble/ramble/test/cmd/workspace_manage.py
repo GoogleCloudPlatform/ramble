@@ -83,3 +83,21 @@ def test_manage_experiments_no_overwrite_wm_vars(workspace_name):
         assert "processes_per_node:" in content
         assert "batch_submit" not in content
         assert "mpi_command" not in content
+
+
+def test_manage_experiments_default_variable_values(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+    workspace(
+        "manage",
+        "experiments",
+        "gromacs",
+        "--wf",
+        "water_bare",
+        global_args=global_args,
+    )
+    with open(ws.config_file_path, encoding="utf-8") as f:
+        content = f.read()
+        assert "n_ranks: 1" in content
+        assert "n_nodes: 1" in content
+        assert "processes_per_node: 1" in content

@@ -1400,7 +1400,11 @@ ramble:
             # Ensure required variables are defined
             for key in sorted(missing_vars):
                 if key not in workspace_vars and key not in exp_context.variables:
-                    vars_dict[key] = default_variable_value
+                    default_val = exp_inst.keywords.default(key)
+                    if default_val is not None:
+                        vars_dict[key] = default_val
+                    else:
+                        vars_dict[key] = default_variable_value
 
             # Only extract variable defaults if requested.
             # This is mutually exclusive with workload_name_variable

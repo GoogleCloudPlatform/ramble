@@ -59,12 +59,12 @@ default_keys = {
     "repeat_index": {"type": key_type.reserved, "level": output_level.variable},
     "spec_name": {"type": key_type.optional, "level": output_level.variable},
     "env_name": {"type": key_type.optional, "level": output_level.variable},
-    "n_ranks": {"type": key_type.optional, "level": output_level.key},
-    "n_nodes": {"type": key_type.optional, "level": output_level.key},
-    "processes_per_node": {"type": key_type.optional, "level": output_level.key},
-    "n_threads": {"type": key_type.optional, "level": output_level.key},
-    "n_accelerators": {"type": key_type.optional, "level": output_level.key},
-    "accelerators_per_node": {"type": key_type.optional, "level": output_level.key},
+    "n_ranks": {"type": key_type.optional, "level": output_level.key, "default": 1},
+    "n_nodes": {"type": key_type.optional, "level": output_level.key, "default": 1},
+    "processes_per_node": {"type": key_type.optional, "level": output_level.key, "default": 1},
+    "n_threads": {"type": key_type.optional, "level": output_level.key, "default": 1},
+    "n_accelerators": {"type": key_type.optional, "level": output_level.key, "default": 0},
+    "accelerators_per_node": {"type": key_type.optional, "level": output_level.key, "default": 0},
     "batch_submit": {"type": key_type.required, "level": output_level.variable},
     "mpi_command": {"type": key_type.required, "level": output_level.variable},
     "workload_template_name": {"type": key_type.reserved, "level": output_level.key},
@@ -158,7 +158,7 @@ class Keywords:
 
     def __init__(self, extra_keys=None):
         # Merge in additional Keys:
-        self.keys = default_keys.copy()
+        self.keys = {k: v.copy() for k, v in default_keys.items()}
         if extra_keys is None:
             extra_keys = {}
         self.update_keys(extra_keys)
@@ -171,15 +171,25 @@ class Keywords:
 
     def copy(self):
         new_inst = type(self)()
-        new_inst.keys = self.keys.copy()
+        new_inst.keys = {k: v.copy() for k, v in self.keys.items()}
         new_inst.update_keys({})
         return new_inst
 
     def update_keys(self, extra_keys):
-        self.keys.update(extra_keys)
+        for key, val in extra_keys.items():
+            if key in self.keys:
+                self.keys[key].update(val)
+            else:
+                self.keys[key] = val.copy() if isinstance(val, dict) else val
         # Define class attributes for all of the keys
         for key in self.keys:
             setattr(self, key, key)
+
+    def default(self, key):
+        """Get the default value of a key, if any"""
+        if self.is_valid(key):
+            return self.keys[key].get("default", None)
+        return None
 
     def is_valid(self, key):
         """Check if a key is valid as a known keyword"""
