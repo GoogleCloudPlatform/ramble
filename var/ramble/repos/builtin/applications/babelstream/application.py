@@ -96,13 +96,6 @@ class Babelstream(ExecutableApplication):
     )
 
     workload_variable(
-        "num_times",
-        description="Number of times to repeat stream test",
-        default="10",
-        workload_group="all_workloads",
-    )
-
-    workload_variable(
         "additional_args",
         description="Additional arguments to babelstream executable",
         default="",
