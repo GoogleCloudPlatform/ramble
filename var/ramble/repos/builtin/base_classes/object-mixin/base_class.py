@@ -165,7 +165,6 @@ class ObjectMixin:
 
     def set_required_variables(self, app_inst=None):
         """Stub that allows objects to update required variables"""
-        pass
 
     @staticmethod
     def version_to_pep440(version_str):

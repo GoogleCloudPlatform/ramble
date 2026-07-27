@@ -293,4 +293,3 @@ class UtilityBase(ObjectMixin, metaclass=UtilityMeta):
             workspace: The current workspace object
             app_inst: The application instance that triggered the bootstrap
         """
-        pass

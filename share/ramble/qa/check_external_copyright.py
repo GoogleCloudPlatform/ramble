@@ -58,7 +58,7 @@ def main():
             actual_relative_paths.add(rel_path)
 
     for entry in os.listdir(external_dir):
-        if entry.startswith("__") or entry.startswith("."):
+        if entry.startswith(("__", ".")):
             continue
         full_path = os.path.join(external_dir, entry)
         rel_path = os.path.relpath(full_path, ramble_root)
