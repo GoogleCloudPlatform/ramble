@@ -927,8 +927,8 @@ class Expander:
           replace_escaped_braces (bool): Whether escaped curly braces are replaced
                                          as part of expansion or not.
 
-        returns:
-          str: Expanded version of ``in_str``
+        Returns:
+            str: Expanded version of ``in_str``
         """
 
         if replace_escaped_braces is None:

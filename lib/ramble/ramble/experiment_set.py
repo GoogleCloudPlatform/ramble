@@ -267,7 +267,7 @@ class ExperimentSet:
             repeats (Repeats): Repeats object for this experiment
 
         Returns:
-            list: Instance of an application class for this experiment
+            app_inst: Instance of an application class for this experiment
         """
 
         experiment_suffix = ""
