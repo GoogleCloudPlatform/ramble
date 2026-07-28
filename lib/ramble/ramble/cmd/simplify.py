@@ -17,6 +17,7 @@ import sys
 import ramble.keywords
 import ramble.repository
 import ramble.util.colors as color
+from ramble.expander import format_spec_regex
 from ramble.util.logger import logger
 
 description = "find and simplify unused or unreachable sections in definitions"
@@ -39,6 +40,9 @@ def extract_referenced_names(template_str):
             brace_contents.append(template_str[start + 1 : i])
 
     for content in brace_contents:
+        match = format_spec_regex.search(content)
+        if match:
+            content = match.group("kw")
         words = re.findall(r"[a-zA-Z0-9_:-]+", content)
         for word in words:
             if "::" in word:
@@ -338,6 +342,7 @@ def analyze_object(name, obj_type):
 
     # 3. Collect all defined variables
     defined_variables = set()
+    variable_instances = {}
 
     # Workload variables (for applications)
     if hasattr(cls, "workloads") and cls.workloads:
@@ -346,12 +351,14 @@ def analyze_object(name, obj_type):
                 for var_list in wl_obj.variables.values():
                     for var in var_list:
                         defined_variables.add(var.name)
+                        variable_instances.setdefault(var.name, []).append(var)
 
     # Object variables (for modifiers, base classes, etc.)
     if hasattr(cls, "object_variables") and cls.object_variables:
         for var_list in cls.object_variables.values():
             for var in var_list:
                 defined_variables.add(var.name)
+                variable_instances.setdefault(var.name, []).append(var)
 
     # Collect all software spec names (including inherited ones), package names,
     # and required packages
@@ -627,6 +634,9 @@ def analyze_object(name, obj_type):
             )
         )
         if occurrences <= defs:
+            v_instances = variable_instances.get(var, [])
+            if v_instances and all(getattr(v, "when", None) for v in v_instances):
+                continue
             unused_variables.append(var)
 
     # For each defined input, check if it's used

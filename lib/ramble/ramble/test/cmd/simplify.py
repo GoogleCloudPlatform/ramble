@@ -193,6 +193,7 @@ class Testapp3(ExecutableApplication):
     )
     workload('test_wl', executable='foo')
     workload_variable('my_var', default='1.0', workload='test_wl')
+    workload_variable('my_formatted_var', default='{{{my_var}/2}:0.0f}', workload='test_wl')
 """
     with open(app_file, "w", encoding="utf-8") as f:
         f.write(original_code)
@@ -208,6 +209,9 @@ class Testapp3(ExecutableApplication):
         out = simplify_cmd("-t", "applications", "testapp3")
         # Assert broken template reference is detected
         assert "Broken Variable References in Templates: ['nonexistent_var_typo']" in out
+        # Assert format specifier parts are NOT extracted/reported as broken references
+        assert ":0" not in out
+        assert "0f" not in out
         # Assert valid variables, inputs, and spec paths are NOT reported as broken references
         assert "my_var" not in out or "Broken Variable References" not in out.split("my_var")[0]
         assert "my_input" not in out
