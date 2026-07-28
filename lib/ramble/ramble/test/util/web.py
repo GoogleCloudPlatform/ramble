@@ -186,3 +186,29 @@ def test_push_dir_to_url_gcs(monkeypatch, tmpdir):
     assert "file1.txt" in uploaded_args["filenames"]
     assert uploaded_args["source_directory"] == str(local_dir)
     assert uploaded_args["blob_name_prefix"] == "prefix/path/"
+
+
+def test_check_push_scheme():
+    url_file = web.check_push_scheme("file:///path/to/file")
+    assert url_file.scheme == "file"
+
+    url_s3 = web.check_push_scheme("s3://bucket/key")
+    assert url_s3.scheme == "s3"
+
+    url_gs = web.check_push_scheme("gs://bucket/key")
+    assert url_gs.scheme == "gs"
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: http"):
+        web.check_push_scheme("http://example.com/file")
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: ftp"):
+        web.check_push_scheme("ftp://example.com/file")
+
+
+def test_push_dir_to_url_unsupported_scheme(tmpdir):
+    local_dir = tmpdir.mkdir("src_dir")
+    f1 = local_dir.join("file1.txt")
+    f1.write("content")
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: http"):
+        web.push_dir_to_url(str(local_dir), "http://example.com/remote_dir")

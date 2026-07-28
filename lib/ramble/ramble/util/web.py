@@ -117,11 +117,33 @@ def read_from_url(url, accept_content_type=None):
     return response.geturl(), response.headers, response
 
 
+def check_push_scheme(url):
+    """Validate that a URL scheme is supported for push operations.
+
+    Args:
+        url (str or urllib.parse.ParseResult): URL to check
+
+    Returns:
+        urllib.parse.ParseResult: Parsed URL object
+
+    Raises:
+        NotImplementedError: If the URL scheme is not supported for push operations
+    """
+    remote_url = url_util.parse(url)
+    if url_util.local_file_path(remote_url) is not None:
+        return remote_url
+
+    if remote_url.scheme in ("s3", "gs"):
+        return remote_url
+
+    raise NotImplementedError(f"Unrecognized URL scheme: {remote_url.scheme}")
+
+
 def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=None):
     if sys.platform == "win32":
         if remote_path[1] == ":":
             remote_path = "file://" + remote_path
-    remote_url = url_util.parse(remote_path)
+    remote_url = check_push_scheme(remote_path)
     remote_file_path = url_util.local_file_path(remote_url)
     logger.debug(f"Trying to backup file to: {remote_file_path}")
     if remote_file_path is not None:
@@ -170,10 +192,10 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
 
 def push_dir_to_url(local_dir_path, remote_dir_path, max_workers=None):
     """Upload an entire directory tree recursively to a remote URL in parallel."""
+    remote_url = check_push_scheme(remote_dir_path)
+
     if max_workers is None:
         max_workers = ramble.config.get("config:upload_threads")
-
-    remote_url = url_util.parse(remote_dir_path)
 
     if remote_url.scheme == "gs":
         from google.cloud.storage import transfer_manager
