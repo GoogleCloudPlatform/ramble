@@ -81,13 +81,6 @@ class IntelMlc(ExecutableApplication):
     )
 
     workload_variable(
-        "cores_per_node",
-        default="{processes_per_node}",
-        description="Maximum number of cores to use per node when generating cpu_list",
-        workload_group="all_workloads",
-    )
-
-    workload_variable(
         "thread_distribution",
         default="spread",
         values=["spread", "compact"],
