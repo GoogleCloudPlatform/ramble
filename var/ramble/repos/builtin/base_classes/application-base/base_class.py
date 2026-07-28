@@ -825,6 +825,22 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             default=self.expander.workload_name,
             description="Name of experiment workload",
         )
+
+        if hasattr(self, "workload_groups") and self.workload_groups:
+            for group_name, group_inst in self.workload_groups.items():
+                for (
+                    wl_group_when_set,
+                    workload_group_list,
+                ) in group_inst.workloads.items():
+                    if (not wl_group_when_set) or self.expander.satisfies(
+                        wl_group_when_set, self.experiment_variants()
+                    ):
+                        if self.expander.workload_name in workload_group_list:
+                            self.object_variants.multi_value_variant(
+                                self.keywords.workload_group,
+                                value=group_name,
+                            )
+
         self.clear_variant_cache()
 
         self.no_expand_vars = set()

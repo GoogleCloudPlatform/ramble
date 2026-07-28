@@ -589,3 +589,32 @@ def test_variant_set_conditional_invalidation():
 
     v_set.merge_default_variants(v_set3)
     assert v_set._set_cache is None
+
+
+def test_workload_group_variant(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name):
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        info_out = workspace("info", "--variants", global_args=global_args)
+
+        assert "workload_group=test_wl_group" in info_out
+        assert "workload_group=all_workloads" in info_out

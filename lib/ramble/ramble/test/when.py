@@ -1924,3 +1924,55 @@ def test_object_conflicts_warn_only(workspace_name):
             mock_warn.assert_any_call(
                 "Conflict detected in 'object-conflicts': '+nomsg' is active when +nomsg"
             )
+
+
+def test_workload_group_variant_in_when_directive(workspace_name):
+    ws_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "--default-variable-value",
+            "1",
+            global_args=ws_args,
+        )
+
+        workspace("setup", "--dry-run", global_args=ws_args)
+
+        script = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(script, encoding="utf-8") as f:
+            content = f.read()
+            assert "export GROUP_VARIANT_ENV_VAR=TEST_WL_GROUP_SET" in content
+
+        # Change active work_group
+        config("add", "variants:workload_group_options:group2", global_args=ws_args)
+        workspace("setup", "--dry-run", global_args=ws_args)
+
+        script = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(script, encoding="utf-8") as f:
+            content = f.read()
+            assert "GROUP_VARIANT_ENV_VAR" not in content
