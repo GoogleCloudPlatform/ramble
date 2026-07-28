@@ -488,15 +488,15 @@ _ramble_license() {
 }
 
 _ramble_license_list_files() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -r --root -m --modified"
 }
 
 _ramble_license_verify() {
-    RAMBLE_COMPREPLY="-h --help --root --modified -m"
+    RAMBLE_COMPREPLY="-h --help -r --root -m --modified"
 }
 
 _ramble_license_update_copyright_year() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -r --root -m --modified"
 }
 
 _ramble_list() {

@@ -32,8 +32,8 @@ apache2_mit_spdx = "(Apache-2.0 OR MIT)"
 
 
 # List out regex for object files
-def _object_file_regex_list():
-    prefix = "var/ramble/repos/.*"
+def _object_file_regex_list(is_ramble_root=True):
+    prefix = "var/ramble/repos/.*" if is_ramble_root else r".*"
     regex_list = []
     for obj_def in ramble.repository.type_definitions.values():
         regex = rf'{prefix}/{obj_def["file_name"]}$'
@@ -65,7 +65,7 @@ licensed_files = [
     r"share/ramble/cloud-build/.*\.yaml$",
     # examples
     r"examples/.*\.yaml$",
-] + _object_file_regex_list()
+]
 
 
 #: licensed files that can have LGPL language in them
@@ -99,15 +99,27 @@ def _all_ramble_files(root=ramble.paths.prefix, modified_only=False):
 
 
 def _licensed_files(root=ramble.paths.prefix, modified_only=False):
+    is_ramble_root = os.path.realpath(root) == os.path.realpath(ramble.paths.prefix)
+    obj_regexes = [re.compile(r) for r in _object_file_regex_list(is_ramble_root)]
     for relpath in _all_ramble_files(root, modified_only=modified_only):
-        if any(regex.match(relpath) for regex in licensed_files):
-            yield relpath
+        if is_ramble_root:
+            if any(regex.match(relpath) for regex in licensed_files) or any(
+                r.match(relpath) for r in obj_regexes
+            ):
+                yield relpath
+        else:
+            if (
+                any(regex.match(relpath) for regex in licensed_files)
+                or any(r.match(relpath) for r in obj_regexes)
+                or relpath.endswith((".py", ".sh"))
+            ):
+                yield relpath
 
 
 def list_files(args):
     """list files in ramble that should have license headers"""
-    for relpath in sorted(_licensed_files()):
-        print(os.path.join(ramble.paths.ramble_root, relpath))
+    for relpath in sorted(_licensed_files(root=args.root, modified_only=args.modified)):
+        print(os.path.join(args.root, relpath))
 
 
 # Error codes for license verification. All values are chosen such that
@@ -138,39 +150,41 @@ class LicenseError:
         )
 
 
-strict_date_range = f"2022-{datetime.now(timezone.utc).year}"
+_STRICT_DATE_RANGE = f"2022-{datetime.now(timezone.utc).year}"
 
-strict_copyright_date = f"Copyright {strict_date_range}"
+_STRICT_COPYRIGHT_DATE = f"Copyright {_STRICT_DATE_RANGE}"
+
+# The years are hard-coded in the license header to allow them to be out-dated.
+_LICENSE_HEADER_LINES = [
+    "Copyright 2022-2026 The Ramble Authors",
+    "Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",
+    "https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",
+    "<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",
+    "option. This file may not be copied, modified, or distributed",
+    "except according to those terms.",
+]
+
+LICENSE_HEADER = "\n".join(f"# {line}" if line else "#" for line in _LICENSE_HEADER_LINES) + "\n"
 
 
 def _check_license(lines, path):
-    # The years are hard-coded in the license header to allow them to be out-dated.
-    # The `strict_copyright_date` below issues warnings as reminders for refreshing.
-    license_lines = [
-        r"Copyright 2022-2026 The Ramble Authors",
-        r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",
-        r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",
-        r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",
-        r"option. This file may not be copied, modified, or distributed",
-        r"except according to those terms.",
-    ]
-
+    # The `_STRICT_COPYRIGHT_DATE` below issues warnings as reminders for refreshing.
     found = []
 
     for line in lines:
         line = re.sub(r"^[\s#\.]*", "", line)
         line = line.rstrip()
-        for i, license_line in enumerate(license_lines):
+        for i, license_line in enumerate(_LICENSE_HEADER_LINES):
             if re.match(license_line, line):
                 # The first line of the license contains the copyright date.
                 # We allow it to be out of date but print a warning if it is
                 # out of date.
                 if i == 0:
-                    if not re.search(strict_copyright_date, line):
+                    if not re.search(_STRICT_COPYRIGHT_DATE, line):
                         logger.warn(f"{path}: copyright date mismatch")
                 found.append(i)
 
-    if len(found) == len(license_lines) and found == sorted(found):
+    if len(found) == len(_LICENSE_HEADER_LINES) and found == sorted(found):
         return
 
     def old_license(line, path):
@@ -203,10 +217,9 @@ def _check_license(lines, path):
 
 def verify(args):
     """verify that files in ramble have the right license header"""
-
     license_errors = LicenseError()
 
-    for relpath in _licensed_files(args.root, modified_only=args.modified):
+    for relpath in _licensed_files(root=args.root, modified_only=args.modified):
         path = os.path.join(args.root, relpath)
         if not os.path.exists(path):
             continue
@@ -225,16 +238,26 @@ def verify(args):
 
 def update_copyright_year(args):
     """update copyright header for the current year (utc-based) in all licensed files"""
+    is_ramble_root = os.path.realpath(args.root) == os.path.realpath(ramble.paths.prefix)
+
     patt = re.compile(r"Copyright \d{4}-\d{4}")
-    for filename in _licensed_files():
+    for relpath in _licensed_files(root=args.root, modified_only=args.modified):
+        filename = os.path.join(args.root, relpath)
+        if not os.path.exists(filename):
+            continue
+        modified = False
         with open(filename, encoding="utf-8") as lic_f:
             lines = lic_f.readlines()
             for i, license_line in enumerate(lines[:license_lines]):
                 if patt.search(license_line):
-                    lines[i] = patt.sub(strict_copyright_date, license_line)
+                    new_line = patt.sub(_STRICT_COPYRIGHT_DATE, license_line)
+                    if new_line != license_line:
+                        lines[i] = new_line
+                        modified = True
                     break
-        with open(filename, "w", encoding="utf-8") as lic_f:
-            lic_f.writelines(lines)
+        if modified:
+            with open(filename, "w", encoding="utf-8") as lic_f:
+                lic_f.writelines(lines)
 
     def replace_text(file, regex, new_text):
         with open(file, encoding="utf-8") as f:
@@ -243,48 +266,61 @@ def update_copyright_year(args):
         with open(file, "w", encoding="utf-8") as f:
             f.write(content)
 
-    # Update also the licenses and sphinx config file
-    replace_text(
-        os.path.join(ramble.paths.ramble_root, "LICENSE-MIT"),
-        r"Copyright \(c\) \d{4}-\d{4}",
-        f"Copyright (c) {strict_date_range}",
-    )
-    replace_text(
-        os.path.join(ramble.paths.ramble_root, "LICENSE-APACHE"),
-        r"Copyright \d{4}-\d{4}",
-        f"Copyright {strict_date_range}",
-    )
-    replace_text(
-        os.path.join(ramble.paths.ramble_root, "lib", "ramble", "docs", "conf.py"),
-        r"\d{4}-\d{4}, Google LLC",
-        f"{strict_date_range}, Google LLC",
-    )
+    if is_ramble_root:
+        # Update also the licenses and sphinx config file
+        replace_text(
+            os.path.join(ramble.paths.ramble_root, "LICENSE-MIT"),
+            r"Copyright \(c\) \d{4}-\d{4}",
+            f"Copyright (c) {_STRICT_DATE_RANGE}",
+        )
+        replace_text(
+            os.path.join(ramble.paths.ramble_root, "LICENSE-APACHE"),
+            r"Copyright \d{4}-\d{4}",
+            f"Copyright {_STRICT_DATE_RANGE}",
+        )
+        replace_text(
+            os.path.join(ramble.paths.ramble_root, "lib", "ramble", "docs", "conf.py"),
+            r"\d{4}-\d{4}, Google LLC",
+            f"{_STRICT_DATE_RANGE}, Google LLC",
+        )
 
 
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="license_command")
-    sp.add_parser("list-files", help=list_files.__doc__, description=list_files.__doc__)
+
+    def add_common_license_args(parser):
+        parser.add_argument(
+            "-r",
+            "--root",
+            dest="root",
+            default=ramble.paths.prefix,
+            help=(
+                "path to repository root to scan/update license headers "
+                "(defaults to Ramble root)"
+            ),
+        )
+        parser.add_argument(
+            "-m",
+            "--modified",
+            action="store_true",
+            default=False,
+            help="verify/list/update only modified files",
+        )
+
+    list_parser = sp.add_parser(
+        "list-files", help=list_files.__doc__, description=list_files.__doc__
+    )
+    add_common_license_args(list_parser)
 
     verify_parser = sp.add_parser("verify", help=verify.__doc__, description=verify.__doc__)
-    verify_parser.add_argument(
-        "--root",
-        action="store",
-        default=ramble.paths.prefix,
-        help="scan a different prefix for license issues",
-    )
-    verify_parser.add_argument(
-        "--modified",
-        "-m",
-        action="store_true",
-        default=False,
-        help="verify only the modified files as outputted by `git ls-files --modified`",
-    )
+    add_common_license_args(verify_parser)
 
-    sp.add_parser(
+    update_parser = sp.add_parser(
         "update-copyright-year",
         help=update_copyright_year.__doc__,
         description=update_copyright_year.__doc__,
     )
+    add_common_license_args(update_parser)
 
 
 def license(parser, args):
