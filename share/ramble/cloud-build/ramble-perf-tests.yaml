@@ -120,6 +120,7 @@ substitutions:
   _GITHUB_CLIENT_ID: 'Iv23limpijbNRXQzHurG'
 
 timeout: 3600s
+queueTtl: 7200s
 options:
   # TODO: Maybe use a higher SKU for more consistent performance?
   machineType: N1_HIGHCPU_8

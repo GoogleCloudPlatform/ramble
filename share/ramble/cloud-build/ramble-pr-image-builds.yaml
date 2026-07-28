@@ -44,5 +44,6 @@ substitutions:
   _PKG_MANAGER: apt
 
 timeout: 3600s
+queueTtl: 7200s
 options:
   machineType: N1_HIGHCPU_8
