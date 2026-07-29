@@ -67,4 +67,4 @@ substitutions:
   _CI_CACHE: gs://spack/latest
 timeout: 7200s
 options:
-  machineType: N1_HIGHCPU_8
+  machineType: E2_HIGHCPU_8

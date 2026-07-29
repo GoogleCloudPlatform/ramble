@@ -37,5 +37,5 @@ images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}
 timeout: 6000s
 queueTtl: 7200s
 options:
-  machineType: N1_HIGHCPU_8
+  machineType: E2_HIGHCPU_8
 
