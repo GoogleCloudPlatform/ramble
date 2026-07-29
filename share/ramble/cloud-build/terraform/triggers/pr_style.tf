@@ -3,6 +3,7 @@ locals {
 }
 
 resource "google_cloudbuild_trigger" "pr_style" {
+  location    = var.region
   name        = "PR-Style-${local.pr_style_img.base}${local.pr_style_img.base_ver}-${replace(local.pr_style_img.spack, ".", "-")}spack-${replace(local.pr_style_img.python, ".", "-")}python"
   description = "Run linting on Ramble pull requests"
 

@@ -8,6 +8,7 @@ locals {
 }
 
 resource "google_cloudbuild_trigger" "codecov_pr" {
+  location    = var.region
   name        = "Codecov-PR-Unit-Tests-${local.codecov_image.base}${replace(local.codecov_image.base_ver, ".", "-")}-py${replace(local.codecov_image.python, ".", "-")}-spack${replace(local.codecov_image.spack, ".", "-")}"
   description = "Run unit tests and linting on Ramble pull requests with Codecov upload"
 
@@ -44,6 +45,7 @@ resource "google_cloudbuild_trigger" "codecov_pr" {
 }
 
 resource "google_cloudbuild_trigger" "codecov_push" {
+  location    = var.region
   name        = "Codecov-BasePush-${local.codecov_image.base}${replace(local.codecov_image.base_ver, ".", "-")}-py${replace(local.codecov_image.python, ".", "-")}-spack${replace(local.codecov_image.spack, ".", "-")}"
   description = "Collect coverage information on develop or main pushes"
 

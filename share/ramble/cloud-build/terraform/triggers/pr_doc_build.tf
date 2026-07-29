@@ -3,6 +3,7 @@ locals {
 }
 
 resource "google_cloudbuild_trigger" "pr_doc_build_tests" {
+  location    = var.region
   name        = "PR-Doc-Build-Tests"
   description = "A presubmit check for building Ramble documentation"
 

@@ -1,6 +1,7 @@
 resource "google_cloudbuild_trigger" "pr_unit_tests" {
   for_each = local.image_map
 
+  location    = var.region
   name        = "PR-Unit-Tests-${each.value.base}${replace(each.value.base_ver, ".", "-")}-${replace(each.value.spack, ".", "-")}spack-${replace(each.value.python, ".", "-")}python"
   description = "Run unit tests and linting on Ramble pull requests"
 

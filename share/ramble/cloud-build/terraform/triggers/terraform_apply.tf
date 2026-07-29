@@ -1,4 +1,5 @@
 resource "google_cloudbuild_trigger" "terraform_apply" {
+  location    = var.region
   name        = "ramble-terraform-apply"
   description = "Automatically apply Cloud Build Triggers Terraform configuration when pushed to develop branch"
 
