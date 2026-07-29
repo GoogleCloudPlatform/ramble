@@ -204,7 +204,7 @@ in ``key=value`` format.
 
 Let's generate a ``hostname`` experiment restricted to the ``local`` workload with
 custom variables. But first, because ``workspace manage experiments`` does not
-remove existing configuration, only add new experiments or overwrite existing
+remove existing configuration, only adds new experiments or overwrite existing
 experiments, let's remove the extra workloads. Use
 ``ramble -D manage-workspace workspace edit -c`` to make the configuration look like
 the following:
@@ -276,6 +276,18 @@ Inspecting ``manage-workspace/configs/ramble.yaml`` shows the updated configurat
                  variables:
                    n_nodes: '1'
                    n_ranks: '1'
+
+.. note::
+    If you are setting all the required variables to the same value, you can
+    instead use ``--default-variable-value <value>`` instead of specifying each
+    individual variable. So the above could have been replaced with:
+
+    .. code-block:: console
+
+        $ ramble -D manage-workspace workspace manage experiments hostname \
+                --wf local \
+                --default-variable-value 1 \
+                --overwrite
 
 ---------------------------------------------------
 Configuring Parameter Sweeps (Vectors and Matrices)
