@@ -68,9 +68,9 @@ Activated by the ``strong-scaling``, ``weak-scaling``, or ``multi-line`` subcomm
 
 These commands take two sub-arguments:
   * The y-axis metric: the FOM you want to measure the performance of
-  * The x-axis metric: the scaling variable to plot on the x axis
+  * The x-axis metric: the scaling variable or FOM to plot on the x axis
 
-And example call may look something like:
+An example call may look something like:
 
 .. code-block:: console
 
@@ -78,11 +78,12 @@ And example call may look something like:
 
 (a very similar command should also work for ``--weak-scaling`` and ``--multi-line``)
 
-Another common use case might be to plot data by context (such as in OMB), which can be done by simply changing the y-axis metric:
+Another common use case might be to plot data by context (such as in OMB), which can be done by simply changing the y-axis metric, or to plot an FOM against another FOM (e.g. latency vs array size):
 
 .. code-block:: console
 
     ramble results report --weak-scaling 'Bandwidth' context -f ~/ramble-results.json
+    ramble results report --multi-line "Multichase Best Latency" "Array Size" --logx --logy -f ~/ramble-results.json
 
 Other compelling options include ``-n`` to normalize the plot y values, or ``--logx``/``--logy`` for log axes.
 

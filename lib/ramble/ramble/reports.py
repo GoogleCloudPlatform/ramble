@@ -736,14 +736,25 @@ class PlotGenerator:
 
         ax.set_xticks(series_data.index.unique().tolist())
         ax.set_title(title, wrap=True)
-        if y_label:
-            ax.set_ylabel(y_label)
-        ax.set_xlabel(scale_var)
+        if not y_label:
+            if getattr(self, "perf_unit", "") and not self.normalize:
+                y_label = f"{perf_measure} ({self.perf_unit})"
+            elif self.normalize:
+                y_label = f"{perf_measure} (Normalized)"
+            else:
+                y_label = perf_measure
+        ax.set_ylabel(y_label)
+
+        if getattr(self, "scale_unit", ""):
+            scale_var_label = f"{scale_var} ({self.scale_unit})"
+        else:
+            scale_var_label = scale_var
+        ax.set_xlabel(scale_var_label)
 
         # Rotate to prevent long x-axis labels overlapping. There's probably a better way
         if series_data.index.astype(str).str.len().max() > 4:
             ax.tick_params(axis="x", labelrotation=45)
-            fig.tight_layout()
+        fig.tight_layout()
 
         chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
         self.write(fig, chart_filename, pdf_report)
@@ -784,28 +795,94 @@ class PlotGenerator:
 
     def write(self, fig, filename, pdf_report):
         filename = filename.replace(" ", "-")
-        plt.savefig(os.path.join(self.report_dir_path, filename))
+        plt.savefig(os.path.join(self.report_dir_path, filename), bbox_inches="tight")
         self.add_to_inventory(filename)
-        pdf_report.savefig(fig)
+        pdf_report.savefig(fig, bbox_inches="tight")
         plt.close(fig)
 
 
 class ScalingPlotGenerator(PlotGenerator):
     def generate_plot_data(self, pdf_report):
-        """Creates a dataframe for plotting line charts with scaling var on x axis,
-        and performance variable on y axis."""
+        """Creates a dataframe for plotting line charts with scaling var or FOM on x axis,
+        and performance metric on y axis."""
         pd = import_pandas()
         self.validate_spec(self.spec, self.result_index)
 
         perf_measure, scale_var, *additional_vars = self.spec
 
-        # FOMs are by row, so select only rows with the perf_measure FOM
+        all_foms = get_all_foms(self.result_index)
+
+        foms = [perf_measure]
+        variables = []
+
+        if scale_var in all_foms:
+            foms.append(scale_var)
+        else:
+            variables.append(scale_var)
+
+        for var in additional_vars + [self.split_by]:
+            if var not in variables and var not in foms:
+                variables.append(var)
+
         results = extract_data(
             self.exp_results,
-            [perf_measure],
-            [scale_var] + additional_vars + [self.split_by],
+            foms,
+            variables,
             where_query=self.where,
         )
+
+        if results.empty:
+            logger.warn(f"No results found matching spec {self.spec}")
+            return
+
+        self.perf_unit = ""
+        self.scale_unit = ""
+
+        if ReportVars.FOM_UNITS.value in results.columns:
+            perf_rows = results[results[ReportVars.FOM_NAME.value] == perf_measure]
+            if not perf_rows.empty and pd.notna(perf_rows[ReportVars.FOM_UNITS.value].iloc[0]):
+                unit_val = str(perf_rows[ReportVars.FOM_UNITS.value].iloc[0]).strip()
+                if unit_val:
+                    self.perf_unit = unit_val
+
+            if scale_var in all_foms:
+                scale_rows = results[results[ReportVars.FOM_NAME.value] == scale_var]
+                if not scale_rows.empty and pd.notna(
+                    scale_rows[ReportVars.FOM_UNITS.value].iloc[0]
+                ):
+                    unit_val = str(scale_rows[ReportVars.FOM_UNITS.value].iloc[0]).strip()
+                    if unit_val:
+                        self.scale_unit = unit_val
+
+        if scale_var in all_foms:
+            if ReportVars.FOM_ORIGIN_TYPE.value in results.columns:
+                results["_merge_origin_type"] = results[ReportVars.FOM_ORIGIN_TYPE.value].apply(
+                    lambda x: x if isinstance(x, str) and x.startswith("summary::") else "raw"
+                )
+                origin_key = "_merge_origin_type"
+            else:
+                origin_key = ReportVars.FOM_ORIGIN_TYPE.value
+
+            merge_keys = [
+                k
+                for k in [
+                    ReportVars.EXP_NAME.value,
+                    ReportVars.CONTEXT_NAME.value,
+                    origin_key,
+                ]
+                if k in results.columns
+            ]
+            scale_df = (
+                results[results[ReportVars.FOM_NAME.value] == scale_var][
+                    merge_keys + [ReportVars.FOM_VALUE.value]
+                ]
+                .rename(columns={ReportVars.FOM_VALUE.value: scale_var})
+                .drop_duplicates(subset=merge_keys)
+            )
+            results = results[results[ReportVars.FOM_NAME.value] == perf_measure].copy()
+            results = results.merge(scale_df, on=merge_keys, how="left")
+            if "_merge_origin_type" in results.columns:
+                results.drop(columns=["_merge_origin_type"], inplace=True)
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         if len(results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()) == 1:
@@ -1229,12 +1306,22 @@ class MultiLinePlot(ScalingPlotGenerator):
 
         ax.set_xticks(self.output_df.index.unique().tolist())
         ax.set_title(title, wrap=True)
-        # This is to prevent x-axis labels overlapping but there's probably a better way
-        if series_data.index.astype(str).str.len().max() > 4:
-            ax.tick_params(axis="x", labelrotation=45)
-            fig.tight_layout()
+        if getattr(self, "perf_unit", "") and not self.normalize:
+            y_label = f"{perf_measure} ({self.perf_unit})"
+        elif self.normalize:
+            y_label = f"{perf_measure} (Normalized)"
         ax.set_ylabel(y_label)
-        ax.set_xlabel(scale_var)
+
+        if getattr(self, "scale_unit", ""):
+            scale_var_label = f"{scale_var} ({self.scale_unit})"
+        else:
+            scale_var_label = scale_var
+        ax.set_xlabel(scale_var_label)
+
+        # This is to prevent x-axis labels overlapping but there's probably a better way
+        if self.output_df.index.astype(str).str.len().max() > 4:
+            ax.tick_params(axis="x", labelrotation=45)
+        fig.tight_layout()
 
         chart_filename = f"multi_line_{perf_measure}_vs_{scale_var}_all-series.png"
         self.write(fig, chart_filename, pdf_report)

@@ -499,6 +499,71 @@ def test_multiple_groupby(mutable_mock_workspace_path, tmpdir_factory, capsys):
     )
 
 
+def test_scaling_fom_as_scale_var(tmpdir_factory):
+    report_name = "unit_test_fom_scale_var"
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
+
+    in_data = [
+        ("exp_1", "100", "1.0"),
+        ("exp_2", "200", "2.0"),
+        ("exp_3", "300", "3.0"),
+    ]
+    experiments = []
+    for exp in in_data:
+        name, fom_scale_val, fom_perf_val = exp
+
+        experiment = create_test_exp_result(
+            ramble_status="SUCCESS",
+            experiment_name=name,
+            application_name="app_v1",
+            workload_name="test_wl_1",
+            foms=[
+                (
+                    "null",
+                    (
+                        "fom_perf",
+                        fom_perf_val,
+                        "GFLOPs",
+                        "app_v1",
+                        "application",
+                        foms.FomType.MEASURE,
+                    ),
+                ),
+                (
+                    "null",
+                    (
+                        "fom_scale",
+                        fom_scale_val,
+                        "MB",
+                        "app_v1",
+                        "application",
+                        foms.FomType.MEASURE,
+                    ),
+                ),
+            ],
+            ramble_vars={},
+            ramble_raw_vars={},
+        )
+        experiments.append(experiment)
+
+    test_spec = ["fom_perf", "fom_scale"]
+    logx = False
+    logy = False
+    split_by = "workload_name"
+    plot = ramble.reports.MultiLinePlot(
+        test_spec, False, report_dir_path, experiments, logx, logy, split_by
+    )
+
+    with PdfPages(pdf_path) as pdf_report:
+        plot.generate_plot_data(pdf_report)
+
+    assert os.path.isfile(pdf_path)
+    assert os.path.isfile(
+        os.path.join(report_dir_path, "multi_line_fom_perf_vs_fom_scale_all-series.png")
+    )
+
+
 @pytest.mark.parametrize("format", ["json", "yaml"])
 def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
     test_exps = copy.deepcopy(all_experiments)
