@@ -79,10 +79,10 @@ def test_edit_modifier(mock_modifiers, mock_editor):
 
 
 def test_edit_deduction_modifier(mock_modifiers, mock_editor):
-    """Test `ramble edit info` deduces it's a modifier"""
-    edit("info")
+    """Test `ramble edit versions-mod` deduces it's a modifier"""
+    edit("versions-mod")
     assert len(mock_editor) == 1
-    assert "repos/builtin.mock/modifiers/info/modifier.py" in mock_editor[0]
+    assert "repos/builtin.mock/modifiers/versions-mod/modifier.py" in mock_editor[0]
 
 
 def test_edit_singular_type(mock_modifiers, mock_editor):
@@ -100,10 +100,10 @@ def test_edit_deduction_command(mock_editor):
 
 
 def test_edit_deduction_test(mock_editor):
-    """Test `ramble edit cmd/edit` deduces it's a test"""
-    edit("cmd/edit")
+    """Test `ramble edit application` deduces it's a test"""
+    edit("application")
     assert len(mock_editor) == 1
-    assert "ramble/test/cmd/edit.py" in mock_editor[0]
+    assert "ramble/test/application.py" in mock_editor[0]
 
 
 def test_edit_singular_type_with_spaces_hyphens(mock_editor):
@@ -148,12 +148,6 @@ def test_edit_deduction_fails_correctly():
     assert "No application for 'non-existent-object-name' was found" in output
 
 
-def test_object_exists_exception():
-    from ramble.cmd.edit import object_exists
-
-    assert not object_exists("some_name", "invalid_type_name")
-
-
 def test_normalize_type_name_empty():
     from ramble.cmd.edit import normalize_type_name
 
@@ -191,7 +185,72 @@ def test_edit_no_editor_found(mock_applications, monkeypatch):
 
 def test_edit_multiple_files_found(monkeypatch):
     import glob
+    import os
 
     monkeypatch.setattr(glob, "glob", lambda pattern: ["file1.py", "file2.py"])
+    monkeypatch.setattr(os.path, "isfile", lambda path: path in ["file1.py", "file2.py"])
     output = edit("-t", "command", "non-existent", fail_on_error=False)
     assert "Multiple files exist" in output
+
+
+def test_edit_multiple_matches_warning(mock_applications, mock_modifiers, mock_editor):
+    output = edit("info", fail_on_error=False)
+    assert "Multiple matches found for 'info'" in output
+    assert "Opening highest-precedence match:" in output
+    assert "In order to open a different object, use the commands below:" in output
+    assert (
+        "Type: modifiers, Command: ramble edit --type modifiers --namespace builtin.mock info"
+        in output
+    )
+    assert "Type: command, Command: ramble edit --type command info" in output
+
+
+def test_edit_object_fallback_repo():
+    output = edit("non-existent", "--repo", "/non-existent-path", fail_on_error=False)
+    assert "No application for 'non-existent' was found" in output
+
+
+def test_edit_object_fallback_namespace():
+    output = edit("non-existent", "--namespace", "non-existent-namespace", fail_on_error=False)
+    assert "No application for 'non-existent' was found" in output
+
+
+def test_edit_object_fallback_custom_type_not_found(mock_modifiers):
+    output = edit("non-existent-modifier", "-t", "modifiers", fail_on_error=False)
+    assert "No modifiers for 'non-existent-modifier' was found" in output
+
+
+def test_edit_no_name_default_editor(mock_editor):
+    edit()
+    assert len(mock_editor) == 1
+    assert "var/ramble/repos/builtin" in mock_editor[0]
+
+
+def test_edit_no_name_with_type_editor(mock_editor):
+    edit("-t", "command")
+    assert len(mock_editor) == 1
+    assert "lib/ramble/ramble/cmd" in mock_editor[0]
+
+    edit("-t", "applications")
+    assert len(mock_editor) == 2
+    assert "var/ramble/repos/builtin" in mock_editor[1]
+
+
+def test_edit_no_name_with_custom_type_repo_editor(mock_editor):
+    edit("-t", "applications", "--repo", "/non-existent-path")
+    assert len(mock_editor) == 1
+
+
+def test_edit_no_name_with_custom_type_namespace_editor(mock_applications, mock_editor):
+    edit("-t", "applications", "--namespace", "builtin.mock")
+    assert len(mock_editor) == 1
+    assert "repos/builtin.mock/applications" in mock_editor[0]
+
+
+def test_edit_no_name_no_editor(monkeypatch):
+    def mock_fail_editor(*args, **kwargs):
+        raise TypeError("No editor")
+
+    monkeypatch.setattr("ramble.cmd.edit.editor", mock_fail_editor)
+    output = edit(fail_on_error=False)
+    assert "No valid editor was found" in output
