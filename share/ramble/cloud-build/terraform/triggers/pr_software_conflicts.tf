@@ -3,6 +3,7 @@ locals {
 }
 
 resource "google_cloudbuild_trigger" "pr_software_conflicts" {
+  location    = var.region
   name        = "PR-Software-Conflicts-${local.pr_software_conflicts_img.base}${local.pr_software_conflicts_img.base_ver}-${replace(local.pr_software_conflicts_img.spack, ".", "-")}spack-${replace(local.pr_software_conflicts_img.python, ".", "-")}python"
   description = "Check for conflicts in application definitions on Ramble pull requests"
 

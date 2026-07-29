@@ -3,6 +3,7 @@ locals {
 }
 
 resource "google_cloudbuild_trigger" "perf_test_pr" {
+  location    = var.region
   name        = "PerfTest-PR-${local.perf_test_img.base}${local.perf_test_img.base_ver}-${replace(local.perf_test_img.spack, ".", "-")}spack-${replace(local.perf_test_img.python, ".", "-")}python"
   description = "Ramble perf tests for PR builds"
 
@@ -42,6 +43,7 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
 }
 
 resource "google_cloudbuild_trigger" "perf_test_push" {
+  location    = var.region
   name        = "PerfTest-Push-${local.perf_test_img.base}${local.perf_test_img.base_ver}-${replace(local.perf_test_img.spack, ".", "-")}spack-${replace(local.perf_test_img.python, ".", "-")}python"
   description = "Continuous monitoring of Ramble performance for develop push"
 
