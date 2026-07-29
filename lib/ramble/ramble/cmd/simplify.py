@@ -32,12 +32,22 @@ def extract_referenced_names(template_str):
     referenced = set()
     brace_contents = []
     stack = []
+    escaped = False
     for i, char in enumerate(template_str):
         if char == "{":
-            stack.append(i)
-        elif char == "}" and stack:
-            start = stack.pop()
-            brace_contents.append(template_str[start + 1 : i])
+            if not escaped:
+                stack.append(i)
+        elif char == "}":
+            if not escaped and stack:
+                start = stack.pop()
+                brace_contents.append(template_str[start + 1 : i])
+        elif char == "\n":
+            stack = []
+
+        if char == "\\":
+            escaped = True
+        else:
+            escaped = False
 
     for content in brace_contents:
         match = format_spec_regex.search(content)
