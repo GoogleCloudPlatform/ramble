@@ -736,7 +736,7 @@ class PlotGenerator:
 
         ax.set_xticks(series_data.index.unique().tolist())
         ax.set_title(title, wrap=True)
-        if not y_label:
+        if not y_label or y_label == perf_measure:
             if getattr(self, "perf_unit", "") and not self.normalize:
                 y_label = f"{perf_measure} ({self.perf_unit})"
             elif self.normalize:
@@ -880,9 +880,13 @@ class ScalingPlotGenerator(PlotGenerator):
                 .drop_duplicates(subset=merge_keys)
             )
             results = results[results[ReportVars.FOM_NAME.value] == perf_measure].copy()
-            results = results.merge(scale_df, on=merge_keys, how="left")
+            results = results.merge(scale_df, on=merge_keys, how="inner")
             if "_merge_origin_type" in results.columns:
                 results.drop(columns=["_merge_origin_type"], inplace=True)
+
+        if results.empty:
+            logger.warn(f"No results found matching spec {self.spec}")
+            return
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         if len(results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()) == 1:
@@ -1328,6 +1332,9 @@ class MultiLinePlot(ScalingPlotGenerator):
 
     def generate_plot_data(self, pdf_report):
         super().generate_plot_data(pdf_report)
+
+        if getattr(self, "output_df", None) is None or self.output_df.empty:
+            return
 
         perf_measure, scale_var, *_ = self.spec
         y_label = perf_measure
