@@ -105,4 +105,4 @@ substitutions:
 timeout: 3600s
 queueTtl: 7200s
 options:
-  machineType: N1_HIGHCPU_8
+  machineType: E2_HIGHCPU_8
