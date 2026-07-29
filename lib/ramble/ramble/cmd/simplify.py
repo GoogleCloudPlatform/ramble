@@ -573,6 +573,8 @@ def analyze_object(name, obj_type):
                     refs = extract_referenced_names(criteria_dict["formula"])
                     all_referenced_names.update(refs)
                     for r in refs:
+                        if criteria_dict.get("mode") == "fom_comparison" and r == "value":
+                            continue
                         if not is_valid_reference(
                             r,
                             defined_variables,

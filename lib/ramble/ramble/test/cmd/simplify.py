@@ -573,6 +573,7 @@ class Compapp(ExecutableApplication):
 
     # Success Criteria
     success_criteria('my_crit', 'fom_comparison', file='{var1}.log', formula='{var1} > 0')
+    success_criteria('fom_value_crit', 'fom_comparison', file='{var1}.log', fom_name='my_fom', formula='{value} > 0')
     success_criteria('broken_crit', 'fom_comparison', file='{broken_crit_ref}.log', formula='{broken_formula_ref}')
 
     # Templates
