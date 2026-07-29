@@ -128,3 +128,87 @@ def test_remove_url_file(tmpdir):
     f.write("content")
     web.remove_url(f"file://{str(d)}", recursive=True)
     assert not d.exists()
+
+
+def test_push_dir_to_url_file(tmpdir):
+    local_dir = tmpdir.mkdir("src_dir")
+    f1 = local_dir.join("file1.txt")
+    f1.write("data1")
+    sub_dir = local_dir.mkdir("subdir")
+    f2 = sub_dir.join("file2.txt")
+    f2.write("data2")
+
+    remote_dir = tmpdir.mkdir("dest_dir")
+    dest_url = f"file://{str(remote_dir)}"
+
+    web.push_dir_to_url(str(local_dir), dest_url)
+
+    assert remote_dir.join("file1.txt").exists()
+    assert remote_dir.join("file1.txt").read() == "data1"
+    assert remote_dir.join("subdir").join("file2.txt").exists()
+    assert remote_dir.join("subdir").join("file2.txt").read() == "data2"
+
+
+def test_push_dir_to_url_gcs(monkeypatch, tmpdir):
+    local_dir = tmpdir.mkdir("src_gcs_dir")
+    f1 = local_dir.join("file1.txt")
+    f1.write("data1")
+
+    uploaded_args = {}
+
+    class MockGCSBucket:
+        def __init__(self, url):
+            self.bucket = "mock_bucket_obj"
+
+        def exists(self):
+            return True
+
+        def create(self):
+            pass
+
+    def mock_upload_many(bucket, filenames, source_directory, blob_name_prefix, **kwargs):
+        uploaded_args["bucket"] = bucket
+        uploaded_args["filenames"] = filenames
+        uploaded_args["source_directory"] = source_directory
+        uploaded_args["blob_name_prefix"] = blob_name_prefix
+        uploaded_args.update(kwargs)
+
+    import google.cloud.storage.transfer_manager as tm
+
+    import spack.util.gcs as gcs_util
+
+    monkeypatch.setattr(gcs_util, "GCSBucket", MockGCSBucket)
+    monkeypatch.setattr(tm, "upload_many_from_filenames", mock_upload_many)
+
+    web.push_dir_to_url(str(local_dir), "gs://mock-bucket/prefix/path")
+
+    assert uploaded_args["bucket"] == "mock_bucket_obj"
+    assert "file1.txt" in uploaded_args["filenames"]
+    assert uploaded_args["source_directory"] == str(local_dir)
+    assert uploaded_args["blob_name_prefix"] == "prefix/path/"
+
+
+def test_check_push_scheme():
+    url_file = web.check_push_scheme("file:///path/to/file")
+    assert url_file.scheme == "file"
+
+    url_s3 = web.check_push_scheme("s3://bucket/key")
+    assert url_s3.scheme == "s3"
+
+    url_gs = web.check_push_scheme("gs://bucket/key")
+    assert url_gs.scheme == "gs"
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: http"):
+        web.check_push_scheme("http://example.com/file")
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: ftp"):
+        web.check_push_scheme("ftp://example.com/file")
+
+
+def test_push_dir_to_url_unsupported_scheme(tmpdir):
+    local_dir = tmpdir.mkdir("src_dir")
+    f1 = local_dir.join("file1.txt")
+    f1.write("content")
+
+    with pytest.raises(NotImplementedError, match="Unrecognized URL scheme: http"):
+        web.push_dir_to_url(str(local_dir), "http://example.com/remote_dir")

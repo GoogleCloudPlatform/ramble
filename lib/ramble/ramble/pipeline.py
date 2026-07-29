@@ -361,11 +361,6 @@ class ArchivePipeline(Pipeline):
         self.archive_name = None
         self.archive_patterns = archive_patterns.copy() if archive_patterns else []
 
-        if self.upload_url and not self.create_tar:
-            logger.warn("Upload URL is currently only supported when using tar format (-t)")
-            logger.warn("Forcing `-t` on to enable archive upload.\n")
-            self.create_tar = True
-
     def _prepare(self):
         super()._prepare()
         date_str = self.workspace.date_string()
@@ -452,17 +447,17 @@ class ArchivePipeline(Pipeline):
 
     def _complete(self):
         super()._complete()
+        archive_url = (
+            self.upload_url if self.upload_url else ramble.config.get("config:archive_url")
+        )
+        archive_url = archive_url.rstrip("/") if archive_url else None
+
         if self.create_tar:
             tar_extension = ".tar.gz"
             tar = which("tar", required=True)
             tar_path = self.archive_name + tar_extension
             with fs.working_dir(self.workspace.archive_dir):
                 tar("-czf", tar_path, self.archive_name)
-
-            archive_url = (
-                self.upload_url if self.upload_url else ramble.config.get("config:archive_url")
-            )
-            archive_url = archive_url.rstrip("/") if archive_url else None
 
             tar_path_latest = os.path.join(
                 self.workspace.archive_dir, "archive.latest" + tar_extension
@@ -481,6 +476,19 @@ class ArchivePipeline(Pipeline):
 
                 # Record upload URL to workspace metadata
                 self.workspace.update_metadata("archive_url", remote_tar_path)
+                self.workspace.write_metadata()
+        else:
+            logger.debug(f"Archive url: {archive_url}")
+
+            if archive_url:
+                import ramble.util.web as web_util
+
+                remote_dir_path = archive_url + "/" + self.workspace.latest_archive
+                web_util.push_dir_to_url(self.workspace.latest_archive_path, remote_dir_path)
+                logger.all_msg(f"Uncompressed Archive Uploaded to {remote_dir_path}")
+
+                # Record upload URL to workspace metadata
+                self.workspace.update_metadata("archive_url", remote_dir_path)
                 self.workspace.write_metadata()
 
 

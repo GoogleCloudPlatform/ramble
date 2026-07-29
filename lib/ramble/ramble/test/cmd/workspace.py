@@ -1967,6 +1967,46 @@ ramble:
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
 
 
+def test_workspace_uncompressed_upload_archive(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 5
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: 2
+  software:
+    packages: {}
+    environments: {}
+"""
+
+    ws1, workspace_name = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+    remote_archive_path = os.path.join(ws1.root, "uncompressed_archive_backup")
+    fs.mkdirp(remote_archive_path)
+
+    workspace("archive", "-u", "file://" + remote_archive_path, global_args=["-w", workspace_name])
+
+    assert ws1.latest_archive
+    assert os.path.exists(ws1.latest_archive_path)
+    assert not os.path.exists(ws1.latest_archive_path + ".tar.gz")
+
+    remote_latest_dir = os.path.join(remote_archive_path, ws1.latest_archive)
+    assert os.path.exists(remote_latest_dir)
+    assert os.path.exists(
+        os.path.join(remote_latest_dir, "configs", ramble.workspace.CONFIG_FILE_NAME)
+    )
+
+
 def test_workspace_tar_upload_archive_config_url(workspace_name):
     test_config = """
 ramble:

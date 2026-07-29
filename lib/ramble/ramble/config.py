@@ -216,6 +216,7 @@ config_defaults = {
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": ["$ramble/var/ramble/workspaces"],
         "upload": {"push_failed": True},
+        "upload_threads": cpus.cpus_available(),
         "report_dirs": "~/.ramble/reports",
         "enable_strict_versions": True,
     }
