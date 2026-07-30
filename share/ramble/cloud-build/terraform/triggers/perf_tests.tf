@@ -30,7 +30,7 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
 
   filename = "share/ramble/cloud-build/ramble-perf-tests.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _SPACK_REF    = local.perf_test_img.spack
     _PYTHON_VER   = local.perf_test_img.python
     _BASE_IMG     = local.perf_test_img.base
@@ -39,7 +39,7 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"
     _UPLOAD_TO_BQ = "false"
-  }
+  })
 }
 
 resource "google_cloudbuild_trigger" "perf_test_push" {
@@ -57,7 +57,7 @@ resource "google_cloudbuild_trigger" "perf_test_push" {
 
   filename = "share/ramble/cloud-build/ramble-perf-tests.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _SPACK_REF    = local.perf_test_img.spack
     _PYTHON_VER   = local.perf_test_img.python
     _BASE_IMG     = local.perf_test_img.base
@@ -66,5 +66,5 @@ resource "google_cloudbuild_trigger" "perf_test_push" {
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"
     _UPLOAD_TO_BQ = "true"
-  }
+  })
 }

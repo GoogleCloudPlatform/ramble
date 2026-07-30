@@ -28,10 +28,10 @@ resource "google_cloudbuild_trigger" "pr_unit_tests" {
 
   filename = "share/ramble/cloud-build/ramble-pr-unit-tests.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG   = each.value.base
     _BASE_VER   = each.value.base_ver
     _PYTHON_VER = each.value.python
     _SPACK_REF  = each.value.spack
-  }
+  })
 }

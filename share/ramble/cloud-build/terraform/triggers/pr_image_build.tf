@@ -24,9 +24,9 @@ resource "google_cloudbuild_trigger" "pr_image_build_tests_debian" {
     ]
   )
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _PKG_MANAGER = "apt"
-  }
+  })
 }
 
 resource "google_cloudbuild_trigger" "pr_image_build_tests_rocky" {
@@ -55,7 +55,7 @@ resource "google_cloudbuild_trigger" "pr_image_build_tests_rocky" {
     ]
   )
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _PKG_MANAGER = "yum"
-  }
+  })
 }

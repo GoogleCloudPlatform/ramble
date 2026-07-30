@@ -20,10 +20,10 @@ resource "google_cloudbuild_trigger" "pr_doc_build_tests" {
 
   filename = "share/ramble/cloud-build/ramble-pr-docs.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG   = local.pr_doc_img.base
     _BASE_VER   = local.pr_doc_img.base_ver
     _PYTHON_VER = local.pr_doc_img.python
     _SPACK_REF  = local.pr_doc_img.spack
-  }
+  })
 }

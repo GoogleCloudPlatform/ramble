@@ -30,10 +30,10 @@ resource "google_cloudbuild_trigger" "pr_style" {
 
   filename = "share/ramble/cloud-build/ramble-pr-style.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG   = local.pr_style_img.base
     _BASE_VER   = local.pr_style_img.base_ver
     _PYTHON_VER = local.pr_style_img.python
     _SPACK_REF  = local.pr_style_img.spack
-  }
+  })
 }

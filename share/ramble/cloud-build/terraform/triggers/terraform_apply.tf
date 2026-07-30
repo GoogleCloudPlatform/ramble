@@ -17,4 +17,7 @@ resource "google_cloudbuild_trigger" "terraform_apply" {
   ]
 
   filename = "share/ramble/cloud-build/ramble-terraform-apply.yaml"
+
+  substitutions = local.default_substitutions
 }
+

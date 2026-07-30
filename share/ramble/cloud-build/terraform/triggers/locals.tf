@@ -39,4 +39,20 @@ locals {
     "pyproject.toml",
     "pyproject_objects.toml"
   ]
+
+  # Default execution settings shared across Cloud Build triggers
+  default_trigger_config = {
+    machine_type = "E2_HIGHCPU_8"
+    queue_ttl    = "7200s"
+    timeout      = "6000s"
+  }
+
+  # Default substitution variables to pass into all Cloud Build triggers
+  default_substitutions = {
+    _MACHINE_TYPE = local.default_trigger_config.machine_type
+    _QUEUE_TTL    = local.default_trigger_config.queue_ttl
+    _TIMEOUT      = local.default_trigger_config.timeout
+  }
 }
+
+

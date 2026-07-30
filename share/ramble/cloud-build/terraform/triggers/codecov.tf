@@ -34,14 +34,14 @@ resource "google_cloudbuild_trigger" "codecov_pr" {
 
   filename = "share/ramble/cloud-build/ramble-pr-unit-tests.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG      = local.codecov_image.base
     _BASE_VER      = local.codecov_image.base_ver
     _PYTHON_VER    = local.codecov_image.python
     _SPACK_REF     = local.codecov_image.spack
     _PUSH_CODECOV  = "true"
     _CODECOV_TOKEN = data.google_secret_manager_secret_version.codecov_token.secret_data
-  }
+  })
 }
 
 resource "google_cloudbuild_trigger" "codecov_push" {
@@ -59,12 +59,12 @@ resource "google_cloudbuild_trigger" "codecov_push" {
 
   filename = "share/ramble/cloud-build/ramble-pr-unit-tests.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG      = local.codecov_image.base
     _BASE_VER      = local.codecov_image.base_ver
     _PYTHON_VER    = local.codecov_image.python
     _SPACK_REF     = local.codecov_image.spack
     _PUSH_CODECOV  = "true"
     _CODECOV_TOKEN = data.google_secret_manager_secret_version.codecov_token.secret_data
-  }
+  })
 }

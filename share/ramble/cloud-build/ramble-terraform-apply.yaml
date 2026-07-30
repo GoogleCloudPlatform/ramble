@@ -15,4 +15,9 @@ steps:
       - |
         terraform init -input=false
         terraform apply -auto-approve
-queueTtl: 7200s
+timeout: ${_TIMEOUT}
+queueTtl: ${_QUEUE_TTL}
+options:
+  machineType: ${_MACHINE_TYPE}
+
+

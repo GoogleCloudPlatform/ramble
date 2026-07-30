@@ -26,10 +26,10 @@ resource "google_cloudbuild_trigger" "pr_software_conflicts" {
     "share/ramble/cloud-build/**"
   ]
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _BASE_IMG   = local.pr_software_conflicts_img.base
     _BASE_VER   = local.pr_software_conflicts_img.base_ver
     _PYTHON_VER = local.pr_software_conflicts_img.python
     _SPACK_REF  = local.pr_software_conflicts_img.spack
-  }
+  })
 }

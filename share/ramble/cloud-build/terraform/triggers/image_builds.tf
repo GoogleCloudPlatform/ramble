@@ -23,11 +23,11 @@ resource "google_cloudbuild_trigger" "image_builders" {
 
   filename = "share/ramble/cloud-build/ramble-image-builder.yaml"
 
-  substitutions = {
+  substitutions = merge(local.default_substitutions, {
     _PYTHON_VER  = each.value.python
     _SPACK_REF   = each.value.spack
     _PKG_MANAGER = local.pm_map[each.value.base]
     _BASE_IMG    = each.value.base
     _BASE_VER    = each.value.base_ver
-  }
+  })
 }

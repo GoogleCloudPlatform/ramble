@@ -34,8 +34,10 @@ substitutions:
   _BASE_VER: '8'
   _PKG_MANAGER: 'yum'
 images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}']
-timeout: 6000s
-queueTtl: 7200s
+timeout: ${_TIMEOUT}
+queueTtl: ${_QUEUE_TTL}
 options:
-  machineType: E2_HIGHCPU_8
+  machineType: ${_MACHINE_TYPE}
+
+
 

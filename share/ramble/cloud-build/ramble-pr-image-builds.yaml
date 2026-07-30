@@ -43,7 +43,9 @@ substitutions:
   _PYTHON_VER: 3.11.14
   _PKG_MANAGER: apt
 
-timeout: 3600s
-queueTtl: 7200s
+timeout: ${_TIMEOUT}
+queueTtl: ${_QUEUE_TTL}
 options:
-  machineType: E2_HIGHCPU_8
+  machineType: ${_MACHINE_TYPE}
+
+
