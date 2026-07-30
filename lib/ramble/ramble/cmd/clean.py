@@ -77,7 +77,6 @@ def clean(parser, args):
 
 
 def remove_python_caches():
-    logger.msg("Removing python cache files")
     for directory in [lib_path, var_path]:
         for root, dirs, files in os.walk(directory):
             for f in files:
