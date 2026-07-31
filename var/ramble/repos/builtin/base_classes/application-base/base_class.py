@@ -226,7 +226,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.workspace = None
         self.internals = {}
         self.is_template = False
-        self.generated_experiments = []
+        self.has_generated_experiments = False
         self.repeats = ramble.repeats.Repeats()
         self._command_list = []
         self._command_list_without_logs = []
@@ -302,7 +302,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def clone(self):
         """Deep clone an application instance"""
         new_clone = type(self)(self._file_path)
-        self.generated_experiments.append(new_clone)
+        self.has_generated_experiments = True
 
         if self.known_versions:
             new_clone.known_versions = self.known_versions.copy()
