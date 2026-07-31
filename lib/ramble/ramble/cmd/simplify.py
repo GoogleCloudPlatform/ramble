@@ -17,7 +17,13 @@ import sys
 import ramble.keywords
 import ramble.repository
 import ramble.util.colors as color
-from ramble.expander import format_spec_regex
+from ramble.expander import (
+    format_spec_regex,
+    supported_list_function_pointers,
+    supported_modules,
+    supported_scalar_function_pointers,
+    supported_scalar_function_with_self_arg_pointers,
+)
 from ramble.util.logger import logger
 
 description = "find and simplify unused or unreachable sections in definitions"
@@ -53,12 +59,39 @@ def extract_referenced_names(template_str):
         match = format_spec_regex.search(content)
         if match:
             content = match.group("kw")
-        words = re.findall(r"[a-zA-Z0-9_:-]+", content)
-        for word in words:
-            if "::" in word:
-                referenced.add(word.split("::")[-1])
-            else:
-                referenced.add(word)
+
+        # Replace '::' with '.' to make namespace references valid Python attributes
+        ast_content = content.replace("::", ".")
+        try:
+            tree = ast.parse(ast_content, mode="eval")
+
+            def get_refs(node, parent=None):
+                r = set()
+                if isinstance(node, ast.Name):
+                    if isinstance(parent, ast.Attribute) and node is parent.value:
+                        pass
+                    else:
+                        r.add(node.id)
+                elif isinstance(node, ast.Attribute):
+                    if isinstance(parent, ast.Attribute) and node is parent.value:
+                        pass
+                    else:
+                        r.add(node.attr)
+                    r.update(get_refs(node.value, parent=node))
+                else:
+                    for child in ast.iter_child_nodes(node):
+                        r.update(get_refs(child, parent=node))
+                return r
+
+            referenced.update(get_refs(tree.body))
+        except SyntaxError:
+            # Fallback to regex-based extraction if syntax is not valid Python
+            words = re.findall(r"[a-zA-Z0-9_:-]+", content)
+            for word in words:
+                if "::" in word:
+                    referenced.add(word.split("::")[-1])
+                else:
+                    referenced.add(word)
     return referenced
 
 
@@ -272,6 +305,22 @@ def is_valid_reference(
         return True
     if fom_captures and var_name in fom_captures:
         return True
+
+    # Math functions and constants are always valid references
+    _allowed_math_names = getattr(is_valid_reference, "_allowed_math_names", None)
+    if _allowed_math_names is None:
+        _allowed_math_names = set(
+            list(supported_scalar_function_pointers.keys())
+            + list(supported_list_function_pointers.keys())
+            + list(supported_scalar_function_with_self_arg_pointers.keys())
+            + list(supported_modules.keys())
+            + ["True", "False", "None"]
+        )
+        is_valid_reference._allowed_math_names = _allowed_math_names
+
+    if var_name in _allowed_math_names:
+        return True
+
     # Strip quotes or match as literal token in source code (fallback for python references)
     if re.search(r"\b" + re.escape(var_name) + r"\b", source_code):
         return True

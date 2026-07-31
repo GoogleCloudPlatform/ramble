@@ -188,7 +188,8 @@ class Testapp3(ExecutableApplication):
     input_file('my_input', url='https://host.com/file.tar.gz', description='my input file')
     executable(
         'foo',
-        'bar {my_var} {my_input} {nonexistent_var_typo} {wrf_path} {orca_path}',
+        'bar {my_var} {my_input} {nonexistent_var_typo} {wrf_path} '
+        '{orca_path} {my_var - 1} {my_var -1} {my_var-1}',
         use_mpi=False,
     )
     workload('test_wl', executable='foo')
