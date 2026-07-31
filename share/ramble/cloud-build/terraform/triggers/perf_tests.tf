@@ -2,6 +2,17 @@ locals {
   perf_test_img = local.image_map["rocky8-py3-13-5-spack-v1-0-0"]
 }
 
+resource "google_cloudbuild_worker_pool" "perf_test_pool" {
+  name         = "n2d-perf-test-pool"
+  location     = var.region
+  display_name = "Private N2D worker pool for Ramble performance tests"
+
+  worker_config {
+    machine_type = "n2d-standard-16"
+    disk_size_gb = 100
+  }
+}
+
 resource "google_cloudbuild_trigger" "perf_test_pr" {
   location    = var.region
   name        = "PerfTest-PR-${local.perf_test_img.base}${local.perf_test_img.base_ver}-${replace(local.perf_test_img.spack, ".", "-")}spack-${replace(local.perf_test_img.python, ".", "-")}python"
@@ -39,6 +50,7 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"
     _UPLOAD_TO_BQ = "false"
+    _WORKER_POOL  = google_cloudbuild_worker_pool.perf_test_pool.id
   }
 }
 
@@ -66,5 +78,6 @@ resource "google_cloudbuild_trigger" "perf_test_push" {
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"
     _UPLOAD_TO_BQ = "true"
+    _WORKER_POOL  = google_cloudbuild_worker_pool.perf_test_pool.id
   }
 }
