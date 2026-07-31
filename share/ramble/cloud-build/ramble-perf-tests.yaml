@@ -118,12 +118,13 @@ substitutions:
   # client_id is recommended over app id.
   # client_id is not a secret.
   _GITHUB_CLIENT_ID: 'Iv23limpijbNRXQzHurG'
+  _WORKER_POOL: ''
 
 timeout: 3600s
 queueTtl: 7200s
 options:
-  # TODO: Maybe use a higher SKU for more consistent performance?
-  machineType: E2_HIGHCPU_8
+  pool:
+    name: '$_WORKER_POOL'
 
 availableSecrets:
   secretManager:
