@@ -189,7 +189,9 @@ class Testapp3(ExecutableApplication):
     executable(
         'foo',
         'bar {my_var} {my_input} {nonexistent_var_typo} {wrf_path} '
-        '{orca_path} {my_var - 1} {my_var -1} {my_var-1}',
+        '{orca_path} {my_var - 1} {my_var -1} {my_var-1} '
+        '{min(my_var, 2)} {sqrt(my_var)} \\\\{escaped\\\\} '
+        '{my_var ? application::my_var : my_input}',
         use_mpi=False,
     )
     workload('test_wl', executable='foo')
