@@ -1995,7 +1995,7 @@ ramble:
         logger.debug(str(self.software_environments))
 
         for _, app_inst in experiment_set.template_experiments():
-            if app_inst.is_template and not app_inst.generated_experiments:
+            if app_inst.is_template and not app_inst.has_generated_experiments:
                 app = app_inst.expander.application_name
                 wl = app_inst.expander.workload_name
                 exp = app_inst.expander.experiment_name
