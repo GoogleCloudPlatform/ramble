@@ -58,7 +58,6 @@ class Spack(UtilityBase):
     def install(self, workspace):
         # E.g., make, configure, etc.
         logger.debug(f"Executing install phase for {self.name}")
-        pass
 
     def is_available(self, workspace, min_version=None, max_version=None):
         """Check if spack is available in the user's environment."""

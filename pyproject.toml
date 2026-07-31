@@ -184,7 +184,6 @@ extend-exclude = [
 
 [tool.ruff.lint]
 preview = true
-explicit-preview-rules = true
 # B905 requires Python 3.9 or up.
 ignore = ["B905", "PERF203"]
 select = [
@@ -193,10 +192,9 @@ select = [
     "B043",   # del-attr-with-constant
     "PLW1510",# subprocess-run-without-check
     "PLW1514",# unspecified-encoding
-    "PIE794", # duplicate-class-field-definition
-    "PIE796", # non-unique-enums
+    "PIE",    # flake8-pie
     "PT014",  # pytest-duplicate-parametrize-test-cases
-    "T100",   # debugger
+    "T10",    # flake8-debugger
     "RUF019", # unnecessary-key-check
     "PLC0206",# dict-index-missing-items
     "SIM118", # in-dict-keys
@@ -204,7 +202,7 @@ select = [
     "RUF015", # unnecessary-iterable-allocation
     "FURB192",# sorted-min-max
     "FURB118",# reimplemented-operator
-    "TID251", # banned imports
+    "TID",    # flake8-tidy-imports
 ]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]

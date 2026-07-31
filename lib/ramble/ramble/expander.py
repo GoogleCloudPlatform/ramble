@@ -975,7 +975,7 @@ class Expander:
 
         """
         # Fast path for things that are likely paths
-        if in_str.startswith("/") or in_str.startswith("./"):
+        if in_str.startswith(("/", "./")):
             return in_str
 
         # Heuristic: if no math operators/keywords, it's probably a string. Skip parsing.
