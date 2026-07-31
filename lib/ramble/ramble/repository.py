@@ -470,23 +470,20 @@ class FastObjectChecker(Mapping):
     during instance initialization.
     """
 
-    #: Global cache, reused by every instance
-    _paths_cache: Mapping[str, str] = {}
-
     def __init__(self, objects_path, object_file_name, object_type):
         # The path of the repository managed by this instance
         self.objects_path = objects_path
         self.object_file_name = object_file_name
         self.object_type = object_type
 
-        # If the cache we need is not there yet, then build it appropriately
-        if objects_path not in self._paths_cache:
-            self._paths_cache[objects_path] = self._create_new_cache()
-
         #: Reference to the appropriate entry in the global cache
-        self._objects_to_stats = self._paths_cache[objects_path]
+        self._objects_to_stats = self._create_new_cache(
+            objects_path, object_file_name, object_type
+        )
 
-    def _create_new_cache(self):
+    @staticmethod
+    @functools.lru_cache()
+    def _create_new_cache(objects_path, object_file_name, object_type):
         """Create a new cache for objects in a repo.
 
         The implementation here should try to minimize filesystem
@@ -497,24 +494,24 @@ class FastObjectChecker(Mapping):
         # Create a dictionary that will store the mapping between a
         # object name and its stat info
         cache = {}
-        if not os.path.isdir(self.objects_path):
+        if not os.path.isdir(objects_path):
             return cache
-        for obj_name in os.listdir(self.objects_path):
+        for obj_name in os.listdir(objects_path):
             # Skip non-directories in the object root.
-            obj_dir = os.path.join(self.objects_path, obj_name)
+            obj_dir = os.path.join(objects_path, obj_name)
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
                 if not obj_name.startswith(".") and obj_name not in _ALL_ACCEPTED_CONFIGS:
                     logger.warn(
-                        f"Skipping {self.object_type} "
+                        f"Skipping {object_type} "
                         f'at {obj_dir}. "{obj_name}" is not '
                         "a valid Ramble module name."
                     )
                 continue
 
             # Construct the file name from the directory
-            obj_file = os.path.join(self.objects_path, obj_name, self.object_file_name)
+            obj_file = os.path.join(objects_path, obj_name, object_file_name)
 
             # Use stat here to avoid lots of calls to the filesystem.
             try:
@@ -524,7 +521,7 @@ class FastObjectChecker(Mapping):
                     # No application.py file here.
                     continue
                 elif e.errno == errno.EACCES:
-                    logger.warn(f"Can't read {self.object_type} file {obj_file}.")
+                    logger.warn(f"Can't read {object_type} file {obj_file}.")
                     continue
                 raise e
 

@@ -414,7 +414,7 @@ def is_specifier_set_compatible(spec_set):
     return True
 
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=4096)
 def _parse_when(w_set):
     from ramble.util.format import when_order
 
