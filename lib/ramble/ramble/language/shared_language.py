@@ -602,8 +602,12 @@ def success_criteria(
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "success_criteria"
         )
+        when_set = frozenset(when_list)
 
-        obj.success_criteria[name] = {
+        if when_set not in obj.success_criteria:
+            obj.success_criteria[when_set] = {}
+
+        obj.success_criteria[when_set][name] = {
             "mode": mode,
             "match": match,
             "anti_match": anti_match,
