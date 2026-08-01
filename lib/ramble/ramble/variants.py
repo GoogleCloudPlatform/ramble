@@ -15,6 +15,8 @@ import ramble.error
 import ramble.util.colors as color
 from ramble.expander import Expander
 
+from spack.util.spack_yaml import syaml_bool
+
 reserved_variants = {
     "modifier",
     "package_manager",
@@ -223,10 +225,7 @@ class VariantSet:
             default_var = self.default_variants[name]
 
         # If the default value is a boolean, convert the experiment value to a boolean
-        if default_var and (
-            isinstance(default_var.default, bool)
-            or type(default_var.default).__name__ == "syaml_bool"
-        ):
+        if default_var and isinstance(default_var.default, (bool, syaml_bool)):
             if isinstance(value, str):
                 value = value.lower() == "true"
 
@@ -416,7 +415,7 @@ class VariantSet:
                         if callable(values):
                             is_valid = values(val)
                         else:
-                            is_valid = str(val) in [str(v) for v in values]
+                            is_valid = str(val).lower() in [str(v).lower() for v in values]
                         if not is_valid:
                             raise RambleVariantError(
                                 f"When defining variant {name} the value {val} is not valid.\n"
@@ -464,7 +463,7 @@ class Variant:
         self._definitions = self._build_definitions()
 
     def _build_definitions(self) -> tuple:
-        if isinstance(self.default, bool) or type(self.default).__name__ == "syaml_bool":
+        if isinstance(self.default, (bool, syaml_bool)):
             val_str = str(self.default)
             return (
                 self._definition,
@@ -480,7 +479,7 @@ class Variant:
 
     def format_value(self, value: Any) -> str:
         """Format a value for this variant into Spack-like syntax"""
-        if isinstance(self.default, bool) or type(self.default).__name__ == "syaml_bool":
+        if isinstance(self.default, (bool, syaml_bool)):
             prefix = "+" if value else "~"
             return f"{prefix}{self.name}"
         else:

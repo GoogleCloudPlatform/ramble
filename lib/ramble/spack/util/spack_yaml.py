@@ -202,11 +202,6 @@ class OrderedLineDumper(RoundTripDumper):
         """Make the dumper NEVER print YAML aliases."""
         return True
 
-    def represent_bool(self, data):
-        if hasattr(data, 'string_val') and data.string_val:
-            return self.represent_scalar('tag:yaml.org,2002:bool', data.string_val)
-        return super(SafeDumper, self).represent_bool(bool(data))
-
     def represent_data(self, data):
         result = super(OrderedLineDumper, self).represent_data(data)
         if data is None:
