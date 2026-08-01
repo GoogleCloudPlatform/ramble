@@ -1083,24 +1083,22 @@ def test_archive_pattern_when(
 
         import ramble.filters
 
+        expected_patterns = [expected_pattern]
+        unexpected_patterns = [unexpected_pattern]
+        for pattern_variation in ["when_mod", "when_pm"]:
+            expected_patterns.append(expected_pattern.replace("when", pattern_variation))
+            unexpected_patterns.append(unexpected_pattern.replace("when", pattern_variation))
+
         filters = ramble.filters.Filters()
         for _, app_inst, _ in experiment_set.filtered_experiments(filters):
             exp_dir = app_inst.expander.expand_var("{experiment_run_dir}")
             os.makedirs(exp_dir, exist_ok=True)
 
             # Write expected patterns
-            mod_expected = expected_pattern.replace("test_pattern_when", "test_pattern_when_mod")
-            mod_unexpected = unexpected_pattern.replace(
-                "test_pattern_when", "test_pattern_when_mod"
-            )
-
-            pm_expected = expected_pattern.replace("test_pattern_when", "test_pattern_when_pm")
-            pm_unexpected = unexpected_pattern.replace("test_pattern_when", "test_pattern_when_pm")
-
-            for pat in [expected_pattern, mod_expected, pm_expected]:
+            for pat in expected_patterns:
                 with open(os.path.join(exp_dir, pat), "w", encoding="utf-8") as f:
                     f.write("Expected")
-            for pat in [unexpected_pattern, mod_unexpected, pm_unexpected]:
+            for pat in unexpected_patterns:
                 with open(os.path.join(exp_dir, pat), "w", encoding="utf-8") as f:
                     f.write("Unexpected")
 
@@ -1116,19 +1114,11 @@ def test_archive_pattern_when(
         for _exp, app_inst, _ in experiment_set.filtered_experiments(filters):
             exp_dir = app_inst.expander.expand_var("{experiment_run_dir}")
 
-            mod_expected = expected_pattern.replace("test_pattern_when", "test_pattern_when_mod")
-            mod_unexpected = unexpected_pattern.replace(
-                "test_pattern_when", "test_pattern_when_mod"
-            )
-
-            pm_expected = expected_pattern.replace("test_pattern_when", "test_pattern_when_pm")
-            pm_unexpected = unexpected_pattern.replace("test_pattern_when", "test_pattern_when_pm")
-
-            for pat in [expected_pattern, mod_expected, pm_expected]:
+            for pat in expected_patterns:
                 expected_archive_path = os.path.join(exp_dir.replace(ws.root, archive_dir), pat)
                 assert os.path.exists(expected_archive_path)
 
-            for pat in [unexpected_pattern, mod_unexpected, pm_unexpected]:
+            for pat in unexpected_patterns:
                 unexpected_archive_path = os.path.join(exp_dir.replace(ws.root, archive_dir), pat)
                 assert not os.path.exists(unexpected_archive_path)
 
