@@ -240,14 +240,12 @@ class RambleArgumentParser(argparse.ArgumentParser):
         add_group(self._optionals)
 
         # epilog
-        formatter.add_text(
-            f"""{section_descriptions['help']}:
+        formatter.add_text(f"""{section_descriptions['help']}:
   ramble help --all       list all commands and options
   ramble help <command>   help on a specific command
   ramble help --spec      help on the application specification syntax
   ramble docs             open https://ramble.readthedocs.io/ in a browser
-"""
-        )
+""")
 
         # determine help from format above
         return formatter.format_help()

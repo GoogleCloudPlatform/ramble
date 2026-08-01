@@ -349,11 +349,9 @@ def test_variant_nesting_works(workspace_name, test_value):
         ws.write()
 
         with open(os.path.join(ws.config_dir, "variants.yaml"), "w+", encoding="utf-8") as f:
-            f.write(
-                f"""variants:
+            f.write(f"""variants:
   iterative_variant: {test_value}
-  iterative_variant2: {test_value}"""
-            )
+  iterative_variant2: {test_value}""")
         workspace(
             "manage",
             "experiments",
@@ -420,10 +418,8 @@ def test_variant_expansion(workspace_name, variant_scope, expected_bool, expecte
 
         if variant_scope == "mod_pkg_args":
             with open(os.path.join(ws.config_dir, "modifiers.yaml"), "w+", encoding="utf-8") as f:
-                f.write(
-                    """modifiers:
-- name: spack-mod"""
-                )
+                f.write("""modifiers:
+- name: spack-mod""")
 
         ws._re_read()
         workspace("concretize", global_args=global_args)

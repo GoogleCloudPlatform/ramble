@@ -25,8 +25,7 @@ def test_modifier_directive_injection(
     app_dir = app_repo_dir / "applications" / "modifier-directive-app"
     app_dir.mkdir(parents=True)
     with open(str(app_dir / "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -49,8 +48,7 @@ class ModifierDirectiveApp(ExecutableApplication):
 
     # Conditionally inject another modifier when inject_modifiers_from_directives is false
     modifier('bad-modifier-2', when='~inject_modifiers_from_directives')
-"""
-        )
+""")
 
     app_repo = ramble.repository.Repo(
         str(app_repo_dir), object_type=ramble.repository.ObjectTypes.applications
@@ -66,8 +64,7 @@ class ModifierDirectiveApp(ExecutableApplication):
     mod_dir1.mkdir(parents=True)
     modifier_path = mod_dir1 / "modifier.py"
     with open(str(modifier_path), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -79,8 +76,7 @@ from ramble.modkit import *
 class DirectiveTestMod(BasicModifier):
     name = "directive-test-mod"
     mode('standard', description='Standard mode')
-"""
-        )
+""")
 
     mod_repo = ramble.repository.Repo(
         str(mod_repo_dir), object_type=ramble.repository.ObjectTypes.modifiers
@@ -90,8 +86,7 @@ class DirectiveTestMod(BasicModifier):
     mod_dir2 = mod_repo_dir / "modifiers" / "bad-modifier"
     mod_dir2.mkdir(parents=True)
     with open(str(mod_dir2 / "modifier.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -103,14 +98,12 @@ from ramble.modkit import *
 class BadModifier(BasicModifier):
     name = "bad-modifier"
     mode('standard', description='Standard mode')
-"""
-        )
+""")
 
     mod_dir3 = mod_repo_dir / "modifiers" / "bad-modifier-2"
     mod_dir3.mkdir(parents=True)
     with open(str(mod_dir3 / "modifier.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -122,8 +115,7 @@ from ramble.modkit import *
 class BadModifier2(BasicModifier):
     name = "bad-modifier-2"
     mode('standard', description='Standard mode')
-"""
-        )
+""")
 
     try:
         with ramble.workspace.create(workspace_name) as ws:
@@ -133,8 +125,7 @@ class BadModifier2(BasicModifier):
 
             # Test 1: With inject_modifiers_from_directives enabled (default)
             with open(config_path, "w", encoding="utf-8") as f:
-                f.write(
-                    """
+                f.write("""
 ramble:
   variables:
     mpi_command: 'mpirun'
@@ -149,8 +140,7 @@ ramble:
             exp1:
               variables:
                 env_name: 'test'
-"""
-                )
+""")
 
             ws._re_read()
             experiment_set = ws.build_experiment_set()
@@ -171,8 +161,7 @@ ramble:
 
                 # Test 2: With inject_modifiers_from_directives disabled via variants
                 with open(config_path2, "w", encoding="utf-8") as f:
-                    f.write(
-                        """
+                    f.write("""
 ramble:
   variables:
     mpi_command: 'mpirun'
@@ -191,8 +180,7 @@ ramble:
             exp2:
               variables:
                 env_name: 'test'
-"""
-                    )
+""")
 
                 ws2._re_read()
                 experiment_set = ws2.build_experiment_set()
@@ -223,8 +211,7 @@ def test_modifier_directive_from_package_manager(
     app_dir = app_repo_dir / "applications" / "pm-directive-app"
     app_dir.mkdir(parents=True)
     with open(str(app_dir / "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -238,8 +225,7 @@ class PmDirectiveApp(ExecutableApplication):
 
     executable('run', 'echo "hello"', use_mpi=False)
     workload('test', executable='run')
-"""
-        )
+""")
 
     app_repo = ramble.repository.Repo(
         str(app_repo_dir), object_type=ramble.repository.ObjectTypes.applications
@@ -253,8 +239,7 @@ class PmDirectiveApp(ExecutableApplication):
     pm_dir = pm_repo_dir / "package_managers" / "directive-pm"
     pm_dir.mkdir(parents=True)
     with open(str(pm_dir / "package_manager.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -271,8 +256,7 @@ class DirectivePm(PackageManagerBase):
     def environment_unload_commands(self, *args, **kwargs): pass
     def get_package_list(self, *args, **kwargs): return []
     def package_name_from_spec(self, spec, *args, **kwargs): return spec
-"""
-        )
+""")
 
     pm_repo = ramble.repository.Repo(
         str(pm_repo_dir), object_type=ramble.repository.ObjectTypes.package_managers
@@ -286,8 +270,7 @@ class DirectivePm(PackageManagerBase):
     mod_dir1 = mod_repo_dir / "modifiers" / "directive-mod"
     mod_dir1.mkdir(parents=True)
     with open(str(mod_dir1 / "modifier.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -299,8 +282,7 @@ from ramble.modkit import *
 class DirectiveMod(BasicModifier):
     name = "directive-mod"
     mode('standard', description='Standard mode')
-"""
-        )
+""")
 
     mod_repo = ramble.repository.Repo(
         str(mod_repo_dir), object_type=ramble.repository.ObjectTypes.modifiers
@@ -314,8 +296,7 @@ class DirectiveMod(BasicModifier):
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
             with open(config_path, "w", encoding="utf-8") as f:
-                f.write(
-                    """
+                f.write("""
 ramble:
   variables:
     mpi_command: 'mpirun'
@@ -332,8 +313,7 @@ ramble:
             exp1:
               variables:
                 env_name: 'test'
-"""
-                )
+""")
 
             ws._re_read()
             experiment_set = ws.build_experiment_set()
@@ -360,15 +340,13 @@ def test_modifier_directive_edge_cases(
     app_dir = app_repo_dir / "applications" / "edge-case-app"
     app_dir.mkdir(parents=True)
     with open(str(app_dir / "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """from ramble.appkit import *
+        f.write("""from ramble.appkit import *
 class EdgeCaseApp(ExecutableApplication):
     name = "edge-case-app"
     executable('run', 'echo "hello"', use_mpi=False)
     workload('test', executable='run')
     modifier('directive-test-mod')
-"""
-        )
+""")
 
     app_repo = ramble.repository.Repo(
         str(app_repo_dir), object_type=ramble.repository.ObjectTypes.applications
@@ -381,13 +359,11 @@ class EdgeCaseApp(ExecutableApplication):
     mod_dir1 = mod_repo_dir / "modifiers" / "directive-test-mod"
     mod_dir1.mkdir(parents=True)
     with open(str(mod_dir1 / "modifier.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """from ramble.modkit import *
+        f.write("""from ramble.modkit import *
 class DirectiveTestMod(BasicModifier):
     name = "directive-test-mod"
     mode('standard', description='Standard mode')
-"""
-        )
+""")
     mod_repo = ramble.repository.Repo(
         str(mod_repo_dir), object_type=ramble.repository.ObjectTypes.modifiers
     )
@@ -398,8 +374,7 @@ class DirectiveTestMod(BasicModifier):
             ws.write()
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w", encoding="utf-8") as f:
-                f.write(
-                    """
+                f.write("""
 ramble:
   variables:
     mpi_command: 'mpirun'
@@ -419,8 +394,7 @@ ramble:
             exp2:
               variants:
                 inject_modifiers_from_directives: 'True'
-"""
-                )
+""")
             ws._re_read()
             experiment_set = ws.build_experiment_set()
 

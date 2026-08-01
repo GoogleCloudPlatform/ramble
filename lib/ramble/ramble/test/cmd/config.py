@@ -57,29 +57,22 @@ def test_get_config_scope_merged(mock_low_high_config):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, "repos.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 repos:
 - repo3
-"""
-        )
+""")
 
     with open(os.path.join(high_path, "repos.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 repos:
 - repo1
 - repo2
-"""
-        )
+""")
 
-    assert (
-        config("get", "repos").strip()
-        == """repos:
+    assert config("get", "repos").strip() == """repos:
 - repo1
 - repo2
 - repo3"""
-    )
 
 
 def test_merged_variables_section(mock_low_high_config):
@@ -90,27 +83,20 @@ def test_merged_variables_section(mock_low_high_config):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, "variables.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 variables:
   foo: 'bar'
-"""
-        )
+""")
 
     with open(os.path.join(high_path, "variables.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 variables:
   bar: 'baz'
-"""
-        )
+""")
 
-    assert (
-        config("get", "variables").strip()
-        == """variables:
+    assert config("get", "variables").strip() == """variables:
   bar: baz
   foo: bar"""
-    )
 
 
 def test_merged_env_vars_section(mock_low_high_config):
@@ -121,33 +107,26 @@ def test_merged_env_vars_section(mock_low_high_config):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, "env_vars.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 env_vars:
   set:
     FOO: bar
-"""
-        )
+""")
 
     with open(os.path.join(high_path, "env_vars.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 env_vars:
   append:
     vars:
       FOO: baz
-"""
-        )
+""")
 
-    assert (
-        config("get", "env_vars").strip()
-        == """env_vars:
+    assert config("get", "env_vars").strip() == """env_vars:
   append:
     vars:
       FOO: baz
   set:
     FOO: bar"""
-    )
 
 
 @pytest.mark.parametrize("section_key", ["software"])
@@ -159,36 +138,29 @@ def test_merged_software_section(mock_low_high_config, section_key):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, f"{section_key}.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            f"""\
+        f.write(f"""\
 {section_key}:
   packages:
     gcc:
       pkg_spec: gcc@4.8.5
-"""
-        )
+""")
 
     with open(os.path.join(high_path, f"{section_key}.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            f"""\
+        f.write(f"""\
 {section_key}:
   packages:
     zlib:
       pkg_spec: zlib
       compiler: gcc
-"""
-        )
+""")
 
-    assert (
-        config("get", section_key).strip()
-        == f"""{section_key}:
+    assert config("get", section_key).strip() == f"""{section_key}:
   packages:
     zlib:
       pkg_spec: zlib
       compiler: gcc
     gcc:
       pkg_spec: gcc@4.8.5"""
-    )
 
 
 def test_merged_success_criteria_section(mock_low_high_config):
@@ -199,30 +171,24 @@ def test_merged_success_criteria_section(mock_low_high_config):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, "success_criteria.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 success_criteria:
   - name: done
     mode: string
     match: "DONE"
     file: "{log_file}"
-"""
-        )
+""")
 
     with open(os.path.join(high_path, "success_criteria.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 success_criteria:
   - name: complete
     mode: string
     match: "COMPLETE"
     file: "{log_file}"
-"""
-        )
+""")
 
-    assert (
-        config("get", "success_criteria").strip()
-        == """success_criteria:
+    assert config("get", "success_criteria").strip() == """success_criteria:
 - name: complete
   mode: string
   match: COMPLETE
@@ -231,7 +197,6 @@ success_criteria:
   mode: string
   match: DONE
   file: '{log_file}'"""
-    )
 
 
 def test_merged_applications_section(mock_low_high_config):
@@ -242,8 +207,7 @@ def test_merged_applications_section(mock_low_high_config):
     fs.mkdirp(high_path)
 
     with open(os.path.join(low_path, "applications.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 applications:
   foo:
     workloads:
@@ -252,12 +216,10 @@ applications:
           test:
             variables:
               my_var: value
-"""
-        )
+""")
 
     with open(os.path.join(high_path, "applications.yaml"), "w", encoding="utf-8") as f:
-        f.write(
-            """\
+        f.write("""\
 applications:
   foo:
     workloads:
@@ -278,12 +240,9 @@ applications:
           single:
             variables:
               n_ranks: 1
-"""
-        )
+""")
 
-    assert (
-        config("get", "applications").strip()
-        == """applications:
+    assert config("get", "applications").strip() == """applications:
   foo:
     workloads:
       bar:
@@ -306,7 +265,6 @@ applications:
           single:
             variables:
               n_ranks: 1"""
-    )
 
 
 def test_config_edit():
@@ -376,12 +334,9 @@ def test_config_add(mutable_empty_config):
     config("add", "config:dirty:true")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   dirty: true
 """
-    )
 
 
 def test_config_add_list(mutable_empty_config):
@@ -390,15 +345,12 @@ def test_config_add_list(mutable_empty_config):
     config("add", "config:template_dirs:test3")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test3
   - test2
   - test1
 """
-    )
 
 
 def test_config_add_override(mutable_empty_config):
@@ -406,14 +358,11 @@ def test_config_add_override(mutable_empty_config):
     config("add", "config:template_dirs:[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test2
   - test1
 """
-    )
 
 
 def test_config_add_override_short_scope(mutable_empty_config):
@@ -421,25 +370,19 @@ def test_config_add_override_short_scope(mutable_empty_config):
     config("add", "config:template_dirs:[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test2
   - test1
 """
-    )
 
     config("add", "config::template_dirs:[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test2
 """
-    )
 
 
 def test_config_add_override_leaf(mutable_empty_config):
@@ -447,25 +390,19 @@ def test_config_add_override_leaf(mutable_empty_config):
     config("add", "config:template_dirs:[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test2
   - test1
 """
-    )
 
     config("add", "config:template_dirs::[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   'template_dirs:':
   - test2
 """
-    )
 
 
 def test_config_add_update_dict(mutable_empty_config):
@@ -495,13 +432,10 @@ def test_config_add_ordered_dict(mutable_empty_config):
     config("add", "config:second:/path/to/second")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   first: /path/to/first
   second: /path/to/second
 """
-    )
 
 
 def test_config_add_from_file(mutable_empty_config, tmpdir):
@@ -515,12 +449,9 @@ def test_config_add_from_file(mutable_empty_config, tmpdir):
     config("add", "-f", file)
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   dirty: true
 """
-    )
 
 
 def test_config_add_from_file_multiple(mutable_empty_config, tmpdir):
@@ -535,13 +466,10 @@ def test_config_add_from_file_multiple(mutable_empty_config, tmpdir):
     config("add", "-f", file)
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   dirty: true
   template_dirs: [test1]
 """
-    )
 
 
 def test_config_add_override_from_file(mutable_empty_config, tmpdir):
@@ -556,12 +484,9 @@ def test_config_add_override_from_file(mutable_empty_config, tmpdir):
     config("add", "-f", file)
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs: [test2]
 """
-    )
 
 
 def test_config_add_override_leaf_from_file(mutable_empty_config, tmpdir):
@@ -576,12 +501,9 @@ def test_config_add_override_leaf_from_file(mutable_empty_config, tmpdir):
     config("add", "-f", file)
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   'template_dirs:': [test2]
 """
-    )
 
 
 def test_config_add_invalid_file_fails(tmpdir):
@@ -605,11 +527,8 @@ def test_config_remove_value(mutable_empty_config):
     config("remove", "config:dirty:true")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config: {}
+    assert output == """config: {}
 """
-    )
 
 
 def test_config_remove_alias_rm(mutable_empty_config):
@@ -617,11 +536,8 @@ def test_config_remove_alias_rm(mutable_empty_config):
     config("rm", "config:dirty:true")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config: {}
+    assert output == """config: {}
 """
-    )
 
 
 def test_config_remove_dict(mutable_empty_config):
@@ -629,11 +545,8 @@ def test_config_remove_dict(mutable_empty_config):
     config("rm", "config:dirty")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config: {}
+    assert output == """config: {}
 """
-    )
 
 
 def test_remove_from_list(mutable_empty_config):
@@ -643,14 +556,11 @@ def test_remove_from_list(mutable_empty_config):
     config("remove", "config:template_dirs:test2")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test3
   - test1
 """
-    )
 
 
 def test_remove_list(mutable_empty_config):
@@ -660,14 +570,11 @@ def test_remove_list(mutable_empty_config):
     config("remove", "config:template_dirs:[test2]")
     output = config("get", "config")
 
-    assert (
-        output
-        == """config:
+    assert output == """config:
   template_dirs:
   - test3
   - test1
 """
-    )
 
 
 def test_config_add_to_workspace(mutable_empty_config, mutable_mock_workspace_path):

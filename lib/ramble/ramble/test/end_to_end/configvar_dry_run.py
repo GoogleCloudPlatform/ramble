@@ -68,9 +68,7 @@ ramble:
         packages:
         - openfoam
         - intel
-""".format(
-        *test_scopes, var_name=var_name1
-    )
+""".format(*test_scopes, var_name=var_name1)
 
     config = ramble.main.RambleCommand("config")
 
