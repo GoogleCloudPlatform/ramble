@@ -29,7 +29,12 @@ __all__ = [
 NS_SEPARATOR = "::"
 
 # Valid module names can contain '-' but can't start with it.
-_valid_module_re = r"^\w[\w-]*$"
+_VALID_MODULE_RE = re.compile(r"^\w[\w-]*$")
+_DASH_UNDERSCORE_RE = re.compile(r"[-_]+")
+_NUM_PREFIX_RE = re.compile(r"^num(\d)")
+_UNDERSCORE_SPLIT_RE = re.compile(r"(_)")
+_LUA_PREFIX_RE = re.compile(r"^(lua)([^-])")
+_BPP_PREFIX_RE = re.compile(r"^(bpp)([^-])")
 
 
 def mod_to_class(mod_name):
@@ -53,13 +58,13 @@ def mod_to_class(mod_name):
     """
     validate_module_name(mod_name)
 
-    class_name = re.sub(r"[-_]+", "-", mod_name)
+    class_name = _DASH_UNDERSCORE_RE.sub("-", mod_name)
     class_name = string.capwords(class_name, "-")
     class_name = class_name.replace("-", "")
 
     # If a class starts with a number, prefix it with Number_ to make it
     # a valid Python class name.
-    if re.match(r"^[0-9]", class_name):
+    if class_name and class_name[0].isdigit():
         class_name = f"_{class_name}"
 
     return class_name
@@ -68,9 +73,9 @@ def mod_to_class(mod_name):
 def possible_ramble_module_names(python_mod_name):
     """Given a Python module name, return a list of all possible ramble module
     names that could correspond to it."""
-    mod_name = re.sub(r"^num(\d)", r"\1", python_mod_name)
+    mod_name = _NUM_PREFIX_RE.sub(r"\1", python_mod_name)
 
-    parts = re.split(r"(_)", mod_name)
+    parts = _UNDERSCORE_SPLIT_RE.split(mod_name)
     options = [["_", "-"]] * mod_name.count("_")
 
     results = []
@@ -122,17 +127,17 @@ def simplify_name(name):
 
     # Simplify Lua package names
     # We don't want "lua" to occur multiple times in the name
-    name = re.sub("^(lua)([^-])", r"\1-\2", name)
+    name = _LUA_PREFIX_RE.sub(r"\1-\2", name)
 
     # Simplify Bio++ package names
-    name = re.sub("^(bpp)([^-])", r"\1-\2", name)
+    name = _BPP_PREFIX_RE.sub(r"\1-\2", name)
 
     return name
 
 
 def valid_module_name(mod_name):
     """Return whether mod_name is valid for use in Ramble."""
-    return bool(re.match(_valid_module_re, mod_name))
+    return bool(_VALID_MODULE_RE.match(mod_name))
 
 
 def validate_module_name(mod_name):

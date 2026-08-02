@@ -90,6 +90,7 @@ WORKSPACE_DEPLOYMENTS_PATH = "deployments"
 
 #: regex for validating workspace names
 VALID_WORKSPACE_NAME_RE = re.compile(r"^\w[\w-]*$")
+_DEF_REGEX = re.compile(r"\s*=\s*")
 
 # File that includes licensing information for sourcing
 LICENSE_INC_NAME = "license.inc"
@@ -126,7 +127,7 @@ _active_workspace = None
 
 
 def valid_workspace_name(name):
-    return re.match(VALID_WORKSPACE_NAME_RE, name)
+    return VALID_WORKSPACE_NAME_RE.match(name)
 
 
 def validate_workspace_name(name):
@@ -1247,9 +1248,8 @@ ramble:
 
         def process_definitions(definitions, def_type="variable"):
             def_dict = {}
-            def_regex = re.compile(r"\s*=\s*")
             for definition in definitions:
-                m = def_regex.search(definition)
+                m = _DEF_REGEX.search(definition)
 
                 if m:
                     key = definition[0 : m.start()]
@@ -1293,9 +1293,8 @@ ramble:
 
         workloads_dict = apps_dict[application][namespace.workload]
 
-        def_regex = re.compile(r"\s*=\s*")
         for zip_def in zips:
-            m = def_regex.match(zip_def)
+            m = _DEF_REGEX.match(zip_def)
             if m:
                 key = m.group("key")
                 value = list_str_to_list(m.group("value"))

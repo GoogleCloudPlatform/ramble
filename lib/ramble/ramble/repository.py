@@ -43,6 +43,9 @@ global_namespace = "ramble"
 #: Guaranteed unused default value for some functions.
 NOT_PROVIDED = object()
 
+_NAMESPACE_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9_.]+")
+_VALID_NAMESPACE_RE = re.compile(r"\w[\.\w-]*")
+
 
 ####
 # Implement type specific functionality between here, and
@@ -1063,7 +1066,7 @@ class Repo:
 
         self.namespace = config["namespace"]
         check(
-            re.match(r"[a-zA-Z][a-zA-Z0-9_.]+", self.namespace),
+            _NAMESPACE_RE.match(self.namespace),
             (f"Invalid namespace '{self.namespace}' in repo '{self.root}'. ")
             + "Namespaces must be valid python identifiers separated by '.'",
         )
@@ -1450,7 +1453,7 @@ def create_repo(
     if not namespace:
         namespace = os.path.basename(root)
 
-    if not re.match(r"\w[\.\w-]*", namespace):
+    if not _VALID_NAMESPACE_RE.match(namespace):
         raise InvalidNamespaceError(f"'{namespace}' is not a valid namespace.")
 
     existed = False

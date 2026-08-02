@@ -11,13 +11,15 @@ import io
 import re
 import textwrap
 
+_WHITESPACE_RE = re.compile(r"\s+")
+
 
 def format_doc(doc_str, **kwargs):
     """Wrap doc string at 72 characters and format nicely"""
     if not doc_str:
         return ""
     indent = kwargs.get("indent", 0)
-    doc = re.sub(r"\s+", " ", doc_str)
+    doc = _WHITESPACE_RE.sub(" ", doc_str)
     lines = textwrap.wrap(doc, 72)
     results = io.StringIO()
     for line in lines:

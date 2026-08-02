@@ -16,6 +16,10 @@ from ramble.util.logger import logger
 
 ALL_PHASES: List[str] = ["*"]
 
+_INVALID_CHARS_RE = re.compile(r"[a-zA-Z0-9_\s\(\)-]")
+_TOKEN_RE = re.compile(r"([a-zA-Z0-9_-]+|\(|\))")
+_VALID_NAME_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
+
 
 class Filters:
     """Object containing filters for limiting various operations in Ramble"""
@@ -74,14 +78,13 @@ def expand_filter_groups(expression: str, filter_groups_defs: Optional[dict]) ->
         filter_groups_defs = {}
 
     # Validate expression only contains allowed characters to prevent injection or silent failures
-    invalid_chars = re.sub(r"[a-zA-Z0-9_\s\(\)-]", "", expression)
+    invalid_chars = _INVALID_CHARS_RE.sub("", expression)
     if invalid_chars:
         raise RambleError(
             f"Invalid characters {repr(invalid_chars)} in filter group expression '{expression}'"
         )
 
-    token_re = re.compile(r"([a-zA-Z0-9_-]+|\(|\))")
-    tokens = token_re.findall(expression)
+    tokens = _TOKEN_RE.findall(expression)
 
     expanded_tokens = []
     for token in tokens:
@@ -140,7 +143,7 @@ def validate_filter_group_name(name: str):
     if name.lower() in ("and", "or", "not"):
         raise RambleError(f"Filter group name '{name}' is a reserved keyword.")
 
-    if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+    if not _VALID_NAME_RE.match(name):
         raise RambleError(
             f"Filter group name '{name}' is invalid. "
             "It can only contain alphanumeric characters, underscores, and hyphens."
