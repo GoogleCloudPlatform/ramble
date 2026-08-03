@@ -4487,6 +4487,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _object_templates(self):
         """Return templates defined from different objects associated with the app_inst"""
+        if hasattr(self, "_cached_object_templates"):
+            return self._cached_object_templates
+
         workspace = self.workspace
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
@@ -4550,6 +4553,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 "dest_path": dest_path,
             }
 
+        cached_templates = []
         for obj_type, obj in self.objects():
             obj_tpls = []
             for when_set, tpl in obj.templates.items():
@@ -4565,7 +4569,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     for name, tpl_conf in tpl.items()
                 )
             if obj_tpls:
-                yield obj, obj_tpls
+                cached_templates.append((obj, obj_tpls))
+
+        self._cached_object_templates = cached_templates
+        return self._cached_object_templates
 
     def _get_rendered_template_content(
         self, template_name, extra_vars_origin, rendering_stack=None

@@ -2221,7 +2221,6 @@ ramble:
         """Iterator over each template in the workspace"""
         yield from sorted(self._templates.items())
 
-
     def all_auxiliary_software_files(self):
         """Iterator over each auxiliary software file"""
         yield from self._auxiliary_software_files.items()
