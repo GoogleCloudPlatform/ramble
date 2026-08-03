@@ -49,6 +49,8 @@ import spack.compilers
 import spack.paths
 import spack.platforms
 import spack.schema
+import ramble.schema
+spack.schema.Validator = ramble.schema.Validator
 import spack.schema.bootstrap
 import spack.schema.compilers
 import spack.schema.concretizer
@@ -384,7 +386,7 @@ def _config_mutator(method):
     """
     @functools.wraps(method)
     def _method(self, *args, **kwargs):
-        self._get_config_memoized.cache.clear()
+        self._get_config_memoized.cache_clear()
         return method(self, *args, **kwargs)
     return _method
 

@@ -6,9 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Utility classes for logging the output of blocks of code.
-"""
-from __future__ import unicode_literals
+"""Utility classes for logging the output of blocks of code."""
 
 import atexit
 import ctypes
@@ -20,33 +18,53 @@ import re
 import select
 import signal
 import sys
-import threading
 import traceback
 from contextlib import contextmanager
+from multiprocessing.connection import Connection
 from threading import Thread
-from types import ModuleType  # novm
-from typing import Optional  # novm
+from typing import IO, Callable, List, Optional, Tuple
 
 import llnl.util.tty as tty
 
-termios = None  # type: Optional[ModuleType]
+if sys.platform == "win32":
+    import ctypes.wintypes as wintypes
+    import msvcrt
+
+    kernel32 = ctypes.windll.kernel32
+
 try:
-    import termios as term_mod
-    termios = term_mod
+    import termios
 except ImportError:
-    pass
+    termios = None  # type: ignore[assignment]
 
+# win32api constants
+DUPLICATE_SAME_ACCESS = 0x00000002
 
+esc, bell, lbracket, bslash, newline = r"\x1b", r"\x07", r"\[", r"\\", r"\n"
+# Ansi Control Sequence Introducers (CSI) are a well-defined format
+# Standard ECMA-48: Control Functions for Character-Imaging I/O Devices, section 5.4
+# https://www.ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf
+csi_pre = f"{esc}{lbracket}"
+csi_param, csi_inter, csi_post = r"[0-?]", r"[ -/]", r"[@-~]"
+ansi_csi = f"{csi_pre}{csi_param}*{csi_inter}*{csi_post}"
+# General ansi escape sequences have well-defined prefixes,
+#  but content and suffixes are less reliable.
+# Conservatively assume they end with either "<ESC>\" or "<BELL>",
+#  with no intervening "<ESC>"/"<BELL>" keys or newlines
+esc_pre = f"{esc}[@-_]"
+esc_content = f"[^{esc}{bell}{newline}]"
+esc_post = f"(?:{esc}{bslash}|{bell})"
+ansi_esc = f"{esc_pre}{esc_content}*{esc_post}"
 # Use this to strip escape sequences
-_escape = re.compile(r'\x1b[^m]*m|\x1b\[?1034h|\x1b\][0-9]+;[^\x07]*\x07')
+_escape = re.compile(f"{ansi_csi}|{ansi_esc}")
 
 # control characters for enabling/disabling echo
 #
 # We use control characters to ensure that echo enable/disable are inline
 # with the other output.  We always follow these with a newline to ensure
 # one per line the following newline is ignored in output.
-xon, xoff = '\x11\n', '\x13\n'
-control = re.compile('(\x11\n|\x13\n)')
+xon, xoff = "\x11\n", "\x13\n"
+control = re.compile("(\x11\n|\x13\n)")
 
 
 @contextmanager
@@ -59,21 +77,64 @@ def ignore_signal(signum):
         signal.signal(signum, old_handler)
 
 
-def _is_background_tty(stream):
-    """True if the stream is a tty and calling process is in the background.
-    """
-    return (
-        stream.isatty() and
-        os.getpgrp() != os.tcgetpgrp(stream.fileno())
-    )
+def _is_background_tty(stdin: IO[str]) -> bool:
+    """True if the stream is a tty and calling process is in the background."""
+    return stdin.isatty() and os.getpgrp() != os.tcgetpgrp(stdin.fileno())
 
 
-def _strip(line):
+def _strip(line: str) -> str:
     """Strip color and control characters from a line."""
-    return _escape.sub('', line)
+    return _escape.sub("", line)
 
 
-class keyboard_input(object):
+class preserve_terminal_settings:
+    """Context manager to preserve terminal settings on a stream.
+
+    Stores terminal settings before the context and ensures they are restored after.
+    Ensures that things like echo and canonical line mode are not left disabled if
+    terminal settings in the context are not properly restored.
+    """
+
+    def __init__(self, stdin: Optional[IO[str]]) -> None:
+        """Create a context manager that preserves terminal settings on a stream.
+
+        Args:
+            stream: keyboard input stream, typically sys.stdin
+        """
+        self.stdin = stdin
+
+    def _restore_default_terminal_settings(self) -> None:
+        """Restore the original input configuration on ``self.stdin``."""
+        # Can be called in foreground or background. When called in the background, tcsetattr
+        # triggers SIGTTOU, which we must ignore, or the process will be stopped.
+        assert self.stdin is not None and self.old_cfg is not None and termios is not None
+        with ignore_signal(signal.SIGTTOU):
+            termios.tcsetattr(self.stdin, termios.TCSANOW, self.old_cfg)
+
+    def __enter__(self) -> "preserve_terminal_settings":
+        """Store terminal settings."""
+        self.old_cfg = None
+
+        # Ignore all this if the input stream is not a tty.
+        if not self.stdin or not self.stdin.isatty() or not termios:
+            return self
+
+        # save old termios settings to restore later
+        self.old_cfg = termios.tcgetattr(self.stdin)
+
+        # add an atexit handler to ensure the terminal is restored
+        atexit.register(self._restore_default_terminal_settings)
+
+        return self
+
+    def __exit__(self, exc_type, exception, traceback):
+        """If termios was available, restore old settings."""
+        if self.old_cfg:
+            self._restore_default_terminal_settings()
+            atexit.unregister(self._restore_default_terminal_settings)
+
+
+class keyboard_input(preserve_terminal_settings):
     """Context manager to disable line editing and echoing.
 
     Use this with ``sys.stdin`` for keyboard input, e.g.::
@@ -89,7 +150,7 @@ class keyboard_input(object):
     the stream immediately, and they are not printed to the
     terminal. Typically, standard input is line-buffered, which means
     keypresses won't be sent until the user hits return. In this mode, a
-    user can hit, e.g., 'v', and it will be read on the other end of the
+    user can hit, e.g., ``v``, and it will be read on the other end of the
     pipe immediately but not printed.
 
     The handler takes care to ensure that terminal changes only take
@@ -109,7 +170,7 @@ class keyboard_input(object):
         [Running] <------- bg sends SIGCONT ---------- [Stopped]
         [ in BG ]                                      [ in BG ]
 
-    We handle all transitions exept for ``SIGTSTP`` generated by Ctrl-Z
+    We handle all transitions except for ``SIGTSTP`` generated by Ctrl-Z
     by periodically calling ``check_fg_bg()``.  This routine notices if
     we are in the background with canonical mode or echo disabled, or if
     we are in the foreground without canonical disabled and echo enabled,
@@ -148,53 +209,45 @@ class keyboard_input(object):
       a TTY, ``keyboard_input`` has no effect.
 
     """
-    def __init__(self, stream):
+
+    def __init__(self, stdin: Optional[IO[str]]) -> None:
         """Create a context manager that will enable keyboard input on stream.
 
         Args:
-            stream (file-like): stream on which to accept keyboard input
+            stdin: text io wrapper of stdin (keyboard input)
 
-        Note that stream can be None, in which case ``keyboard_input``
-        will do nothing.
+        Note that stdin can be None, in which case ``keyboard_input`` will do nothing.
         """
-        self.stream = stream
+        super().__init__(stdin)
 
-    def _is_background(self):
+    def _is_background(self) -> bool:
         """True iff calling process is in the background."""
-        return _is_background_tty(self.stream)
+        assert self.stdin is not None, "stdin should be available"
+        return _is_background_tty(self.stdin)
 
-    def _get_canon_echo_flags(self):
+    def _get_canon_echo_flags(self) -> Tuple[bool, bool]:
         """Get current termios canonical and echo settings."""
-        cfg = termios.tcgetattr(self.stream)
-        return (
-            bool(cfg[3] & termios.ICANON),
-            bool(cfg[3] & termios.ECHO),
-        )
+        assert termios is not None and self.stdin is not None
+        cfg = termios.tcgetattr(self.stdin)
+        return (bool(cfg[3] & termios.ICANON), bool(cfg[3] & termios.ECHO))
 
-    def _enable_keyboard_input(self):
-        """Disable canonical input and echoing on ``self.stream``."""
+    def _enable_keyboard_input(self) -> None:
+        """Disable canonical input and echoing on ``self.stdin``."""
         # "enable" input by disabling canonical mode and echo
-        new_cfg = termios.tcgetattr(self.stream)
+        assert termios is not None and self.stdin is not None
+        new_cfg = termios.tcgetattr(self.stdin)
         new_cfg[3] &= ~termios.ICANON
         new_cfg[3] &= ~termios.ECHO
 
         # Apply new settings for terminal
         with ignore_signal(signal.SIGTTOU):
-            termios.tcsetattr(self.stream, termios.TCSANOW, new_cfg)
-
-    def _restore_default_terminal_settings(self):
-        """Restore the original input configuration on ``self.stream``."""
-        # _restore_default_terminal_settings Can be called in foreground
-        # or background. When called in the background, tcsetattr triggers
-        # SIGTTOU, which we must ignore, or the process will be stopped.
-        with ignore_signal(signal.SIGTTOU):
-            termios.tcsetattr(self.stream, termios.TCSANOW, self.old_cfg)
+            termios.tcsetattr(self.stdin, termios.TCSANOW, new_cfg)
 
     def _tstp_handler(self, signum, frame):
         self._restore_default_terminal_settings()
         os.kill(os.getpid(), signal.SIGSTOP)
 
-    def check_fg_bg(self):
+    def check_fg_bg(self) -> None:
         # old_cfg is set up in __enter__ and indicates that we have
         # termios and a valid stream.
         if not self.old_cfg:
@@ -205,35 +258,28 @@ class keyboard_input(object):
         bg = self._is_background()
 
         # restore sanity if flags are amiss -- see diagram in class docs
-        if not bg and any(flags):    # fg, but input not enabled
+        if not bg and any(flags):  # fg, but input not enabled
             self._enable_keyboard_input()
         elif bg and not all(flags):  # bg, but input enabled
             self._restore_default_terminal_settings()
 
-    def __enter__(self):
+    def __enter__(self) -> "keyboard_input":
         """Enable immediate keypress input, while this process is foreground.
 
         If the stream is not a TTY or the system doesn't support termios,
         do nothing.
         """
-        self.old_cfg = None
+        super().__enter__()
         self.old_handlers = {}
 
         # Ignore all this if the input stream is not a tty.
-        if not self.stream or not self.stream.isatty():
+        if not self.stdin or not self.stdin.isatty():
             return self
 
         if termios:
-            # save old termios settings to restore later
-            self.old_cfg = termios.tcgetattr(self.stream)
-
             # Install a signal handler to disable/enable keyboard input
             # when the process moves between foreground and background.
-            self.old_handlers[signal.SIGTSTP] = signal.signal(
-                signal.SIGTSTP, self._tstp_handler)
-
-            # add an atexit handler to ensure the terminal is restored
-            atexit.register(self._restore_default_terminal_settings)
+            self.old_handlers[signal.SIGTSTP] = signal.signal(signal.SIGTSTP, self._tstp_handler)
 
             # enable keyboard input initially (if foreground)
             if not self._is_background():
@@ -243,10 +289,7 @@ class keyboard_input(object):
 
     def __exit__(self, exc_type, exception, traceback):
         """If termios was available, restore old settings."""
-        if self.old_cfg:
-            self._restore_default_terminal_settings()
-            if sys.version_info >= (3,):
-                atexit.unregister(self._restore_default_terminal_settings)
+        super().__exit__(exc_type, exception, traceback)
 
         # restore SIGSTP and SIGCONT handlers
         if self.old_handlers:
@@ -254,11 +297,12 @@ class keyboard_input(object):
                 signal.signal(signum, old_handler)
 
 
-class Unbuffered(object):
+class Unbuffered:
     """Wrapper for Python streams that forces them to be unbuffered.
 
     This is implemented by forcing a flush after each write.
     """
+
     def __init__(self, stream):
         self.stream = stream
 
@@ -272,120 +316,6 @@ class Unbuffered(object):
 
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
-
-
-def _file_descriptors_work(*streams):
-    """Whether we can get file descriptors for the streams specified.
-
-    This tries to call ``fileno()`` on all streams in the argument list,
-    and returns ``False`` if anything goes wrong.
-
-    This can happen, when, e.g., the test framework replaces stdout with
-    a ``StringIO`` object.
-
-    We have to actually try this to see whether it works, rather than
-    checking for the fileno attribute, beacuse frameworks like pytest add
-    dummy fileno methods on their dummy file objects that return
-    ``UnsupportedOperationErrors``.
-
-    """
-    # test whether we can get fds for out and error
-    try:
-        for stream in streams:
-            stream.fileno()
-        return True
-    except BaseException:
-        return False
-
-
-class FileWrapper(object):
-    """Represents a file. Can be an open stream, a path to a file (not opened
-    yet), or neither. When unwrapped, it returns an open file (or file-like)
-    object.
-    """
-    def __init__(self, file_like):
-        # This records whether the file-like object returned by "unwrap" is
-        # purely in-memory. In that case a subprocess will need to explicitly
-        # transmit the contents to the parent.
-        self.write_in_parent = False
-
-        self.file_like = file_like
-
-        if isinstance(file_like, str):
-            self.open = True
-        elif _file_descriptors_work(file_like):
-            self.open = False
-        else:
-            self.file_like = None
-            self.open = True
-            self.write_in_parent = True
-
-        self.file = None
-
-    def unwrap(self):
-        if self.open:
-            if self.file_like:
-                if sys.version_info < (3,):
-                    self.file = open(self.file_like, 'w')
-                else:
-                    self.file = open(self.file_like, 'w', encoding='utf-8')  # novm
-            else:
-                self.file = io.StringIO()
-            return self.file
-        else:
-            # We were handed an already-open file object. In this case we also
-            # will not actually close the object when requested to.
-            return self.file_like
-
-    def close(self):
-        if self.file:
-            self.file.close()
-
-
-class MultiProcessFd(object):
-    """Return an object which stores a file descriptor and can be passed as an
-       argument to a function run with ``multiprocessing.Process``, such that
-       the file descriptor is available in the subprocess."""
-    def __init__(self, fd):
-        self._connection = None
-        self._fd = None
-        if sys.version_info >= (3, 8):
-            self._connection = multiprocessing.connection.Connection(fd)
-        else:
-            self._fd = fd
-
-    @property
-    def fd(self):
-        if self._connection:
-            return self._connection.fileno()
-        else:
-            return self._fd
-
-    def close(self):
-        if self._connection:
-            self._connection.close()
-        else:
-            os.close(self._fd)
-
-
-@contextmanager
-def replace_environment(env):
-    """Replace the current environment (`os.environ`) with `env`.
-
-    If `env` is empty (or None), this unsets all current environment
-    variables.
-    """
-    env = env or {}
-    old_env = os.environ.copy()
-    try:
-        os.environ.clear()
-        for name, val in env.items():
-            os.environ[name] = val
-        yield
-    finally:
-        os.environ.clear()
-        for name, val in old_env.items():
-            os.environ[name] = val
 
 
 def log_output(*args, **kwargs):
@@ -419,44 +349,48 @@ def log_output(*args, **kwargs):
     This method is actually a factory serving a per platform
     (unix vs windows) log_output class
     """
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         return winlog(*args, **kwargs)
     else:
         return nixlog(*args, **kwargs)
 
 
-class nixlog(object):
+class nixlog:
     """
     Under the hood, we spawn a daemon and set up a pipe between this
     process and the daemon.  The daemon writes our output to both the
     file and to stdout (if echoing).  The parent process can communicate
     with the daemon to tell it when and when not to echo; this is what
-    force_echo does.  You can also enable/disable echoing by typing 'v'.
+    force_echo does.  You can also enable/disable echoing by typing ``v``.
 
-    We try to use OS-level file descriptors to do the redirection, but if
-    stdout or stderr has been set to some Python-level file object, we
-    use Python-level redirection instead.  This allows the redirection to
-    work within test frameworks like nose and pytest.
+    We use OS-level file descriptors to do the redirection, which
+    redirects output for subprocesses and system calls.
     """
 
-    def __init__(self, file_like=None, echo=False, debug=0, buffer=False,
-                 env=None, filter_fn=None):
+    def __init__(
+        self,
+        filename: str = None,
+        echo=False,
+        debug=0,
+        buffer=False,
+        env=None,
+        filter_fn=None,
+        append=False,
+    ):
         """Create a new output log context manager.
 
         Args:
-            file_like (str or stream): open file object or name of file where
-                output should be logged
+            filename (str): path to file where output should be logged
             echo (bool): whether to echo output in addition to logging it
             debug (int): positive to enable tty debug mode during logging
             buffer (bool): pass buffer=True to skip unbuffering output; note
                 this doesn't set up any *new* buffering
             filter_fn (callable, optional): Callable[str] -> str to filter each
                 line of output
+            append (bool): whether to append to file ('a' mode)
 
-        log_output can take either a file object or a filename. If a
-        filename is passed, the file will be opened and closed entirely
-        within ``__enter__`` and ``__exit__``. If a file object is passed,
-        this assumes the caller owns it and will close it.
+        The filename will be opened and closed entirely within ``__enter__``
+        and ``__exit__``.
 
         By default, we unbuffer sys.stdout and sys.stderr because the
         logger will include output from executed programs and from python
@@ -466,54 +400,18 @@ class nixlog(object):
         Logger daemon is not started until ``__enter__()``.
 
         """
-        self.file_like = file_like
+        self.filename = filename
         self.echo = echo
         self.debug = debug
         self.buffer = buffer
-        self.env = env  # the environment to use for _writer_daemon
         self.filter_fn = filter_fn
+        self.append = append
 
         self._active = False  # used to prevent re-entry
-
-    def __call__(self, file_like=None, echo=None, debug=None, buffer=None):
-        """This behaves the same as init. It allows a logger to be reused.
-
-        Arguments are the same as for ``__init__()``.  Args here take
-        precedence over those passed to ``__init__()``.
-
-        With the ``__call__`` function, you can save state between uses
-        of a single logger.  This is useful if you want to remember,
-        e.g., the echo settings for a prior ``with log_output()``::
-
-            logger = log_output()
-
-            with logger('foo.txt'):
-                # log things; user can change echo settings with 'v'
-
-            with logger('bar.txt'):
-                # log things; logger remembers prior echo settings.
-
-        """
-        if file_like is not None:
-            self.file_like = file_like
-        if echo is not None:
-            self.echo = echo
-        if debug is not None:
-            self.debug = debug
-        if buffer is not None:
-            self.buffer = buffer
-        return self
 
     def __enter__(self):
         if self._active:
             raise RuntimeError("Can't re-enter the same log_output!")
-
-        if self.file_like is None:
-            raise RuntimeError(
-                "file argument must be set by either __init__ or __call__")
-
-        # set up a stream for the daemon to write to
-        self.log_file = FileWrapper(self.file_like)
 
         # record parent color settings before redirecting.  We do this
         # because color output depends on whether the *original* stdout
@@ -525,43 +423,52 @@ class nixlog(object):
         # forcing debug output.
         self._saved_debug = tty._debug
 
-        # OS-level pipe for redirecting output to logger
-        read_fd, write_fd = os.pipe()
+        # Pipe for redirecting output to logger
+        read_fd, self.write_fd = multiprocessing.Pipe(duplex=False)
 
-        read_multiprocess_fd = MultiProcessFd(read_fd)
-
-        # Multiprocessing pipe for communication back from the daemon
+        # Pipe for communication back from the daemon
         # Currently only used to save echo value between uses
-        self.parent_pipe, child_pipe = multiprocessing.Pipe()
+        self.parent_pipe, child_pipe = multiprocessing.Pipe(duplex=False)
 
-        # Sets a daemon that writes to file what it reads from a pipe
+        stdin_fd = None
+        stdout_fd = None
         try:
             # need to pass this b/c multiprocessing closes stdin in child.
-            input_multiprocess_fd = None
             try:
                 if sys.stdin.isatty():
-                    input_multiprocess_fd = MultiProcessFd(
-                        os.dup(sys.stdin.fileno())
-                    )
+                    stdin_fd = Connection(os.dup(sys.stdin.fileno()))
             except BaseException:
                 # just don't forward input if this fails
                 pass
 
-            with replace_environment(self.env):
-                self.process = multiprocessing.Process(
-                    target=_writer_daemon,
-                    args=(
-                        input_multiprocess_fd, read_multiprocess_fd, write_fd,
-                        self.echo, self.log_file, child_pipe, self.filter_fn
-                    )
-                )
-                self.process.daemon = True  # must set before start()
-                self.process.start()
+            # If our process has redirected stdout after the forkserver was started, we need to
+            # make the forked processes use the new file descriptors.
+            if multiprocessing.get_start_method() == "forkserver":
+                stdout_fd = Connection(os.dup(sys.stdout.fileno()))
+
+            self.process = multiprocessing.Process(
+                target=_writer_daemon,
+                args=(
+                    stdin_fd,
+                    stdout_fd,
+                    read_fd,
+                    self.write_fd,
+                    self.echo,
+                    self.filename,
+                    self.append,
+                    child_pipe,
+                    self.filter_fn,
+                ),
+            )
+            self.process.daemon = True  # must set before start()
+            self.process.start()
 
         finally:
-            if input_multiprocess_fd:
-                input_multiprocess_fd.close()
-            read_multiprocess_fd.close()
+            if stdin_fd:
+                stdin_fd.close()
+            if stdout_fd:
+                stdout_fd.close()
+            read_fd.close()
 
         # Flush immediately before redirecting so that anything buffered
         # goes to the original stream
@@ -569,34 +476,18 @@ class nixlog(object):
         sys.stderr.flush()
 
         # Now do the actual output redirection.
-        self.use_fds = _file_descriptors_work(sys.stdout, sys.stderr)
-        if self.use_fds:
-            # We try first to use OS-level file descriptors, as this
-            # redirects output for subprocesses and system calls.
+        # We use OS-level file descriptors, as this
+        # redirects output for subprocesses and system calls.
+        self._redirected_fds = {}
 
-            # Save old stdout and stderr file descriptors
-            self._saved_stdout = os.dup(sys.stdout.fileno())
-            self._saved_stderr = os.dup(sys.stderr.fileno())
+        # sys.stdout and sys.stderr may have been replaced with file objects under pytest, so
+        # redirect their file descriptors in addition to the original fds 1 and 2.
+        fds = {sys.stdout.fileno(), sys.stderr.fileno(), 1, 2}
+        for fd in fds:
+            self._redirected_fds[fd] = os.dup(fd)
+            os.dup2(self.write_fd.fileno(), fd)
 
-            # redirect to the pipe we created above
-            os.dup2(write_fd, sys.stdout.fileno())
-            os.dup2(write_fd, sys.stderr.fileno())
-            os.close(write_fd)
-
-        else:
-            # Handle I/O the Python way. This won't redirect lower-level
-            # output, but it's the best we can do, and the caller
-            # shouldn't expect any better, since *they* have apparently
-            # redirected I/O the Python way.
-
-            # Save old stdout and stderr file objects
-            self._saved_stdout = sys.stdout
-            self._saved_stderr = sys.stderr
-
-            # create a file object for the pipe; redirect to it.
-            pipe_fd_out = os.fdopen(write_fd, 'w')
-            sys.stdout = pipe_fd_out
-            sys.stderr = pipe_fd_out
+        self.write_fd.close()
 
         # Unbuffer stdout and stderr at the Python level
         if not self.buffer:
@@ -619,22 +510,10 @@ class nixlog(object):
         sys.stdout.flush()
         sys.stderr.flush()
 
-        # restore previous output settings, either the low-level way or
-        # the python way
-        if self.use_fds:
-            os.dup2(self._saved_stdout, sys.stdout.fileno())
-            os.close(self._saved_stdout)
-
-            os.dup2(self._saved_stderr, sys.stderr.fileno())
-            os.close(self._saved_stderr)
-        else:
-            sys.stdout = self._saved_stdout
-            sys.stderr = self._saved_stderr
-
-        # print log contents in parent if needed.
-        if self.log_file.write_in_parent:
-            string = self.parent_pipe.recv()
-            self.file_like.write(string)
+        # restore previous output settings using the OS-level way
+        for fd, saved_fd in self._redirected_fds.items():
+            os.dup2(saved_fd, fd)
+            os.close(saved_fd)
 
         # recover and store echo settings from the child before it dies
         try:
@@ -659,8 +538,7 @@ class nixlog(object):
     def force_echo(self):
         """Context manager to force local echo, even if echo is off."""
         if not self._active:
-            raise RuntimeError(
-                "Can't call force_echo() outside log_output region!")
+            raise RuntimeError("Can't call force_echo() outside log_output region!")
 
         # This uses the xon/xoff to highlight regions to be echoed in the
         # output. We us these control characters rather than, say, a
@@ -676,176 +554,221 @@ class nixlog(object):
 
 
 class StreamWrapper:
-    """ Wrapper class to handle redirection of io streams """
+    """Wrapper class to handle redirection of io streams"""
+
     def __init__(self, sys_attr):
         self.sys_attr = sys_attr
         self.saved_stream = None
-        if sys.platform.startswith('win32'):
-            if sys.version_info < (3, 5):
-                libc = ctypes.CDLL(ctypes.util.find_library('c'))
-            else:
-                if hasattr(sys, 'gettotalrefcount'):  # debug build
-                    libc = ctypes.CDLL('ucrtbased')
-                else:
-                    libc = ctypes.CDLL('api-ms-win-crt-stdio-l1-1-0')
 
-            kernel32 = ctypes.WinDLL('kernel32')
+        kernel32.SetStdHandle.argtypes = [wintypes.DWORD, wintypes.HANDLE]  # nStdHandle  # hHandle
 
-            # https://docs.microsoft.com/en-us/windows/console/getstdhandle
-            if self.sys_attr == 'stdout':
-                STD_HANDLE = -11
-            elif self.sys_attr == 'stderr':
-                STD_HANDLE = -12
-            else:
-                raise KeyError(self.sys_attr)
+        kernel32.GetStdHandle.argtypes = [wintypes.DWORD]
+        kernel32.GetStdHandle.restype = wintypes.HANDLE
 
-            c_stdout = kernel32.GetStdHandle(STD_HANDLE)
-            self.libc = libc
-            self.c_stream = c_stdout
+        # https://docs.microsoft.com/en-us/windows/console/getstdhandle
+        if self.sys_attr == "stdout":
+            self.STD_HANDLE = -11
+        elif self.sys_attr == "stderr":
+            self.STD_HANDLE = -12
         else:
-            self.libc = ctypes.CDLL(None)
-            self.c_stream = ctypes.c_void_p.in_dll(self.libc, self.sys_attr)
-        self.sys_stream = getattr(sys, self.sys_attr)
-        self.orig_stream_fd = self.sys_stream.fileno()
-        # Save a copy of the original stdout fd in saved_stream
-        self.saved_stream = os.dup(self.orig_stream_fd)
+            raise KeyError(self.sys_attr)
 
-    def redirect_stream(self, to_fd):
+        self.saved_stream = getattr(sys, self.sys_attr)
+        self.std_fd = self.saved_stream.fileno()
+        self.saved_std_handle = kernel32.GetStdHandle(self.STD_HANDLE)
+        self.saved_stream_fd = os.dup(self.std_fd)
+        self.redirect_fd = None
+
+    def redirect_stream(self, writer):
         """Redirect stdout to the given file descriptor."""
-        # Flush the C-level buffer stream
-        if sys.platform.startswith('win32'):
-            self.libc.fflush(None)
-        else:
-            self.libc.fflush(self.c_stream)
-        # Flush and close sys_stream - also closes the file descriptor (fd)
-        sys_stream = getattr(sys, self.sys_attr)
-        sys_stream.flush()
-        sys_stream.close()
-        # Make orig_stream_fd point to the same file as to_fd
-        os.dup2(to_fd, self.orig_stream_fd)
-        # Set sys_stream to a new stream that points to the redirected fd
-        new_buffer = open(self.orig_stream_fd, 'wb')
-        new_stream = io.TextIOWrapper(new_buffer)
-        setattr(sys, self.sys_attr, new_stream)
-        self.sys_stream = getattr(sys, self.sys_attr)
+        self.flush()
+        # Get fd for new stream
+        # new stream is file object
+        redirect_fd = writer.fileno()
+        # get windows file handle
+        redirect_h = msvcrt.get_osfhandle(redirect_fd)
+        # duplicate handle for local copy we own
+        dup_redirect_h = dup_fh(redirect_h)
+        self.redirect_fd = msvcrt.open_osfhandle(dup_redirect_h, os.O_WRONLY)
+        kernel32.SetStdHandle(self.STD_HANDLE, wintypes.HANDLE(dup_redirect_h))
+        os.dup2(self.redirect_fd, self.std_fd)
+        setattr(
+            sys,
+            self.sys_attr,
+            os.fdopen(
+                self.std_fd,
+                "w",
+                encoding="utf-8",
+                buffering=1,
+                errors="replace",
+                closefd=False,
+                newline="\n",
+            ),
+        )
 
     def flush(self):
-        if sys.platform.startswith('win32'):
-            self.libc.fflush(None)
-        else:
-            self.libc.fflush(self.c_stream)
-        self.sys_stream.flush()
+        # get current system stream for the standard fd we're redirecting
+        sys_stream = getattr(sys, self.sys_attr)
+        try:
+            if sys_stream:
+                # Flush the system stream before redirection
+                sys_stream.flush()
+        except BaseException as e:
+            # swallow flush errors
+            tty.debug(f"Encountered error flushing stream: {e}")
+            pass
 
     def close(self):
         """Redirect back to the original system stream, and close stream"""
         try:
-            if self.saved_stream is not None:
-                self.redirect_stream(self.saved_stream)
+            self.flush()
+            if self.saved_stream_fd is not None:
+                # restore os handle
+                kernel32.SetStdHandle(self.STD_HANDLE, self.saved_std_handle)
+                # restore c fd
+                os.dup2(self.saved_stream_fd, self.std_fd)
+                # python level
+                setattr(sys, self.sys_attr, self.saved_stream)
         finally:
-            if self.saved_stream is not None:
-                os.close(self.saved_stream)
+            if self.redirect_fd is not None:
+                os.close(self.redirect_fd)
+            if self.saved_stream_fd is not None:
+                os.close(self.saved_stream_fd)
 
 
-class winlog(object):
+class winlog:
     """
     Similar to nixlog, with underlying
     functionality ported to support Windows.
 
-    Does not support the use of 'v' toggling as nixlog does.
+    Does not support the use of ``v`` toggling as nixlog does.
     """
-    def __init__(self, file_like=None, echo=False, debug=0, buffer=False,
-                 env=None, filter_fn=None):
-        self.env = env
+
+    def __init__(
+        self, filename: str = None, echo=False, debug=0, buffer=False, filter_fn=None, append=False
+    ):
         self.debug = debug
         self.echo = echo
-        self.logfile = file_like
-        self.stdout = StreamWrapper('stdout')
-        self.stderr = StreamWrapper('stderr')
+        self.logfile = filename
+        self.stdout = StreamWrapper("stdout")
+        self.stderr = StreamWrapper("stderr")
         self._active = False
-        self._ioflag = False
         self.old_stdout = sys.stdout
         self.old_stderr = sys.stderr
+        self.append = append
+        self.filter_fn = filter_fn
+        self.read_p, self.write_p = None, None
+        self._thread = None
 
     def __enter__(self):
         if self._active:
             raise RuntimeError("Can't re-enter the same log_output!")
 
-        if self.logfile is None:
-            raise RuntimeError(
-                "file argument must be set by __init__ ")
+        read_fd, write_fd = os.pipe()
+        self.read_p = read_fd
+        self.write_p = os.fdopen(write_fd, "wb", buffering=0)
 
-        # Open both write and reading on logfile
-        if type(self.logfile) == io.StringIO:
-            self._ioflag = True
-            # cannot have two streams on tempfile, so we must make our own
-            sys.stdout = self.logfile
-            sys.stderr = self.logfile
-        else:
-            self.writer = open(self.logfile, mode='wb+')
-            self.reader = open(self.logfile, mode='rb+')
+        # Dup stdout so we can still write to it after redirection
+        original_stdout_fd = sys.stdout.fileno()
+        echo_writer = os.fdopen(os.dup(original_stdout_fd), "w", encoding="utf-8", newline="\n")
 
-            # Dup stdout so we can still write to it after redirection
-            self.echo_writer = open(os.dup(sys.stdout.fileno()), "w")
-            # Redirect stdout and stderr to write to logfile
-            self.stderr.redirect_stream(self.writer.fileno())
-            self.stdout.redirect_stream(self.writer.fileno())
-            self._kill = threading.Event()
+        self._active = True
+        self._thread = Thread(
+            target=self._background_reader,
+            args=(self.read_p, self.logfile, echo_writer, self.append, self.echo, self.filter_fn),
+        )
+        self._thread.start()
+        # Redirect stdout and stderr to write to logfile
+        self.stderr.redirect_stream(self.write_p)
+        self.stdout.redirect_stream(self.write_p)
 
-            def background_reader(reader, echo_writer, _kill):
-                # for each line printed to logfile, read it
-                # if echo: write line to user
-                try:
-                    while True:
-                        is_killed = _kill.wait(.1)
-                        # Flush buffered build output to file
-                        # stdout/err fds refer to log file
-                        self.stderr.flush()
-                        self.stdout.flush()
-
-                        line = reader.readline()
-                        if self.echo and line:
-                            echo_writer.write('{0}'.format(line.decode()))
-                            echo_writer.flush()
-
-                        if is_killed:
-                            break
-                finally:
-                    reader.close()
-
-            self._active = True
-            with replace_environment(self.env):
-                self._thread = Thread(target=background_reader,
-                                      args=(self.reader, self.echo_writer, self._kill))
-                self._thread.start()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._ioflag:
-            sys.stdout = self.old_stdout
-            sys.stderr = self.old_stderr
-            self._ioflag = False
-        else:
-            self.writer.close()
-            self.echo_writer.flush()
-            self.stdout.flush()
-            self.stderr.flush()
-            self._kill.set()
-            self._thread.join()
-            self.stdout.close()
-            self.stderr.close()
+        self.stdout.close()
+        self.stderr.close()
+        self.write_p.close()
+        self._thread.join()
         self._active = False
 
     @contextmanager
     def force_echo(self):
         """Context manager to force local echo, even if echo is off."""
         if not self._active:
-            raise RuntimeError(
-                "Can't call force_echo() outside log_output region!")
-        yield
+            raise RuntimeError("Can't call force_echo() outside log_output region!")
+        sys.stdout.write(xon)
+        sys.stdout.flush()
+        try:
+            yield
+        finally:
+            sys.stdout.write(xoff)
+            sys.stdout.flush()
+
+    @staticmethod
+    def _background_reader(
+        read_fd: int,
+        logfile: str,
+        stdout: io.TextIOWrapper,
+        append: bool,
+        echo: bool,
+        filter_fn: Optional[Callable],
+    ):
+        force_echo = False
+        write_mode = "a" if append else "w"
+        read_file = os.fdopen(read_fd, "r", encoding="utf-8", errors="replace", buffering=1)
+
+        def process_message(message):
+            nonlocal force_echo
+            clean_line, num_controls = control.subn("", message)
+            if log_writer:
+                log_writer.write(_strip(clean_line))
+                log_writer.flush()
+            if echo or force_echo:
+                output = clean_line
+                if filter_fn:
+                    output = filter_fn(output)
+                enc = stdout.encoding
+                if enc != "utf-8":
+                    output = output.encode(enc, "replace").decode(enc)
+                stdout.write(output)
+                stdout.flush()
+            if num_controls > 0:
+                controls = control.findall(message)
+                force_echo = force_echo_on(force_echo, controls)
+
+        try:
+            if logfile is not None:
+                log_writer = open(logfile, mode=write_mode, encoding="utf-8")
+            else:
+                log_writer = None
+            try:
+                while True:
+                    line = read_file.readline(4096)
+                    if not line:
+                        break
+                    process_message(line)
+            finally:
+                if log_writer:
+                    log_writer.close()
+        except Exception as e:
+            tty.error(f"Exception in log writer thread! {e}", stream=stdout)
+            traceback.print_exc(file=stdout)
+        finally:
+            read_file.close()
+            stdout.close()
 
 
-def _writer_daemon(stdin_multiprocess_fd, read_multiprocess_fd, write_fd, echo,
-                   log_file_wrapper, control_pipe, filter_fn):
+def _writer_daemon(
+    stdin_fd: Optional[Connection],
+    stdout_fd: Optional[Connection],
+    read_fd: Connection,
+    write_fd: Connection,
+    echo: bool,
+    log_filename: str,
+    append: bool,
+    control_fd: Connection,
+    filter_fn: Optional[Callable[[str], str]],
+) -> None:
     """Daemon used by ``log_output`` to write to a log file and to ``stdout``.
 
     The daemon receives output from the parent process and writes it both
@@ -876,52 +799,50 @@ def _writer_daemon(stdin_multiprocess_fd, read_multiprocess_fd, write_fd, echo,
 
     In addition to the input and output file descriptors, the daemon
     interacts with the parent via ``control_pipe``.  It reports whether
-    ``stdout`` was enabled or disabled when it finished and, if the
-    ``log_file`` is a ``StringIO`` object, then the daemon also sends the
-    logged output back to the parent as a string, to be written to the
-    ``StringIO`` in the parent. This is mainly for testing.
+    ``stdout`` was enabled or disabled when it finished.
 
     Arguments:
-        stdin_multiprocess_fd (int): input from the terminal
-        read_multiprocess_fd (int): pipe for reading from parent's redirected
-            stdout
-        echo (bool): initial echo setting -- controlled by user and
-            preserved across multiple writer daemons
-        log_file_wrapper (FileWrapper): file to log all output
-        control_pipe (Pipe): multiprocessing pipe on which to send control
-            information to the parent
-        filter_fn (callable, optional): function to filter each line of output
+        stdin_fd: optional input from the terminal
+        read_fd: pipe for reading from parent's redirected stdout
+        echo: initial echo setting -- controlled by user and preserved across multiple writer
+            daemons
+        log_filename: filename where output should be logged
+        append: whether to append to the file or overwrite it
+        control_pipe: multiprocessing pipe on which to send control information to the parent
+        filter_fn: optional function to filter each line of output
 
     """
-    # If this process was forked, then it will inherit file descriptors from
-    # the parent process. This process depends on closing all instances of
-    # write_fd to terminate the reading loop, so we close the file descriptor
-    # here. Forking is the process spawning method everywhere except Mac OS
-    # for Python >= 3.8 and on Windows
-    if sys.version_info < (3, 8) or sys.platform != 'darwin':
-        os.close(write_fd)
+    # This process depends on closing all instances of write_pipe to terminate the reading loop
+    write_fd.close()
 
-    # Use line buffering (3rd param = 1) since Python 3 has a bug
-    # that prevents unbuffered text I/O.
-    if sys.version_info < (3,):
-        in_pipe = os.fdopen(read_multiprocess_fd.fd, 'r', 1)
-    else:
-        # Python 3.x before 3.7 does not open with UTF-8 encoding by default
-        in_pipe = os.fdopen(read_multiprocess_fd.fd, 'r', 1, encoding='utf-8', closefd=False)
+    # 1. Use line buffering (3rd param = 1) since Python 3 has a bug
+    #    that prevents unbuffered text I/O. [needs citation]
+    # 2. Enforce a UTF-8 interpretation of build process output with errors replaced by '?'.
+    #    The downside is that the log file will not contain the exact output of the build process.
+    # 3. closefd=False because Connection has "ownership"
+    read_file = os.fdopen(
+        read_fd.fileno(), "r", 1, encoding="utf-8", errors="replace", closefd=False
+    )
 
-    if stdin_multiprocess_fd:
-        stdin = os.fdopen(stdin_multiprocess_fd.fd, closefd=False)
+    if stdin_fd:
+        stdin_file = os.fdopen(stdin_fd.fileno(), closefd=False)
     else:
-        stdin = None
+        stdin_file = None
+
+    if stdout_fd:
+        os.dup2(stdout_fd.fileno(), sys.stdout.fileno())
+        stdout_fd.close()
 
     # list of streams to select from
-    istreams = [in_pipe, stdin] if stdin else [in_pipe]
-    force_echo = False      # parent can force echo for certain output
-
-    log_file = log_file_wrapper.unwrap()
+    istreams = [read_file, stdin_file] if stdin_file else [read_file]
+    force_echo = False  # parent can force echo for certain output
+    if log_filename is not None:
+        log_file = open(log_filename, mode="a" if append else "w", encoding="utf-8")
+    else:
+        log_file = None
 
     try:
-        with keyboard_input(stdin) as kb:
+        with keyboard_input(stdin_file) as kb:
             while True:
                 # fix the terminal settings if we recently came to
                 # the foreground
@@ -929,118 +850,136 @@ def _writer_daemon(stdin_multiprocess_fd, read_multiprocess_fd, write_fd, echo,
 
                 # wait for input from any stream. use a coarse timeout to
                 # allow other checks while we wait for input
-                rlist, _, _ = _retry(select.select)(istreams, [], [], 1e-1)
+                rlist, _, _ = select.select(istreams, [], [], 0.1)
 
                 # Allow user to toggle echo with 'v' key.
                 # Currently ignores other chars.
                 # only read stdin if we're in the foreground
-                if stdin in rlist and not _is_background_tty(stdin):
+                if stdin_file and stdin_file in rlist and not _is_background_tty(stdin_file):
                     # it's possible to be backgrounded between the above
                     # check and the read, so we ignore SIGTTIN here.
                     with ignore_signal(signal.SIGTTIN):
                         try:
-                            if stdin.read(1) == 'v':
+                            if stdin_file.read(1) == "v":
                                 echo = not echo
-                        except IOError as e:
+                        except OSError as e:
                             # If SIGTTIN is ignored, the system gives EIO
                             # to let the caller know the read failed b/c it
                             # was in the bg. Ignore that too.
                             if e.errno != errno.EIO:
                                 raise
 
-                if in_pipe in rlist:
+                if read_file in rlist:
                     line_count = 0
                     try:
                         while line_count < 100:
                             # Handle output from the calling process.
-                            try:
-                                line = _retry(in_pipe.readline)()
-                            except UnicodeDecodeError:
-                                # installs like --test=root gpgme produce non-UTF8 logs
-                                line = '<line lost: output was not encoded as UTF-8>\n'
+                            line = read_file.readline()
 
                             if not line:
                                 return
                             line_count += 1
 
                             # find control characters and strip them.
-                            clean_line, num_controls = control.subn('', line)
+                            clean_line, num_controls = control.subn("", line)
 
                             # Echo to stdout if requested or forced.
                             if echo or force_echo:
                                 output_line = clean_line
                                 if filter_fn:
                                     output_line = filter_fn(clean_line)
+                                enc = sys.stdout.encoding
+                                if enc != "utf-8":
+                                    # On Python 3.6 and 3.7-3.14 with non-{utf-8,C} locale stdout
+                                    # may not be able to handle utf-8 output. We do an inefficient
+                                    # dance of re-encoding with errors replaced, so stdout.write
+                                    # does not raise.
+                                    output_line = output_line.encode(enc, "replace").decode(enc)
                                 sys.stdout.write(output_line)
 
                             # Stripped output to log file.
-                            log_file.write(_strip(clean_line))
+                            if log_file:
+                                log_file.write(_strip(clean_line))
 
                             if num_controls > 0:
                                 controls = control.findall(line)
-                                if xon in controls:
-                                    force_echo = True
-                                if xoff in controls:
-                                    force_echo = False
+                                force_echo = force_echo_on(force_echo, controls)
 
-                            if not _input_available(in_pipe):
+                            if not _input_available(read_file):
                                 break
                     finally:
                         if line_count > 0:
                             if echo or force_echo:
                                 sys.stdout.flush()
-                            log_file.flush()
+                            if log_file:
+                                log_file.flush()
 
     except BaseException:
         tty.error("Exception occurred in writer daemon!")
         traceback.print_exc()
 
     finally:
-        # send written data back to parent if we used a StringIO
-        if isinstance(log_file, io.StringIO):
-            control_pipe.send(log_file.getvalue())
-        log_file_wrapper.close()
-        read_multiprocess_fd.close()
-        if stdin_multiprocess_fd:
-            stdin_multiprocess_fd.close()
+        log_file.close()
+        read_fd.close()
+        if stdin_fd:
+            stdin_fd.close()
 
         # send echo value back to the parent so it can be preserved.
-        control_pipe.send(echo)
+        control_fd.send(echo)
 
 
-def _retry(function):
-    """Retry a call if errors indicating an interrupted system call occur.
+if sys.platform == "win32":
+    # dont define this outside windows, otherwise mypy complains
+    # or we'd have to # type: ignore on basically every line of
+    # this method
+    def dup_fh(fh: int) -> int:
+        """Windows Only
+        Duplicates Windows file handles. Useful when
+        we need multiple references to a single file handle
+        that all can be closed independently
 
-    Interrupted system calls return -1 and set ``errno`` to ``EINTR`` if
-    certain flags are not set.  Newer Pythons automatically retry them,
-    but older Pythons do not, so we need to retry the calls.
+        uses DuplicateHandle from the win32 api
 
-    This function converts a call like this:
+        Arguments:
+            fh: OS level file handle to be duplicated
 
-        syscall(args)
+        Returns: integer representing the new, identical file handle
+        """
+        # Define function signatures for safety
+        kernel32.DuplicateHandle.argtypes = [
+            wintypes.HANDLE,  # hSourceProcessHandle
+            wintypes.HANDLE,  # hSourceHandle
+            wintypes.HANDLE,  # hTargetProcessHandle
+            ctypes.POINTER(wintypes.HANDLE),  # lpTargetHandle
+            wintypes.DWORD,  # dwDesiredAccess
+            wintypes.BOOL,  # bInheritHandle
+            wintypes.DWORD,  # dwOptions
+        ]
+        current_process = kernel32.GetCurrentProcess()
+        target_handle = wintypes.HANDLE()
 
-    and makes it retry by wrapping the function like this:
+        success = kernel32.DuplicateHandle(
+            current_process,
+            wintypes.HANDLE(fh),
+            current_process,
+            ctypes.byref(target_handle),
+            0,
+            True,
+            DUPLICATE_SAME_ACCESS,
+        )
 
-        _retry(syscall)(args)
+        if not success or not target_handle.value:
+            raise ctypes.WinError()
 
-    This is a private function because EINTR is unfortunately raised in
-    different ways from different functions, and we only handle the ones
-    relevant for this file.
+        return target_handle.value
 
-    """
-    def wrapped(*args, **kwargs):
-        while True:
-            try:
-                return function(*args, **kwargs)
-            except IOError as e:
-                if e.errno == errno.EINTR:
-                    continue
-                raise
-            except select.error as e:
-                if e.args[0] == errno.EINTR:
-                    continue
-                raise
-    return wrapped
+
+def force_echo_on(force_echo: bool, controls: List[str]):
+    if xon in controls:
+        return True
+    if xoff in controls:
+        return False
+    return force_echo
 
 
 def _input_available(f):
