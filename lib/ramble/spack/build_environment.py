@@ -42,9 +42,8 @@ import traceback
 import types
 
 import llnl.util.tty as tty
-from llnl.util.filesystem import install, install_tree, mkdirp
+from llnl.util.filesystem import install, install_tree, mkdirp, symlink
 from llnl.util.lang import dedupe
-from llnl.util.symlink import symlink
 from llnl.util.tty.color import cescape, colorize
 from llnl.util.tty.log import MultiProcessFd
 

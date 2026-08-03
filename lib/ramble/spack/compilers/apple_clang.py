@@ -8,7 +8,7 @@ import shutil
 
 import llnl.util.lang
 import llnl.util.tty as tty
-from llnl.util.symlink import symlink
+from llnl.util.filesystem import symlink
 
 import spack.compiler
 import spack.compilers.clang

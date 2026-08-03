@@ -11,8 +11,7 @@
 import os
 
 import llnl.util.lang
-from llnl.util.filesystem import mkdirp
-from llnl.util.symlink import symlink
+from llnl.util.filesystem import mkdirp, symlink
 
 import ramble.config
 import ramble.fetch_strategy
