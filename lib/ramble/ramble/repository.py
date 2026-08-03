@@ -203,105 +203,6 @@ _ALL_ACCEPTED_CONFIGS = {
 }
 
 
-def _apps(repo_dirs=None):
-    """Get the applications singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.applications)
-
-
-def _mods(repo_dirs=None):
-    """Get the modifiers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.modifiers)
-
-
-def _package_managers(repo_dirs=None):
-    """Get the package managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.package_managers)
-
-
-def _workflow_managers(repo_dirs=None):
-    """Get the workflow managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.workflow_managers)
-
-
-def _systems(repo_dirs=None):
-    """Get the systems singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.systems)
-
-
-def _platforms(repo_dirs=None):
-    """Get the platforms singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.platforms)
-
-
-def _base_classes(repo_dirs=None):
-    """Get the base classes singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_classes)
-
-
-def _base_apps(repo_dirs=None):
-    """Get the base applications singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_applications)
-
-
-def _base_mods(repo_dirs=None):
-    """Get the base modifiers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_modifiers)
-
-
-def _base_package_managers(repo_dirs=None):
-    """Get the base package managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_package_managers)
-
-
-def _base_workflow_managers(repo_dirs=None):
-    """Get the base workflow managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_workflow_managers)
-
-
-def _base_systems(repo_dirs=None):
-    """Get the base systems singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_systems)
-
-
-def _base_platforms(repo_dirs=None):
-    """Get the base platforms singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_platforms)
-
-
-def _utilities(repo_dirs=None):
-    """Get the external dependencies singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.utilities)
-
-
-def _base_utilities(repo_dirs=None):
-    """Get the base external dependencies singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_utilities)
-
-
-paths = {
-    ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
-    ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
-    ObjectTypes.package_managers: llnl.util.lang.Singleton(_package_managers),
-    ObjectTypes.workflow_managers: llnl.util.lang.Singleton(_workflow_managers),
-    ObjectTypes.systems: llnl.util.lang.Singleton(_systems),
-    ObjectTypes.platforms: llnl.util.lang.Singleton(_platforms),
-    ObjectTypes.base_classes: llnl.util.lang.Singleton(_base_classes),
-    ObjectTypes.base_applications: llnl.util.lang.Singleton(_base_apps),
-    ObjectTypes.base_modifiers: llnl.util.lang.Singleton(_base_mods),
-    ObjectTypes.base_package_managers: llnl.util.lang.Singleton(_base_package_managers),
-    ObjectTypes.base_workflow_managers: llnl.util.lang.Singleton(_base_workflow_managers),
-    ObjectTypes.base_systems: llnl.util.lang.Singleton(_base_systems),
-    ObjectTypes.base_platforms: llnl.util.lang.Singleton(_base_platforms),
-    ObjectTypes.utilities: llnl.util.lang.Singleton(_utilities),
-    ObjectTypes.base_utilities: llnl.util.lang.Singleton(_base_utilities),
-}
-
-
-#####################################
-#     END TYPE SPECIFIC FUNCTIONALITY
-#####################################
-
-
 def _gen_path(repo_dirs=None, obj_type=default_type):
     """Create a RepoPath for a specific object, add it to sys.meta_path, and return it."""
     section_name = type_definitions[obj_type]["config_section"]
@@ -315,6 +216,17 @@ def _gen_path(repo_dirs=None, obj_type=default_type):
     path = RepoPath(*repo_dirs, object_type=obj_type)
     sys.meta_path.append(path)
     return path
+
+
+paths = {
+    obj_type: llnl.util.lang.Singleton(functools.partial(_gen_path, obj_type=obj_type))
+    for obj_type in ObjectTypes
+}
+
+
+#####################################
+#     END TYPE SPECIFIC FUNCTIONALITY
+#####################################
 
 
 def _get_repo_namespace(repo_path, obj_name):
