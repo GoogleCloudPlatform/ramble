@@ -366,6 +366,7 @@ class ExperimentSet:
         """Helper to render a base and its repeated experiments, for parallel execution."""
         experiment_vars, repeats = render_item
         processed_experiments = []
+        wl_stats = {}
         # Expand and prepare base and repeated experiments
         # TODO: Exploit the relationship between base and repeated experiments,
         # to save up redundant works.
@@ -391,6 +392,10 @@ class ExperimentSet:
                 self.keywords.experiment_namespace
             )
 
+            wl_name = app_inst.expander.workload_name
+            if wl_name not in wl_stats:
+                wl_stats[wl_name] = {"passed_global": 0, "dropped_wl": 0}
+
             # Skip explicitly excluded experiments
             if final_exp_name not in excluded_experiments:
                 active = True
@@ -401,9 +406,25 @@ class ExperimentSet:
                             break
 
                 if active:
+                    wl_stats[wl_name]["passed_global"] += 1
+                    wl_inst = app_inst.get_workload()
+                    if wl_inst:
+                        for expression in wl_inst.where:
+                            if not app_inst.expander.evaluate_predicate(expression):
+                                active = False
+                                wl_stats[wl_name]["dropped_wl"] += 1
+                                break
+                        if active:
+                            for expression in wl_inst.exclude_where:
+                                if app_inst.expander.evaluate_predicate(expression):
+                                    active = False
+                                    wl_stats[wl_name]["dropped_wl"] += 1
+                                    break
+
+                if active:
                     app_inst.read_status()
                     processed_experiments.append((app_inst, final_exp_namespace, n == 0))
-        return processed_experiments
+        return processed_experiments, wl_stats
 
     def render_experiment_set(
         self,
@@ -629,8 +650,18 @@ class ExperimentSet:
             with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                 results = list(executor.map(worker_func, render_list))
 
-        for processed_experiments in results:
+        overall_wl_stats = {}
+        for processed_experiments, wl_stats in results:
             all_processed_experiments.extend(processed_experiments)
+            for wl_name, stats in wl_stats.items():
+                if wl_name not in overall_wl_stats:
+                    overall_wl_stats[wl_name] = {
+                        "passed_global": 0,
+                        "dropped_wl": 0,
+                        "processed": 0,
+                    }
+                overall_wl_stats[wl_name]["passed_global"] += stats["passed_global"]
+                overall_wl_stats[wl_name]["dropped_wl"] += stats["dropped_wl"]
 
         # The results are now processed serially to update the experiment set state
         for app_inst, final_exp_namespace, is_base_experiment in all_processed_experiments:
@@ -761,6 +792,8 @@ class ExperimentSet:
                         ) from None
 
             workload_names.add(app_inst.expander.workload_name)
+            if app_inst.expander.workload_name in overall_wl_stats:
+                overall_wl_stats[app_inst.expander.workload_name]["processed"] += 1
 
             app_inst.define_variable(
                 self.keywords.experiment_index,
@@ -774,6 +807,13 @@ class ExperimentSet:
                 self.experiment_order.append(final_exp_namespace)
             else:
                 self.add_chained_experiment(app_inst.expander.experiment_name, app_inst)
+
+        for wl_name, stats in overall_wl_stats.items():
+            if stats["passed_global"] > 0 and stats["processed"] == 0 and stats["dropped_wl"] > 0:
+                logger.warn(
+                    f"Workload {wl_name} generated zero valid experiments because they were "
+                    "all filtered out by the workload's internal clauses."
+                )
 
         self.define_scoped_tables(workload_names, experiment_template_name)
         return rendered_instances
