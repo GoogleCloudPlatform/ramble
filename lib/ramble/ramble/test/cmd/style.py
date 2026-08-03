@@ -9,16 +9,23 @@
 
 import pytest
 
-from ramble import main, paths
+from ramble import main
 from ramble.cmd import style
 
 style_cmd = main.RambleCommand("style")
 
 
 @pytest.mark.parametrize("tool", style.tool_names)
-def test_style(tool):
-    out = style_cmd("--tool", tool, __file__)
-    assert f"{tool} checks were clean" in out
+def test_style(tool, request):
+    fail_on_style = request.config.getoption("--fail-on-style")
+    if fail_on_style:
+        files = style.changed_files(all_files=False)
+        if files:
+            out = style_cmd("--tool", tool, *files)
+            assert f"{tool} checks were clean" in out
+    else:
+        out = style_cmd("--tool", tool, __file__)
+        assert f"{tool} checks were clean" in out
 
 
 @pytest.mark.parametrize(
@@ -86,6 +93,8 @@ def test_style_invalid_repo(tmpdir):
 
 
 def test_style_valid_repo():
+    from ramble import paths
+
     builtin_mock_repo = paths.mock_builtin_path
     out = style_cmd("--repo-path", builtin_mock_repo)
     assert "style checks were clean" in out

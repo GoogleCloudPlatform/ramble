@@ -569,15 +569,21 @@ def run_isort(isort_cmd, file_list, args):
 
 @tool("mypy")
 def run_mypy(mypy_cmd, file_list, args):
-    del file_list
     if args.repo_path is not None:
         print("Skipping mypy for external repository.")
         return 0
-    print_tool_header("mypy", [])
+    print_tool_header("mypy", file_list)
 
     config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
-    mypy_args = ("--config-file", config_file)
-    mypy_args += tuple(get_tool_args(args, "mypy"))
+    mypy_args = ["--config-file", config_file]
+    mypy_args.extend(get_tool_args(args, "mypy"))
+
+    if file_list:
+        mypy_files = [f for f in file_list if f.startswith("lib/ramble/ramble/")]
+        if not mypy_files:
+            print_tool_result("mypy", 0)
+            return 0
+        mypy_args.extend(mypy_files)
 
     output = mypy_cmd(*mypy_args, fail_on_error=False, output=str, error=str)
     returncode = mypy_cmd.returncode
