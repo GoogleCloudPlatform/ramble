@@ -3010,15 +3010,15 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for mod in self._modifier_instances:
                 exec_vars.update(mod.modded_variables(self, exec_vars))
 
-            for template_name, template_conf in workspace.all_templates():
+            for template_name, _ in workspace.all_templates():
                 expand_path = os.path.join(experiment_run_dir, template_name)
                 logger.msg(
                     f"Writing template {template_name} to {expand_path}"
                 )
                 fs.mkdirp(os.path.dirname(expand_path))
 
-                rendered_content = self.expander.expand_var(
-                    template_conf["contents"], extra_vars=exec_vars
+                rendered_content = self._get_rendered_template_content(
+                    template_name, exec_vars, rendering_stack=[]
                 )
 
                 with open(expand_path, "w+", encoding="utf-8") as f:
@@ -4498,7 +4498,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 expander.expand_var(path), local_replacements=replacements
             )
 
-        def _get_template_config(obj, tpl_config, obj_type):
+        def _get_template_config(obj, name, tpl_config, obj_type):
             # Resolve the source path
             src_path_config = _expand_path(tpl_config["src_path"])
             if not src_path_config.endswith(tpl_ext):
@@ -4543,7 +4543,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if not os.path.isabs(dest_path):
                 dest_path = os.path.join(run_dir, dest_path)
 
-            return {**tpl_config, "src_path": src_path, "dest_path": dest_path}
+            return {
+                "name": name,
+                **tpl_config,
+                "src_path": src_path,
+                "dest_path": dest_path,
+            }
 
         for obj_type, obj in self.objects():
             obj_tpls = []
@@ -4554,28 +4559,85 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     continue
 
                 obj_tpls.extend(
-                    _get_template_config(obj, tpl_conf, obj_type=obj_type)
-                    for tpl_conf in tpl.values()
+                    _get_template_config(
+                        obj, name, tpl_conf, obj_type=obj_type
+                    )
+                    for name, tpl_conf in tpl.items()
                 )
             if obj_tpls:
                 yield obj, obj_tpls
 
+    def _get_rendered_template_content(
+        self, template_name, extra_vars_origin, rendering_stack=None
+    ):
+        """Retrieve and fully render template content, expanding includes in-place recursively"""
+        if rendering_stack is None:
+            rendering_stack = []
+
+        if template_name in rendering_stack:
+            cycle = " -> ".join(rendering_stack + [template_name])
+            raise ApplicationError(
+                f"Circular template inclusion detected: {cycle}"
+            )
+
+        rendering_stack.append(template_name)
+        try:
+            content = None
+            extra_vars = extra_vars_origin.copy()
+
+            if template_name in self.workspace._templates:
+                content = self.workspace._templates[template_name]["contents"]
+            else:
+                found = False
+                for obj, tpl_configs in self._object_templates():
+                    for tpl_config in tpl_configs:
+                        if tpl_config["name"] == template_name:
+                            src_path = tpl_config["src_path"]
+                            content = self.workspace.read_file_content(
+                                src_path
+                            )
+                            extra_vars_dict = tpl_config.get("extra_vars")
+                            if extra_vars_dict is not None:
+                                extra_vars.update(extra_vars_dict)
+                            extra_vars_func_name = tpl_config.get(
+                                "extra_vars_func_name"
+                            )
+                            if extra_vars_func_name is not None:
+                                extra_vars_func = getattr(
+                                    obj, extra_vars_func_name
+                                )
+                                extra_vars.update(extra_vars_func())
+                            found = True
+                            break
+                    if found:
+                        break
+
+            if content is None:
+                raise ApplicationError(
+                    f"Template '{template_name}' not found for inclusion."
+                )
+
+            def replace_include(match):
+                child_tpl_name = match.group(1)
+                return self._get_rendered_template_content(
+                    child_tpl_name, extra_vars, rendering_stack
+                )
+
+            processed_content = re.sub(
+                r"include\(\s*\{([^}]+)\}\s*\)", replace_include, content
+            )
+
+            return self.expander.expand_var(
+                processed_content, extra_vars=extra_vars
+            )
+        finally:
+            rendering_stack.pop()
+
     def _render_object_templates(self, extra_vars_origin):
-        workspace = self.workspace
-        for obj, tpl_configs in self._object_templates():
+        for _, tpl_configs in self._object_templates():
             for tpl_config in tpl_configs:
-                extra_vars = extra_vars_origin.copy()
-                src_path = tpl_config["src_path"]
-                content = workspace.read_file_content(src_path)
-                extra_vars_dict = tpl_config.get("extra_vars")
-                if extra_vars_dict is not None:
-                    extra_vars.update(extra_vars_dict)
-                extra_vars_func_name = tpl_config.get("extra_vars_func_name")
-                if extra_vars_func_name is not None:
-                    extra_vars_func = getattr(obj, extra_vars_func_name)
-                    extra_vars.update(extra_vars_func())
-                rendered = self.expander.expand_var(
-                    content, extra_vars=extra_vars
+                rendered = self._get_rendered_template_content(
+                    tpl_config["name"], extra_vars_origin, rendering_stack=[]
                 )
                 out_path = tpl_config["dest_path"]
                 perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
