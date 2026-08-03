@@ -1293,17 +1293,7 @@ ramble:
 
         workloads_dict = apps_dict[application][namespace.workload]
 
-        for zip_def in zips:
-            m = _DEF_REGEX.match(zip_def)
-            if m:
-                key = m.group("key")
-                value = list_str_to_list(m.group("value"))
-                exp_context.zips[key] = value
-            else:
-                logger.die(
-                    f"Invalid zip definition provided: {zip_def}. "
-                    + "Accepted form is 'zipname=[var1,var2,var3]'"
-                )
+        exp_context.zips = process_definitions(zips, def_type="zip")
 
         if matrix:
             exp_context.matrices.append(list(matrix.split(",")))

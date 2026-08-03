@@ -109,3 +109,9 @@ def test_list_object_files(
         assert expected[i][0] == actual[i][0]
         assert actual[i][1].endswith(expected[i][1])
         assert expected[i][2] == actual[i][2]
+
+
+@pytest.mark.parametrize("bad_ns", ["foo!bar", "foo-bar", "123foo"])
+def test_invalid_namespace(tmpdir, bad_ns):
+    with pytest.raises(ramble.repository.InvalidNamespaceError):
+        ramble.repository.create_repo(str(tmpdir.join("bad_repo")), namespace=bad_ns)

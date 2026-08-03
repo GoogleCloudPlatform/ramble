@@ -16,7 +16,7 @@ from ramble.util.logger import logger
 
 ALL_PHASES: List[str] = ["*"]
 
-_INVALID_CHARS_RE = re.compile(r"[a-zA-Z0-9_\s\(\)-]")
+_VALID_CHARS_RE = re.compile(r"[a-zA-Z0-9_\s\(\)-]")
 _TOKEN_RE = re.compile(r"([a-zA-Z0-9_-]+|\(|\))")
 _VALID_NAME_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
 
@@ -78,7 +78,7 @@ def expand_filter_groups(expression: str, filter_groups_defs: Optional[dict]) ->
         filter_groups_defs = {}
 
     # Validate expression only contains allowed characters to prevent injection or silent failures
-    invalid_chars = _INVALID_CHARS_RE.sub("", expression)
+    invalid_chars = _VALID_CHARS_RE.sub("", expression)
     if invalid_chars:
         raise RambleError(
             f"Invalid characters {repr(invalid_chars)} in filter group expression '{expression}'"
