@@ -24,6 +24,7 @@ steps:
       - 'TRIGGER_NAME=$TRIGGER_NAME'
       - 'BUILD_ID=$BUILD_ID'
       - 'PROJECT_ID=$PROJECT_ID'
+      - 'LOCATION=$LOCATION'
   - name: 'gcr.io/cloud-builders/docker'
     id: build-image
     args:
