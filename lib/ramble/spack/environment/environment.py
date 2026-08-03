@@ -16,9 +16,8 @@ import ruamel.yaml as yaml
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
-from llnl.util.filesystem import rename
+from llnl.util.filesystem import rename, symlink
 from llnl.util.lang import dedupe
-from llnl.util.symlink import symlink
 
 import spack.bootstrap
 import spack.compilers

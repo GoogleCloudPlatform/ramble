@@ -41,8 +41,8 @@ from llnl.util.filesystem import (
     temp_cwd,
     temp_rename,
     working_dir,
+    symlink,
 )
-from llnl.util.symlink import symlink
 
 import spack.config
 import spack.error

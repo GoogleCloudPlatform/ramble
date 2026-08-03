@@ -18,6 +18,7 @@ from llnl.util.filesystem import (
     remove_dead_links,
     remove_empty_directories,
     visit_directory_tree,
+    symlink,
 )
 from llnl.util.lang import index_by, match_predicate
 from llnl.util.link_tree import (
@@ -27,7 +28,6 @@ from llnl.util.link_tree import (
     SingleMergeConflictError,
     SourceMergeVisitor,
 )
-from llnl.util.symlink import symlink
 from llnl.util.tty.color import colorize
 
 import spack.config
