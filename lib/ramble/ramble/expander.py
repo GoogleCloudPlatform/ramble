@@ -776,6 +776,9 @@ class Expander:
         if var is None or var == "None":
             return None if typed else "None"
 
+        if isinstance(var, (int, float, bool)):
+            return var if typed else str(var)
+
         passthrough_setting = allow_passthrough
 
         # If disable_passthrough is set, override allow_passthrough from caller

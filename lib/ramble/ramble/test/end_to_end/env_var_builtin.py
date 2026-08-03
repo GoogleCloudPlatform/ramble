@@ -324,3 +324,43 @@ ramble:
         assert "MY_AUTO_ENV_VAR_WL_DEFAULTS" not in data
         assert "MY_AUTO_ENV_VAR_WG" not in data
         assert "OBJ_AUTO_ENV_VAR" not in data
+
+
+def test_env_var_bool_case(mock_applications, make_workspace_from_config):
+    test_config = """
+ramble:
+  config:
+    shell: bash
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    partition: 'part1'
+    processes_per_node: '16'
+    n_threads: '1'
+  applications:
+    interleved-env-vars:
+      workloads:
+        test_wl:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+              env_vars:
+                set:
+                  MY_VAR: TRUE
+  software:
+    packages: {}
+    environments: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
+
+    with open(exp_script, encoding="utf-8") as f:
+        data = f.read()
+
+        assert "MY_VAR=TRUE" in data

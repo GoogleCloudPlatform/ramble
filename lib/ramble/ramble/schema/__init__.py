@@ -41,9 +41,19 @@ def _make_validator():
 
             yield jsonschema.ValidationError(msg)
 
-    return jsonschema.validators.extend(
+    ValidatorClass = jsonschema.validators.extend(
         jsonschema.Draft4Validator, {"deprecatedProperties": _deprecated_properties}
     )
+
+    import spack.util.spack_yaml as syaml
+
+    # Add syaml_bool to the accepted boolean types for validation
+    boolean_types = ValidatorClass.DEFAULT_TYPES.get("boolean", bool)
+    if not isinstance(boolean_types, tuple):
+        boolean_types = (boolean_types,)
+    ValidatorClass.DEFAULT_TYPES["boolean"] = boolean_types + (syaml.syaml_bool,)
+
+    return ValidatorClass
 
 
 Validator = llnl.util.lang.Singleton(_make_validator)
