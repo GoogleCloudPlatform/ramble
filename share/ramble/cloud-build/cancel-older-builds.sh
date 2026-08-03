@@ -18,10 +18,15 @@ fi
 
 target_tag="${TRIGGER_NAME}-${PR_NUMBER}"
 
+region_flag=()
+if [ -n "${LOCATION}" ]; then
+  region_flag=(--region="${LOCATION}")
+fi
+
 echo "Current Build ID: $BUILD_ID"
 echo "Filtering for tag: ${target_tag} in project: ${PROJECT_ID}"
 
-current_create_time=$(gcloud builds describe "${BUILD_ID}" --project="${PROJECT_ID}" --format="value(create_time)")
+current_create_time=$(gcloud builds describe "${BUILD_ID}" --project="${PROJECT_ID}" "${region_flag[@]}" --format="value(create_time)")
 
 if [ -z "${current_create_time}" ]; then
   echo "Warning: Could not retrieve creation time for build ${BUILD_ID}. Skipping cancellation of older builds."
@@ -30,6 +35,7 @@ fi
 
 builds_to_cancel=$(gcloud builds list \
   --project="${PROJECT_ID}" \
+  "${region_flag[@]}" \
   --filter="tags='${target_tag}' AND (status=WORKING OR status=QUEUED) AND id!=${BUILD_ID} AND create_time < '${current_create_time}'" \
   --format="value(id)")
 
@@ -40,5 +46,5 @@ fi
 
 for build in ${builds_to_cancel}; do
   echo "Cancelling obsolete build: ${build}"
-  gcloud builds cancel "${build}" --project="${PROJECT_ID}" || echo "Failed to cancel ${build}"
+  gcloud builds cancel "${build}" --project="${PROJECT_ID}" "${region_flag[@]}" || echo "Failed to cancel ${build}"
 done
