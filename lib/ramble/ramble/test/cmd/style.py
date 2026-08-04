@@ -15,11 +15,23 @@ from ramble.cmd import style
 style_cmd = main.RambleCommand("style")
 
 
+def _get_changed_files_with_fallback():
+    files = []
+    for base in [None, "origin/develop", "origin/main"]:
+        try:
+            files = style.changed_files(base=base, all_files=False)
+            if files:
+                break
+        except Exception:
+            pass
+    return files
+
+
 @pytest.mark.parametrize("tool", style.tool_names)
 def test_style(tool, request):
     fail_on_style = request.config.getoption("--fail-on-style")
     if fail_on_style:
-        files = style.changed_files(all_files=False)
+        files = _get_changed_files_with_fallback()
         if files:
             out = style_cmd("--tool", tool, *files)
             assert f"{tool} checks were clean" in out
@@ -180,3 +192,52 @@ def test_style_external_repo(tmpdir):
     out = style_cmd("--repo-path", str(tmpdir), "-a", "-t", "flake8")
     assert "style checks were clean" in out
     assert "applications/test_app/application.py" in out
+
+
+def test_black_target_version_parsing(capsys):
+    class MockExecutable:
+        def __init__(self):
+            self.args_received = []
+            self.returncode = 0
+
+        def __call__(self, *args, **kwargs):
+            if "-h" in args:
+                return "  -t, --target-version [py36|py37|py38|py39|py310|py311|py312]"
+            self.args_received.extend(args)
+            return ""
+
+    mock_black = MockExecutable()
+
+    class MockArgs:
+        fix = False
+        root_relative = False
+        repo_path = None
+
+    args = MockArgs()
+
+    style.run_black(mock_black, ["lib/ramble/ramble/cmd/style.py"], args)
+
+    expected_versions = ["py36", "py37", "py38", "py39", "py310", "py311", "py312"]
+    for ver in expected_versions:
+        assert "--target-version" in mock_black.args_received
+        assert ver in mock_black.args_received
+    assert "py313" not in mock_black.args_received
+
+
+def test_changed_files_fallback(monkeypatch):
+    calls = []
+
+    def mock_changed_files(base, all_files):
+        calls.append(base)
+        if base == "origin/main":
+            return ["file1.py"]
+        elif base == "origin/develop":
+            return []
+        raise Exception("Mock error simulating missing branch")
+
+    monkeypatch.setattr(style, "changed_files", mock_changed_files)
+
+    files = _get_changed_files_with_fallback()
+    assert files == ["file1.py"]
+    # Check that it tried None, origin/develop, and origin/main in order
+    assert calls == [None, "origin/develop", "origin/main"]
