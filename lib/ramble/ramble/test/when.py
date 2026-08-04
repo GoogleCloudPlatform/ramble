@@ -1016,6 +1016,114 @@ def test_register_builtin_when(workspace_name, include_builtin, builtin_found):
 
 
 @pytest.mark.parametrize(
+    "archive_variant_on,expected_pattern,unexpected_pattern",
+    [
+        (False, "archive_test_pattern_when_false.txt", "archive_test_pattern_when_true.txt"),
+        (True, "archive_test_pattern_when_true.txt", "archive_test_pattern_when_false.txt"),
+    ],
+)
+def test_archive_pattern_when(
+    workspace_name,
+    archive_variant_on,
+    expected_pattern,
+    unexpected_pattern,
+    mutable_mock_mods_repo,
+    mutable_mock_pkg_mans_repo,
+):
+    import os
+
+    import ramble.workspace
+
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "exec_when_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        config(
+            "add",
+            f"variants:archive_pattern_when:{str(archive_variant_on).lower()}",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "--name",
+            "when-modifier",
+            "-s",
+            "workspace",
+            "--on-executable",
+            "*",
+            global_args=global_args,
+        )
+
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        # Write dummy files to the experiment directory to be archived
+        ws._re_read()
+        experiment_set = ws.build_experiment_set()
+
+        import ramble.filters
+
+        expected_patterns = [expected_pattern]
+        unexpected_patterns = [unexpected_pattern]
+        for pattern_variation in ["when_mod", "when_pm"]:
+            expected_patterns.append(expected_pattern.replace("when", pattern_variation))
+            unexpected_patterns.append(unexpected_pattern.replace("when", pattern_variation))
+
+        filters = ramble.filters.Filters()
+        for _, app_inst, _ in experiment_set.filtered_experiments(filters):
+            exp_dir = app_inst.expander.expand_var("{experiment_run_dir}")
+            os.makedirs(exp_dir, exist_ok=True)
+
+            # Write expected patterns
+            for pat in expected_patterns:
+                with open(os.path.join(exp_dir, pat), "w", encoding="utf-8") as f:
+                    f.write("Expected")
+            for pat in unexpected_patterns:
+                with open(os.path.join(exp_dir, pat), "w", encoding="utf-8") as f:
+                    f.write("Unexpected")
+
+        # Run the archive pipeline
+        workspace("archive", "--archive-pattern", "archive_test_pattern*", global_args=global_args)
+
+        # Run the experiment-logs pipeline to cover LogsPipeline logic
+        workspace("experiment-logs", global_args=global_args)
+
+        archive_dir = ws.latest_archive_path
+
+        # Verify the expected pattern is copied to the archive for the experiment
+        for _exp, app_inst, _ in experiment_set.filtered_experiments(filters):
+            exp_dir = app_inst.expander.expand_var("{experiment_run_dir}")
+
+            for pat in expected_patterns:
+                expected_archive_path = os.path.join(exp_dir.replace(ws.root, archive_dir), pat)
+                assert os.path.exists(expected_archive_path)
+
+            for pat in unexpected_patterns:
+                unexpected_archive_path = os.path.join(exp_dir.replace(ws.root, archive_dir), pat)
+                assert not os.path.exists(unexpected_archive_path)
+
+
+@pytest.mark.parametrize(
     "exec_variant_on,exec_ver2_found,skipped_exec_found",
     [
         (False, False, False),

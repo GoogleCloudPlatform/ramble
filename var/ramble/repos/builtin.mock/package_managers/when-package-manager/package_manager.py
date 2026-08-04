@@ -65,6 +65,19 @@ class WhenPackageManager(PackageManagerBase):
         when=["+pkg_man_required_key"],
     )
 
+    variant(
+        "archive_pattern_when",
+        default=False,
+        values=[True, False],
+        description="Test archive pattern with when",
+    )
+
+    with when("+archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_pm_true.txt")
+
+    with when("~archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_pm_false.txt")
+
     def get_package_list(self, workspace):
         del workspace
         return []

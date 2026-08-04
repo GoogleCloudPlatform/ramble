@@ -3350,11 +3350,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # Copy all archive patterns
             archive_patterns = set()
             for _, obj_inst in self.objects():
-                for pattern in getattr(obj_inst, "archive_patterns", {}):
-                    archive_patterns.add(pattern)
+                for when_set, patterns in getattr(
+                    obj_inst, "archive_patterns", {}
+                ).items():
+                    if self.expander.satisfies(
+                        reqs=when_set, variant_set=self.experiment_variants()
+                    ):
+                        for pattern in patterns.values():
+                            archive_patterns.add(pattern)
 
             for pattern in archive_patterns:
                 exp_pattern = self.expander.expand_var(pattern)
+                if not os.path.isabs(exp_pattern):
+                    exp_pattern = os.path.join(experiment_run_dir, exp_pattern)
                 for file in glob.glob(exp_pattern):
                     dest_dir = os.path.dirname(
                         file.replace(workspace.root, ws_archive_dir)

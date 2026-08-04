@@ -285,7 +285,7 @@ def patch_file(
 
 
 @shared_directive("archive_patterns")
-def archive_pattern(pattern, **kwargs):
+def archive_pattern(pattern, when=None, **kwargs):
     """Adds a file pattern to be archived in addition to figure of merit logs
 
     Defines a new file pattern that will be archived during workspace archival.
@@ -294,10 +294,18 @@ def archive_pattern(pattern, **kwargs):
 
     Args:
       pattern (str): Pattern that refers to files to archive
+      when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_archive_pattern(obj):
-        obj.archive_patterns[pattern] = pattern
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, pattern, "archive_pattern"
+        )
+        when_set = frozenset(when_list)
+        if when_set not in obj.archive_patterns:
+            obj.archive_patterns[when_set] = {}
+
+        obj.archive_patterns[when_set][pattern] = pattern
 
     return _execute_archive_pattern
 
