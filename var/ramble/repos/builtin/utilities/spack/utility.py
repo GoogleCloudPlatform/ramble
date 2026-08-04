@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import shutil
 
 # flake8: noqa: F403
 from ramble.toolkit import *
@@ -69,6 +68,7 @@ class Spack(UtilityBase):
             .get("variables", {})
         )
         if ws_vars.get("use_system_spack", False):
-            if shutil.which("spack"):
-                return True
-        return False
+            return super().is_available(workspace)
+        return super().is_available(
+            workspace, min_version=min_version, max_version=max_version
+        )
