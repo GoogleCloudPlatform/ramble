@@ -507,9 +507,22 @@ def run_black(black_cmd, file_list, args):
                 file=sys.stderr,
             )
 
+    help_out = black_cmd("-h", output=str, error=str)
+    supported_versions = set()
+    help_match = re.search(r"--target-version\s+\[([^\]]+)\]", help_out)
+    if help_match:
+        supported_versions = set(help_match.group(1).split("|"))
+
+    desired_versions = ["py36", "py37", "py38", "py39", "py310", "py311", "py312", "py313"]
+    target_args = []
+    for ver in desired_versions:
+        if ver in supported_versions:
+            target_args.extend(["--target-version", ver])
+
     common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         common_args += ("--check", "--diff")
+    common_args += tuple(target_args)
     common_args += tuple(get_tool_args(args, "black"))
     primary_files, obj_files = _split_file_list(file_list, args)
     output = ""
