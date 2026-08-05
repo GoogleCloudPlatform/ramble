@@ -18,6 +18,7 @@ import llnl.util.filesystem as fs
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
 from ramble.util.executable import PrefixedExecutable, which
+from ramble.util.format import when_order
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
@@ -158,12 +159,16 @@ class Pip(PackageManagerBase):
                     )
                     and pkg not in installed_pkgs
                 ):
+                    sorted_vars = sorted(
+                        self.experiment_variants().as_set(for_output=True),
+                        key=when_order,
+                    )
                     logger.die(
                         f"Package {pkg} is not installed "
                         f"in environment {env_context}, but is "
                         f"required by the {app_inst.name} application "
                         "definition\n",
-                        f"{self.experiment_variants().as_set(for_output=True)}\n",
+                        f"{sorted_vars}\n",
                         f"{conf['when']}",
                     )
 

@@ -442,9 +442,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     found = True
 
         if not found:
+            sorted_variants = sorted(
+                self.experiment_variants().as_set(for_output=True),
+                key=when_order,
+            )
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.experiment_variants().as_set(for_output=True)}"
+                f"  {sorted_variants}"
             )
 
     def _set_package_manager(self):

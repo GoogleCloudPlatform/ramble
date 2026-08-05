@@ -62,11 +62,13 @@ class VariantSet:
         self._set_cache = None
         self._output_set_cache = None
         self._has_template_variants = False
+        self._has_output_template_variants = False
 
     def _invalidate_cache(self):
         self._set_cache = None
         self._output_set_cache = None
         self._has_template_variants = False
+        self._has_output_template_variants = False
 
     def __str__(self):
         if not hasattr(self, "_str_indent"):
@@ -370,8 +372,11 @@ class VariantSet:
             (set): Set of expanded variant definitions
         """
         cache = self._output_set_cache if for_output else self._set_cache
+        has_templates = (
+            self._has_output_template_variants if for_output else self._has_template_variants
+        )
 
-        if expander is None or not self._has_template_variants:
+        if expander is None or not has_templates:
             return cache
 
         expanded_set = set()
@@ -460,7 +465,10 @@ class VariantSet:
             self._set_cache = out_set
 
         if any("{" in v for v in out_set):
-            self._has_template_variants = True
+            if for_output:
+                self._has_output_template_variants = True
+            else:
+                self._has_template_variants = True
 
         return self._expanded_set(expander, for_output=for_output)
 
