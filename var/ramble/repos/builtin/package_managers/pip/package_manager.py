@@ -163,7 +163,7 @@ class Pip(PackageManagerBase):
                         f"in environment {env_context}, but is "
                         f"required by the {app_inst.name} application "
                         "definition\n",
-                        f"{self.experiment_variants().as_set()}\n",
+                        f"{self.experiment_variants().as_set(for_output=True)}\n",
                         f"{conf['when']}",
                     )
 

@@ -32,6 +32,7 @@ import ramble.workspace.shell
 from ramble import ramble_version
 from ramble.cmd.common import arguments
 from ramble.namespace import namespace
+from ramble.util.format import when_order
 from ramble.util.logger import logger
 
 import spack.util.environment
@@ -1028,9 +1029,11 @@ def workspace_info(args):
                         variant_set = set()
                         for _, obj in app_inst.objects():
                             variant_set = variant_set.union(
-                                obj.experiment_variants().as_set(expander=app_inst.expander)
+                                obj.experiment_variants().as_set(
+                                    expander=app_inst.expander, for_output=True
+                                )
                             )
-                        for variant in variant_set:
+                        for variant in sorted(variant_set, key=when_order):
                             color.cprint(f"          - {variant}")
 
                     if args.executables:

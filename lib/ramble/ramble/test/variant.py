@@ -13,6 +13,7 @@ import pytest
 import ramble.variants
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.util.format import when_order
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -614,3 +615,32 @@ def test_workload_group_variant(workspace_name):
 
         assert "workload_group=test_wl_group" in info_out
         assert "workload_group=all_workloads" in info_out
+
+
+def test_boolean_variant_output_formatting():
+    v_set = ramble.variants.VariantSet()
+    v_set.default_variant("bool_var", default=True, values=[True, False])
+    v_set.default_variant("false_var", default=False, values=[True, False])
+    v_set.default_variant("str_var", default="foo")
+
+    # Evaluation set contains all condition forms for when clause matching
+    eval_set = v_set.as_set()
+    assert "+bool_var" in eval_set
+    assert "bool_var=True" in eval_set
+    assert "bool_var=true" in eval_set
+    assert "~false_var" in eval_set
+    assert "false_var=False" in eval_set
+    assert "false_var=false" in eval_set
+
+    # Output set contains only + or ~ format for booleans
+    output_set = v_set.as_set(for_output=True)
+    assert "+bool_var" in output_set
+    assert "bool_var=True" not in output_set
+    assert "bool_var=true" not in output_set
+    assert "~false_var" in output_set
+    assert "false_var=False" not in output_set
+    assert "false_var=false" not in output_set
+    assert "str_var=foo" in output_set
+
+    sorted_output = sorted(output_set, key=when_order)
+    assert sorted_output == ["str_var=foo", "+bool_var", "~false_var"]

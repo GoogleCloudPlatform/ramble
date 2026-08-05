@@ -60,10 +60,12 @@ class VariantSet:
         self.experiment_variants = {}
         self.version_variants = {}
         self._set_cache = None
+        self._output_set_cache = None
         self._has_template_variants = False
 
     def _invalidate_cache(self):
         self._set_cache = None
+        self._output_set_cache = None
         self._has_template_variants = False
 
     def __str__(self):
@@ -357,43 +359,56 @@ class VariantSet:
 
         return None
 
-    def _expanded_set(self, expander: Optional[Expander] = None) -> set:
+    def _expanded_set(self, expander: Optional[Expander] = None, for_output: bool = False) -> set:
         """Return an expanded version of the cached set in this variant set.
 
         Args:
             expander (ramble.expander.Expander): Expander to use for expanding this set
+            for_output (bool): If True, returns expanded set for output formatting.
 
         Returns:
-            (set): Set of exanded variant definitions
+            (set): Set of expanded variant definitions
         """
+        cache = self._output_set_cache if for_output else self._set_cache
 
         if expander is None or not self._has_template_variants:
-            return self._set_cache
+            return cache
 
         expanded_set = set()
-        for variant in self._set_cache:
+        for variant in cache:
             if "{" in variant:
                 expanded_set.add(expander.expand_var(variant))
             else:
                 expanded_set.add(variant)
         return expanded_set
 
-    def as_set(self, expander: Optional[Expander] = None) -> set:
+    def as_set(self, expander: Optional[Expander] = None, for_output: bool = False) -> set:
         """Construct a set of definitions for this variant set
 
         The set of variant definitions will be used to determine if a when
-        clause is valid or not.
+        clause is valid or not, or formatted for output.
+
+        Args:
+            expander (ramble.expander.Expander): Expander to use when expanding
+                                                 variant definitions
+            for_output (bool): If True, only include primary variant definitions
+                               (e.g., +name or ~name for boolean variants) for display/output.
 
         Returns:
             set: A set consisting of strings with the variant definitions
-            expander (ramble.expander.Expander): Expander to use when expanding
-                                                 variant definitions
         """
-        if self._set_cache is not None:
-            return self._expanded_set(expander)
+        cache = self._output_set_cache if for_output else self._set_cache
+        if cache is not None:
+            return self._expanded_set(expander, for_output=for_output)
 
         defined_variants = set()
         out_set = set()
+
+        def _add_variant(var):
+            if for_output:
+                out_set.add(var.as_definition())
+            else:
+                out_set.update(var.as_definitions())
 
         for name, variant in self.experiment_variants.items():
             if name in self.default_variants or name in reserved_variants:
@@ -422,26 +437,32 @@ class VariantSet:
                                 f"   Valid values include: {values}"
                             )
 
-                out_set.update(variant.as_definitions())
+                _add_variant(variant)
                 defined_variants.add(name)
 
         for name, variant in self.default_variants.items():
             if name not in defined_variants:
-                out_set.update(variant.as_definitions())
+                _add_variant(variant)
                 defined_variants.add(name)
 
         for variant_list in self.multi_value_variants.values():
             for variant in variant_list:
-                out_set.update(variant.as_definitions())
+                _add_variant(variant)
 
         # Version variants are included as strings in the set for completeness, but should be
         # checked using the stored ObjectVersion class instead of a string comparison.
         for variant in self.version_variants.values():
-            out_set.update(variant.as_definitions())
+            _add_variant(variant)
 
-        self._set_cache = out_set
-        self._has_template_variants = any("{" in v for v in out_set)
-        return self._expanded_set(expander)
+        if for_output:
+            self._output_set_cache = out_set
+        else:
+            self._set_cache = out_set
+
+        if any("{" in v for v in out_set):
+            self._has_template_variants = True
+
+        return self._expanded_set(expander, for_output=for_output)
 
 
 class Variant:
