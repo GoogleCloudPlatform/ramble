@@ -230,14 +230,14 @@ def test_application_base_bootstrap_utilities_is_bootstrappable_false(
         setup_pipeline = ramble.pipeline.SetupPipeline(ws, filters)
         app_inst = next(iter(setup_pipeline.experiment_set.experiments.values()))
         app_inst.required_utilities = {frozenset([]): {"spack": {"git": "mygit"}}}
-        UtilityBase = ramble.repository.get_base_class("utility-base")
-        monkeypatch.setattr(UtilityBase, "is_available", lambda *a, **k: False)
+        SpackClass = type(ramble.repository.get("spack", ramble.repository.ObjectTypes.utilities))
+        monkeypatch.setattr(SpackClass, "is_available", lambda *a, **k: False)
         # Mock bootstrappable to False
+        monkeypatch.setattr(SpackClass, "bootstrappable", {"True": [{"is_bootstrappable": False}]})
         monkeypatch.setattr(
-            UtilityBase, "bootstrappable", {"True": [{"is_bootstrappable": False}]}
-        )
-        monkeypatch.setattr(
-            UtilityBase, "missing_error_messages", {"True": [{"message": "Custom Error"}]}
+            SpackClass,
+            "missing_error_messages",
+            {"True": [{"message": "Custom Error"}]},
         )
 
         with pytest.raises(SystemExit):
@@ -302,3 +302,45 @@ def test_application_base_bootstrap_utilities_success(
         setup_pipeline.run()
     assert hasattr(app_inst, "_bootstrapped_utility_paths")
     assert "spack" in app_inst._bootstrapped_utility_paths
+
+
+def test_spack_utility_is_available_version_checking(
+    mutable_config, mutable_mock_workspace_path, monkeypatch
+):
+    ws = ramble.workspace.create("test_spack_ver")
+    os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
+    with open(ws.config_file_path, "w", encoding="utf-8") as f:
+        f.write("""ramble:
+  variables:
+    use_system_spack: True
+""")
+    ws._re_read()
+    spack = Spack("/tmp/dummy")
+    monkeypatch.setattr(
+        shutil, "which", lambda cmd, **kwargs: "/path/to/spack" if cmd == "spack" else None
+    )
+
+    class MockResult:
+        stdout = "0.22.0\n"
+        stderr = ""
+        returncode = 0
+
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: MockResult())
+
+    # When use_system_spack is True, regardless of version, do not bootstrap
+    # a new spack (return True if installed)
+    assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
+    assert spack.is_available(ws, min_version="0.23.0") is True
+    assert spack.is_available(ws, max_version="0.21.0") is True
+
+    # When use_system_spack is False, only return True (avoid bootstrap) if
+    # already-installed spack has right version
+    with open(ws.config_file_path, "w", encoding="utf-8") as f:
+        f.write("""ramble:
+  variables:
+    use_system_spack: False
+""")
+    ws._re_read()
+    assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
+    assert spack.is_available(ws, min_version="0.23.0") is False
+    assert spack.is_available(ws, max_version="0.21.0") is False
