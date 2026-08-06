@@ -963,7 +963,7 @@ class SpackRunner(CommandRunner):
         self._load_compiler_shell(spec, shell_flag, regex)
 
     def _load_compiler_shell(self, spec, shell_flag, regex):
-        args = ["load", shell_flag, spec]
+        args = ["load", "--first", shell_flag, spec]
 
         load_cmds = self.execute(self.spack, args, return_output=True)
 
