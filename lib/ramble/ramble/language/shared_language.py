@@ -1037,12 +1037,14 @@ def register_validator(
 def requires_utility(
     name: str,
     when=None,
+    allow_external: bool = True,
     **kwargs,
 ):
     """Directive to declare an external dependency.
 
     Args:
         name: Name of the external dependency required (e.g. spack)
+        allow_external: Whether or not the dependency can be satisfied by a system installation
         when: List of when conditions to apply to directive
         **kwargs: Optional configuration overrides for the dependency (e.g. version). Also
             supports ``min_version`` and ``max_version`` to constrain the required version.
@@ -1058,6 +1060,7 @@ def requires_utility(
             obj.required_utilities[when_key] = {}
 
         obj.required_utilities[when_key][name] = kwargs.copy()
+        obj.required_utilities[when_key][name]["allow_external"] = allow_external
         obj.required_utilities[when_key][name]["when"] = when_list
 
     return _define_requires_utility

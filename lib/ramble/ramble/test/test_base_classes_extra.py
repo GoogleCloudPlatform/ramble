@@ -176,8 +176,6 @@ def test_application_base_bootstrap_utilities_is_available_true(
         f.write("""ramble:
   config:
     bootstrap_utilities: True
-  variables:
-    use_system_spack: True
   applications:
     hostname:
       workloads:
@@ -308,13 +306,7 @@ def test_spack_utility_is_available_version_checking(
     mutable_config, mutable_mock_workspace_path, monkeypatch
 ):
     ws = ramble.workspace.create("test_spack_ver")
-    os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
-    with open(ws.config_file_path, "w", encoding="utf-8") as f:
-        f.write("""ramble:
-  variables:
-    use_system_spack: True
-""")
-    ws._re_read()
+
     spack = Spack("/tmp/dummy")
     monkeypatch.setattr(
         shutil, "which", lambda cmd, **kwargs: "/path/to/spack" if cmd == "spack" else None
@@ -326,21 +318,6 @@ def test_spack_utility_is_available_version_checking(
         returncode = 0
 
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: MockResult())
-
-    # When use_system_spack is True, regardless of version, do not bootstrap
-    # a new spack (return True if installed)
-    assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
-    assert spack.is_available(ws, min_version="0.23.0") is True
-    assert spack.is_available(ws, max_version="0.21.0") is True
-
-    # When use_system_spack is False, only return True (avoid bootstrap) if
-    # already-installed spack has right version
-    with open(ws.config_file_path, "w", encoding="utf-8") as f:
-        f.write("""ramble:
-  variables:
-    use_system_spack: False
-""")
-    ws._re_read()
     assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
     assert spack.is_available(ws, min_version="0.23.0") is False
     assert spack.is_available(ws, max_version="0.21.0") is False

@@ -107,11 +107,11 @@ If an object requiring this utility provides a `min_version` or `max_version`, R
 ``requires_utility``
 --------------------
 
-Other objects (like Applications or Modifiers) can require a utility and optionally specify a minimum or maximum version using the ``requires_utility`` directive.
+Other objects (like Applications or Modifiers) can require a utility and optionally specify a minimum or maximum version using the ``requires_utility`` directive. You can also specify if the utility can be provided by the system with the ``allow_external`` boolean flag (defaults to ``True``).
 
 .. code-block:: python
 
-    requires_utility("cmake", min_version="3.20.0", max_version="3.30.0")
+    requires_utility("cmake", min_version="3.20.0", max_version="3.30.0", allow_external=True)
 
 Environment Modifications
 =========================
