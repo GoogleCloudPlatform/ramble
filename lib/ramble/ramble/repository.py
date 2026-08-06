@@ -898,7 +898,7 @@ class RepoPath:
 
     def in_path(self, maybe_obj_path):
         """Whether the path belongs to any of the repos."""
-        return any(os.path.commonprefix([maybe_obj_path, r.root]) == r.root for r in self.repos)
+        return any(os.path.commonpath([maybe_obj_path, r.root]) == r.root for r in self.repos)
 
     # TODO: DWJ - Maybe we don't need this? Are we going to have virtual
     #             objects

@@ -100,7 +100,7 @@ class Pip(PackageManagerBase):
 
         cache_tupl = ("pip-env", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug("{cache_tupl} already in cache")
+            logger.debug(f"{cache_tupl} already in cache")
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -138,7 +138,7 @@ class Pip(PackageManagerBase):
 
         cache_tupl = ("pip-install", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug("{cache_tupl} already in cache")
+            logger.debug(f"{cache_tupl} already in cache")
             return
         else:
             workspace.add_to_cache(cache_tupl)
