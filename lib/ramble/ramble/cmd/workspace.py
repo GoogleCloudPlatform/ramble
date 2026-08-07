@@ -26,6 +26,7 @@ import ramble.expander
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
+import ramble.spec
 import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
@@ -909,12 +910,20 @@ def workspace_info(args):
             if experiment_template_name.endswith(suffix):
                 experiment_template_name = experiment_template_name[: -len(suffix)]
 
-        key = (
-            app_inst.variables[app_inst.keywords.application_name],
-            app_inst.variables[app_inst.keywords.workload_template_name],
-            experiment_template_name,
+        app_ns_spec = ramble.spec.Spec(app_inst.variables[app_inst.keywords.application_namespace])
+        app_ns = app_ns_spec.fullname
+        app_name = app_inst.variables[app_inst.keywords.application_name]
+        app_ns_no_type = (
+            f"{app_ns_spec.namespace}.{app_ns_spec.name}" if app_ns_spec.namespace else app_name
         )
-        experiment_index_map[key].append(exp_name)
+
+        for a_name in {app_ns, app_name, app_ns_no_type}:
+            key = (
+                a_name,
+                app_inst.variables[app_inst.keywords.workload_template_name],
+                experiment_template_name,
+            )
+            experiment_index_map[key].append(exp_name)
 
     # Construct filters here...
     filters = ramble.filters.Filters(

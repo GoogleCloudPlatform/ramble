@@ -205,6 +205,24 @@ _ALL_ACCEPTED_CONFIGS = {
 }
 
 
+@functools.lru_cache(maxsize=1)
+def get_object_type_map():
+    """Returns a mapping from string representations of object types (singular,
+    plural, abbrev, hyphens/underscores) to their corresponding ObjectType enum."""
+    mapping = {}
+    for obj_type, type_def in type_definitions.items():
+        candidates = set()
+        for key in ("abbrev", "dir_name", "singular"):
+            val = type_def.get(key)
+            if val:
+                val = val.replace(" ", "_")
+                candidates.update([val, val.replace("_", "-"), val.replace("-", "_")])
+
+        for cand in candidates:
+            mapping[cand] = obj_type
+    return mapping
+
+
 def _gen_path(repo_dirs=None, obj_type=default_type):
     """Create a RepoPath for a specific object, add it to sys.meta_path, and return it."""
     section_name = type_definitions[obj_type]["config_section"]

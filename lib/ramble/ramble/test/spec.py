@@ -20,6 +20,15 @@ class TestSpec:
             ("my-app", "my-app", None, "my-app"),
             ("my-namespace.my-app", "my-app", "my-namespace", "my-namespace.my-app"),
             ("", "", None, ""),
+            ("builtin.app.foo", "foo", "builtin", "builtin.app.foo"),
+            ("builtin.application.foo", "foo", "builtin", "builtin.app.foo"),
+            ("builtin.mod.bar", "bar", "builtin", "builtin.mod.bar"),
+            ("builtin.sys.my_sys", "my_sys", "builtin", "builtin.sys.my_sys"),
+            ("app.foo", "foo", None, "app.foo"),
+            ("org.project.repo.app.foo", "foo", "org.project.repo", "org.project.repo.app.foo"),
+            ("org.project.repo.foo", "foo", "org.project.repo", "org.project.repo.foo"),
+            ("foo@1.0", "foo", None, "foo"),
+            ("builtin.app.foo@1.0", "foo", "builtin", "builtin.app.foo"),
         ],
     )
     def test_init_from_string(
@@ -36,9 +45,11 @@ class TestSpec:
         assert s_empty.name is None
         assert s_empty.namespace is None
         assert s_empty.fullname == ""
+        assert str(s_empty) == ""
 
         # Test init from another spec and copy method
         s1 = Spec("my-namespace.my-app")
+        assert str(s1) == "my-app"
         s2 = Spec(s1)
         s3 = s1.copy()
 

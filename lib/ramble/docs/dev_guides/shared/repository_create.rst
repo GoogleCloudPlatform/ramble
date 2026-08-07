@@ -82,3 +82,29 @@ when multiple exist with the same name. Each repository has a namespace, and
 these namespaces can be used to refer to specific instances of each object
 definition.
 
+Referencing Objects with Namespaces
+-----------------------------------
+
+When multiple repositories contain objects with the same name, or when you want
+to be explicit about which repository an object comes from, you can use fully-qualified
+namespaced specs.
+
+Namespaced specs take the form:
+
+* ``<namespace>.<object_name>`` (e.g., ``tutorial-repo.hostname``, ``builtin.wrf``)
+* ``<namespace>.<type_abbrev>.<object_name>`` (e.g., ``tutorial-repo.app.hostname``, ``builtin.mod.my_modifier``)
+* ``<namespace>.<type_abbrev>.<object_name>@<version>`` (e.g., ``builtin.app.wrf@4.2``, ``builtin.app.wrf@{version}``)
+
+Common object type abbreviations include:
+
+* ``app`` or ``application`` for applications
+* ``mod`` or ``modifier`` for modifiers
+* ``pkg_man`` or ``package_manager`` for package managers
+* ``wm`` or ``workflow_manager`` for workflow managers
+* ``sys`` or ``system`` for systems
+* ``plat`` or ``platform`` for platforms
+
+These namespaced specs can be used in CLI commands (e.g., ``ramble info <spec>``,
+``ramble edit <spec>``, ``ramble create <spec>``) and in workspace configuration files
+(``ramble.yaml``) under the ``applications:`` and ``environments:`` sections.
+

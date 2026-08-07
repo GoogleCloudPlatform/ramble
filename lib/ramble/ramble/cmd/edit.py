@@ -12,6 +12,7 @@ import os
 import ramble.cmd
 import ramble.paths
 import ramble.repository
+import ramble.spec
 from ramble.util.logger import logger
 
 from spack.util.editor import editor
@@ -142,7 +143,12 @@ def setup_parser(subparser):
     excl_args.add_argument("-r", "--repo", default=None, help="path to repo to edit object in")
     excl_args.add_argument("-N", "--namespace", default=None, help="namespace of object to edit")
 
-    subparser.add_argument("object_name", nargs="?", default=None, help="object name")
+    subparser.add_argument(
+        "object_name",
+        nargs="?",
+        default=None,
+        help=("object name or namespaced spec to edit " "(e.g., my-app or builtin.app.my-app)"),
+    )
 
 
 def edit(parser, args):

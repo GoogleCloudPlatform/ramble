@@ -9,6 +9,7 @@
 
 import ramble.creator
 import ramble.repository
+import ramble.spec
 import ramble.util.naming as nm
 from ramble.util.logger import logger
 
@@ -33,8 +34,10 @@ def setup_parser(subparser):
     subparser.add_argument(
         "object_type",
         nargs="?",
-        choices=list(type_mapping.keys()),
-        help="the type of object definition to create",
+        help=(
+            "the type of object definition to create or a namespaced spec "
+            "(e.g., application, or builtin.app.foo)"
+        ),
     )
     subparser.add_argument(
         "name",
@@ -196,11 +199,36 @@ def run_interactive_wizard():
 def create(parser, args):
     """Main command runner logic."""
 
+    obj_type = None
+    name = None
+    repo = args.repo
+    base = args.base
+    maintainers = [m.strip() for m in args.maintainers.split(",")] if args.maintainers else []
+    tags = [t.strip() for t in args.tags.split(",")] if args.tags else []
+
+    if args.object_type:
+        spec = ramble.spec.Spec(args.object_type)
+        if spec.object_type and spec.name:
+            obj_type = spec.object_type
+            name = spec.name
+            if spec.namespace:
+                repo = spec.namespace
+        elif args.object_type in type_mapping:
+            obj_type = type_mapping[args.object_type]
+            name = args.name
+        else:
+            type_map = ramble.repository.get_object_type_map()
+            if args.object_type in type_map:
+                obj_type = type_map[args.object_type]
+                name = args.name
+
     # Check if interactive wizard is requested or needed
-    if args.interactive or not args.object_type or not args.name:
+    if args.interactive or not obj_type or not name:
         import sys
 
         if not sys.stdin.isatty():
+            if args.object_type and not name and obj_type:
+                logger.die(f"Missing name for {args.object_type}.")
             logger.die(
                 "Interactive wizard cannot be run in a non-interactive terminal. "
                 "Please provide 'object_type' and 'name' arguments."
@@ -210,13 +238,6 @@ def create(parser, args):
         except KeyboardInterrupt:
             print("\n\n[ABORTED] Object creation cancelled.")
             return 1
-    else:
-        obj_type = type_mapping[args.object_type]
-        name = args.name
-        repo = args.repo
-        base = args.base
-        maintainers = [m.strip() for m in args.maintainers.split(",")] if args.maintainers else []
-        tags = [t.strip() for t in args.tags.split(",")] if args.tags else []
 
     try:
         file_path, repo_namespace = ramble.creator.create_object(

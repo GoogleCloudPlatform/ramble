@@ -33,6 +33,7 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
+import ramble.spec
 import ramble.util.hashing
 import ramble.util.install_cache
 import ramble.util.lock as lk
@@ -910,6 +911,9 @@ ramble:
             if maybe_version:
                 contents[namespace.version] = maybe_version
 
+            app_spec = ramble.spec.Spec(app_name)
+            app_name = app_spec.fullname
+
             application_context = ramble.context.create_context_from_dict(app_name, contents)
 
             yield contents, application_context
@@ -926,6 +930,9 @@ ramble:
                 app_name, _, maybe_version = application.partition("@")
                 if maybe_version:
                     contents[namespace.version] = maybe_version
+
+                app_spec = ramble.spec.Spec(app_name)
+                app_name = app_spec.fullname
 
                 application_context = ramble.context.create_context_from_dict(app_name, contents)
 

@@ -186,3 +186,41 @@ def test_add_experiments_with_zips(make_workspace_from_config):
     exp_config = app_config["basic"]["workloads"]["test_wl"]["experiments"]["test_exp"]
     assert "zips" in exp_config
     assert exp_config["zips"]["my_zip"] == ["var1", "var2"]
+
+
+def test_all_applications_with_version_and_namespace(mutable_mock_workspace_path):
+    ws_name = "test-ws-app-versions"
+    ws_root = workspace.root(ws_name)
+    ws = None
+
+    if os.path.exists(ws_root):
+        shutil.rmtree(ws_root)
+
+    try:
+        ws = workspace.create(ws_name)
+        workspace.activate(ws)
+
+        ramble.config.add(
+            "applications:builtin.app.hostname@1.0:workloads:test_wl:experiments:{}",
+            scope=ws.ws_file_config_scope_name(),
+        )
+        ramble.config.add(
+            "applications:basic@2.0:workloads:test_wl:experiments:{}",
+            scope=ws.ws_file_config_scope_name(),
+        )
+        ws.write()
+        ws._re_read()
+
+        apps = {}
+        for contents, app_context in ws.all_applications():
+            apps[app_context.context_name] = contents.get(ramble.namespace.namespace.version)
+
+        assert "builtin.app.hostname" in apps
+        assert apps["builtin.app.hostname"] == "1.0"
+        assert "basic" in apps
+        assert apps["basic"] == "2.0"
+    finally:
+        if ws:
+            workspace.deactivate()
+        if os.path.exists(ws_root):
+            shutil.rmtree(ws_root)

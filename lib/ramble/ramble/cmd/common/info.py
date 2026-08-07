@@ -13,6 +13,7 @@ import textwrap
 from llnl.util.tty.colify import colified
 
 import ramble.repository
+import ramble.spec
 import ramble.util.colors as color
 from ramble.cmd.common import arguments
 from ramble.definitions.variables import Variable
@@ -78,7 +79,13 @@ def _map_attr_name(attr):
 def setup_info_parser(subparser):
     """Create the info parser"""
 
-    subparser.add_argument("object", help="Name of object to print info for")
+    subparser.add_argument(
+        "object",
+        help=(
+            "name of object or namespaced spec to print info for "
+            "(e.g., my-app or builtin.app.my-app)"
+        ),
+    )
 
     arguments.add_common_arguments(subparser, ["obj_type"])
 
@@ -473,9 +480,13 @@ def print_info(args):
     format_type = getattr(supported_formats, args.format)
     args.format = format_type
 
-    object_type = ramble.repository.ObjectTypes[args.type]
-    obj_name = args.object
-    obj = ramble.repository.get(obj_name, object_type=object_type)
+    spec = ramble.spec.Spec(args.object)
+    if spec.object_type:
+        object_type = spec.object_type
+    else:
+        object_type = ramble.repository.ObjectTypes[args.type]
+
+    obj = ramble.repository.get(spec, object_type=object_type)
 
     print_object_header(object_type, obj)
 
