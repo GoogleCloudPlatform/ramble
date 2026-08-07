@@ -177,16 +177,30 @@ class Hpcg(ExecutableApplication):
     def _calculate_values(self, workspace, app_inst):
         expander = self.expander
         if "calculator" in expander.workload_name:
-            memory_per_rank = float(
-                expander.expand_var_name("memory_per_rank")
-            )
-            bytes_per_grid_point = float(
-                expander.expand_var_name("bytes_per_grid_point")
-            )
-            size_multiple = int(expander.expand_var_name("size_multiple"))
-            static_memory_overhead = float(
-                expander.expand_var_name("static_memory_overhead")
-            )
+            try:
+                memory_per_rank = float(
+                    expander.expand_var_name("memory_per_rank")
+                )
+                bytes_per_grid_point = float(
+                    expander.expand_var_name("bytes_per_grid_point")
+                )
+                size_multiple = int(expander.expand_var_name("size_multiple"))
+                static_memory_overhead = float(
+                    expander.expand_var_name("static_memory_overhead")
+                )
+            except ValueError as e:
+                logger.die(
+                    f"Failed to parse calculator workload variables: {e}"
+                )
+
+            if memory_per_rank < 0:
+                logger.die("memory_per_rank must be non-negative")
+            if static_memory_overhead < 0:
+                logger.die("static_memory_overhead must be non-negative")
+            if bytes_per_grid_point <= 0:
+                logger.die("bytes_per_grid_point must be positive")
+            if size_multiple <= 0:
+                logger.die("size_multiple must be positive")
 
             # Available memory for matrix allocation (subtracting fixed overhead)
             available_memory = memory_per_rank - static_memory_overhead
