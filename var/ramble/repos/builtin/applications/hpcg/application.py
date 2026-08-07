@@ -46,5 +46,9 @@ class Hpcg(BaseHpcg):
         required_package("hpcg")
 
     workload("standard", executables=["execute", "move-log"])
+    workload("calculator", executables=["execute", "move-log"])
 
-    workload_group("all_workloads", workloads=["standard"], mode="append")
+    workload_group(
+        "all_workloads", workloads=["standard", "calculator"], mode="append"
+    )
+    workload_group("calculator", workloads=["calculator"], mode="append")

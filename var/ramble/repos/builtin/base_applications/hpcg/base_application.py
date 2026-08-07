@@ -35,11 +35,41 @@ class Hpcg(ExecutableApplication):
 
     workload_group("all_workloads")
 
+    workload_group("calculator")
+
     workload_variable(
         "matrix_size",
         default="104 104 104",
         description="Dimensions of the matrix to use",
         workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "memory_per_rank",
+        default="4.0",
+        description="Target total physical memory (RSS) per MPI rank (in GB), including MPI and runtime overhead",
+        workload_group="calculator",
+    )
+
+    workload_variable(
+        "bytes_per_grid_point",
+        default="768",
+        description="Estimated bytes per grid point for memory calculation",
+        workload_group="calculator",
+    )
+
+    workload_variable(
+        "static_memory_overhead",
+        default="0.6",
+        description="Estimated static memory overhead per MPI rank (in GB), subtracted from memory_per_rank to size grids",
+        workload_group="calculator",
+    )
+
+    workload_variable(
+        "size_multiple",
+        default="8",
+        description="Dimension size must be a multiple of this value",
+        workload_group="calculator",
     )
 
     workload_variable(
@@ -125,9 +155,57 @@ class Hpcg(ExecutableApplication):
         fom_type=FomType.THROUGHPUT,
     )
 
+    figure_of_merit(
+        "Memory Used for Data",
+        log_file=out_file,
+        fom_regex=r"Memory Use Information::Total memory used for data \(Gbytes\)=(?P<memory_gb>[0-9\.]+)",
+        group_name="memory_gb",
+        units="Gbytes",
+    )
+
     register_template(
         name="hpcg_dat",
         src_path="hpcg.dat.tpl",
         dest_path="hpcg.dat",
         define_var=False,
     )
+
+    register_phase(
+        "calculate_values", pipeline="setup", run_before=["make_experiments"]
+    )
+
+    def _calculate_values(self, workspace, app_inst):
+        expander = self.expander
+        if "calculator" in expander.workload_name:
+            memory_per_rank = float(
+                expander.expand_var_name("memory_per_rank")
+            )
+            bytes_per_grid_point = float(
+                expander.expand_var_name("bytes_per_grid_point")
+            )
+            size_multiple = int(expander.expand_var_name("size_multiple"))
+            static_memory_overhead = float(
+                expander.expand_var_name("static_memory_overhead")
+            )
+
+            # Available memory for matrix allocation (subtracting fixed overhead)
+            available_memory = memory_per_rank - static_memory_overhead
+            if available_memory < 0.1:
+                available_memory = 0.1
+
+            # Calculate local grid size per rank
+            memory_bytes = available_memory * (1024**3)
+            num_grid_points = memory_bytes / bytes_per_grid_point
+
+            # Each dimension is the cube root of num_grid_points
+            dim_size = num_grid_points ** (1.0 / 3.0)
+
+            # Round to the nearest multiple of size_multiple
+            ndim = int(round(dim_size / size_multiple)) * size_multiple
+
+            # Ensure it is at least size_multiple
+            if ndim < size_multiple:
+                ndim = size_multiple
+
+            matrix_size_str = f"{ndim} {ndim} {ndim}"
+            self.define_variable("matrix_size", matrix_size_str)

@@ -31,5 +31,9 @@ class NvidiaHpcg(BaseHpcg, NvidiaHpcBase):
     )
 
     workload("standard", executables=["execute"])
+    workload("calculator", executables=["execute"])
 
-    workload_group("all_workloads", workloads=["standard"], mode="append")
+    workload_group(
+        "all_workloads", workloads=["standard", "calculator"], mode="append"
+    )
+    workload_group("calculator", workloads=["calculator"], mode="append")
