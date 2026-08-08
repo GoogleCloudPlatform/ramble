@@ -456,19 +456,13 @@ def test_info_namespaced_spec(mutable_config, tmpdir):
 
     try:
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None
 
         repo("create", repo_path, repo_ns)
         repo("add", "-t", "applications", "--scope=site", repo_path)
 
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None
 
         create(f"{repo_ns}.app.test-app")
 
@@ -477,7 +471,4 @@ def test_info_namespaced_spec(mutable_config, tmpdir):
 
     finally:
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None

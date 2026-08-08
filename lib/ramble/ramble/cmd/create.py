@@ -213,9 +213,6 @@ def create(parser, args):
             name = spec.name
             if spec.namespace:
                 repo = spec.namespace
-        elif args.object_type in type_mapping:
-            obj_type = type_mapping[args.object_type]
-            name = args.name
         else:
             type_map = ramble.repository.get_object_type_map()
             if args.object_type in type_map:

@@ -1241,12 +1241,12 @@ class Repo:
         obj_dir = self.dirname_for_object_name(obj_name)
         return os.path.join(obj_dir, self.object_file_name)
 
-    @autospec
     def object_path(self, spec):
+        spec_name = spec.name if isinstance(spec, ramble.spec.Spec) else spec
         return os.path.join(
             self.objects_path,
-            self.dirname_for_object_name(spec.name),
-            self.filename_for_object_name(spec.name),
+            self.dirname_for_object_name(spec_name),
+            self.filename_for_object_name(spec_name),
         )
 
     @property

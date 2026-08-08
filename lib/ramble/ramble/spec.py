@@ -6,15 +6,50 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import functools
 import io
 from typing import Mapping
 
 import ramble.error
-import ramble.repository
 import ramble.util.colors as clr
 
 color_formats: Mapping[str, str] = {}
 default_format = "{name}"
+
+
+@functools.lru_cache(maxsize=None)
+def _parse_spec_string(spec_like):
+    if not spec_like:
+        return "", None, None
+
+    # Strip any version suffix if present (e.g., app@1.0)
+    spec_like = spec_like.partition("@")[0]
+
+    parts = spec_like.split(".")
+
+    import ramble.repository
+
+    type_map = ramble.repository.get_object_type_map()
+
+    if len(parts) >= 3 and parts[-2] in type_map:
+        object_type = type_map[parts[-2]]
+        name = parts[-1]
+        namespace = ".".join(parts[:-2])
+    elif len(parts) >= 2:
+        if len(parts) == 2 and parts[0] in type_map:
+            object_type = type_map[parts[0]]
+            name = parts[1]
+            namespace = None
+        else:
+            object_type = None
+            name = parts[-1]
+            namespace = ".".join(parts[:-1])
+    else:
+        object_type = None
+        name = parts[0]
+        namespace = None
+
+    return name, namespace, object_type
 
 
 class Spec:
@@ -44,33 +79,9 @@ class Spec:
             self._parse_spec_string(spec_like)
 
     def _parse_spec_string(self, spec_like):
-        if not spec_like:
-            self.name = ""
-            self.namespace = None
-            return
-
-        # Strip any version suffix if present (e.g., app@1.0)
-        spec_like = spec_like.partition("@")[0]
-
-        parts = spec_like.split(".")
-
-        type_map = ramble.repository.get_object_type_map()
-
-        if len(parts) >= 3 and parts[-2] in type_map:
-            self.object_type = type_map[parts[-2]]
-            self.name = parts[-1]
-            self.namespace = ".".join(parts[:-2])
-        elif len(parts) >= 2:
-            if len(parts) == 2 and parts[0] in type_map:
-                self.object_type = type_map[parts[0]]
-                self.name = parts[1]
-                self.namespace = None
-            else:
-                self.name = parts[-1]
-                self.namespace = ".".join(parts[:-1])
-        else:
-            self.name = parts[0]
-            self.namespace = None
+        self.name, self.namespace, parsed_type = _parse_spec_string(spec_like)
+        if self.object_type is None:
+            self.object_type = parsed_type
 
     def copy(self):
         new_spec = Spec()
@@ -195,6 +206,10 @@ class Spec:
 
     @property
     def fullname(self):
+        if not self.name:
+            return ""
+        import ramble.repository
+
         if self.namespace:
             if self.object_type:
                 abbrev = ramble.repository.type_definitions[self.object_type]["abbrev"]
@@ -204,7 +219,7 @@ class Spec:
             if self.object_type:
                 abbrev = ramble.repository.type_definitions[self.object_type]["abbrev"]
                 return f"{abbrev}.{self.name}"
-            return self.name if self.name else ""
+            return self.name
 
 
 class SpecFormatStringError(ramble.error.SpecError):
