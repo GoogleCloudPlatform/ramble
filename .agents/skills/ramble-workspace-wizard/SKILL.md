@@ -50,7 +50,7 @@ This skill transforms you into a specialized assistant for managing Ramble works
 - **Modular Configs:** Use `ramble workspace manage includes -a <file>` to include external YAML files for modularity.
 
 ### 5. Workflow Managers
-- **Explicit Declaration:** Always explicitly define the workflow manager in the `config:` section: `config: workflow_manager: <name>`. (Options: `user-managed`, `slurm`, `gke-mpi`, etc.)
+- **Explicit Declaration:** Always explicitly define the workflow manager in the `variants:` section: `variants: workflow_manager: <name>`. (Options: `user-managed`, `slurm`, `gke-mpi`, etc.)
 - **Letting WM Take the Lead:** If using a workflow manager (like `slurm`), **do not** manually set `batch_submit` or `mpi_command` unless explicitly overriding the WM's optimized defaults.
 - **Dynamic MPI Commands:** If comparing MPI types and overriding the WM default is necessary, use variable indirection to set specific commands and flags (e.g., `-ppn` vs `-npernode`) for each type:
   ```yaml
@@ -72,6 +72,8 @@ This skill transforms you into a specialized assistant for managing Ramble works
 - **Application Namespace:** Access variables defined within an application's Python definition using the `{application::<app_name>::<var_name>}` syntax. This is particularly useful for version defaults.
 - **External Environments:** You can bypass Ramble generating a Spack environment by providing an external one: `software: environments: <name>: external_env: path/to/spack.yaml`.
 - **Concretization:** Use `ramble workspace concretize` to automatically populate the `software:` section based on application definitions. **Crucial:** If the `software` block in `ramble.yaml` contains empty dictionaries (e.g., `packages: {}`, `environments: {}`), `concretize` will respect them and *will not* populate the defaults, often leading to missing spec errors. Either remove these empty dictionaries completely before running `concretize`, or use the force flag (`ramble workspace concretize -f`) to overwrite them. Do not manually guess software dependencies (like MPI or compilers) unless specifically requested by the user.
+- **Package Key Consistency**: Always use the exact package keys exposed by `ramble info -v <app_name>`. Do not simplify or rename templatized keys (e.g., keep `{app}-{version}`).
+- **Compiler Association**: Configure compilers strictly via the `compiler:` directive within the `software:packages:` entry. Do not add compiler packages directly to `environments: packages:`.
 - **Dry-run Validation:** To pass `workspace setup --dry-run` without a local software installation, ensure the workspace is concretized OR provide mock paths for required software (e.g., `hpl_path: /tmp/mock-hpl`) in the top-level `variables:` section.
 
 ### 7. Advanced YAML Features
@@ -105,9 +107,8 @@ This skill transforms you into a specialized assistant for managing Ramble works
 - **Prioritize Interactivity:** ALWAYS use the `ask_user` tool to present options to the user at any decision point or transition (e.g., choosing applications, workloads, next steps, or confirming actions). Avoid asking open-ended text questions when a multiple-choice menu can be provided.
 
 ### **B. Creating a New Workspace**
-1. Ask the user for a workspace name or directory if not provided using `ask_user`.
-2. Run `ramble workspace create <name>`.
-3. Note that the workspace lives at `./var/ramble/workspaces/<name>`.
+1. Ask the user for a workspace path using `ask_user`, if not provided.
+2. Run `ramble workspace create -d /path/to/my_workspace`.
 
 ### **C. Building the Configuration**
 1. Ask the user which package manager (e.g., Spack, EESSI, user-managed) and workflow manager (e.g., Slurm, GKE-MPI, user-managed) they intend to use using `ask_user`.
@@ -115,7 +116,7 @@ This skill transforms you into a specialized assistant for managing Ramble works
 3. Determine node counts, ranks, PPN, and if you need any specific workflow manager configurations (like partition or account).
 4. Check if any modifiers are requested (e.g., profilers). Identify their dependencies.
 5. **Draft the `ramble.yaml` directly** applying scaling variables, matrixing, modifiers, workflow managers, chaining/exclusions, and explicit software environments.
-    - **Explicit Declaration:** Set `variants: package_manager: <name>` and `config: workflow_manager: <name>`.
+    - **Explicit Declaration:** Set `variants: package_manager: <name>` and `variants: workflow_manager: <name>`.
     - **Environment Linking:** Use `env_name` in the application's `variables:` section to link it to a specific environment in the `software:` block.
     - **Parameterizing Environments:** If parameterizing over software choices (e.g., `mpi_type: [intel-mpi, openmpi]`), explicitly define the parameterized environment (e.g., `env_name: <app>-{mpi_type}`) and its required packages in the `software:` section before running concretize.
 6. Use `ramble workspace concretize` (with `-f` if empty dictionaries exist or if new applications were added) to pull in default software specs if using a package manager (like Spack) and the user doesn't have specific versions in mind.
@@ -133,7 +134,7 @@ This skill transforms you into a specialized assistant for managing Ramble works
 6. **Celebration:** Once the workspace is successfully created and validated, inject a random Led Zeppelin song quote to celebrate.
 
 ## Reference Documentation
-- [Workspace Configuration File](https://ramble.readthedocs.io/en/latest/workspace_config.html)
-- [Configuration Sections](https://ramble.readthedocs.io/en/latest/configuration_files.html)
-- [Success Criteria](https://ramble.readthedocs.io/en/latest/success_criteria.html)
-- [Workspace Internals](https://ramble.readthedocs.io/en/latest/workspace_config.html#internals-section)
+- [Workspace Configuration File](docs/workspace_config.rst)
+- [Configuration Sections](docs/configuration_files.rst)
+- [Success Criteria](docs/success_criteria.rst)
+
