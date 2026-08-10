@@ -57,6 +57,8 @@ from spack.util.compression import decompressor_for, extension
 from spack.util.executable import CommandNotFoundError, which
 from spack.version import ver
 
+_CONTENT_TYPE_RE = re.compile(r"Content-Type:[^\r\n]+", flags=re.IGNORECASE)
+
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies: List[Type["FetchStrategy"]] = []
 
@@ -373,7 +375,7 @@ class URLFetchStrategy(FetchStrategy):
         # Check if we somehow got an HTML file rather than the archive we
         # asked for.  We only look at the last content type, to handle
         # redirects properly.
-        content_types = re.findall(r"Content-Type:[^\r\n]+", headers, flags=re.IGNORECASE)
+        content_types = _CONTENT_TYPE_RE.findall(headers)
         if content_types and "text/html" in content_types[-1]:
             warn_content_type_mismatch(self.archive_file or "the archive")
 
@@ -496,7 +498,7 @@ class URLFetchStrategy(FetchStrategy):
         # Check if we somehow got an HTML file rather than the archive we
         # asked for.  We only look at the last content type, to handle
         # redirects properly.
-        content_types = re.findall(r"Content-Type:[^\r\n]+", headers, flags=re.IGNORECASE)
+        content_types = _CONTENT_TYPE_RE.findall(headers)
         if content_types and "text/html" in content_types[-1]:
             warn_content_type_mismatch(self.archive_file or "the archive")
         return partial_file, save_file
@@ -1093,7 +1095,7 @@ class CvsFetchStrategy(VCSFetchStrategy):
         with working_dir(self.stage.source_path):
             status = self.cvs("-qn", "update", output=str)
             for line in status.split("\n"):
-                if re.match(r"^[?]", line):
+                if line.startswith("?"):
                     path = line[2:].strip()
                     if os.path.isfile(path):
                         os.unlink(path)
@@ -1184,7 +1186,7 @@ class SvnFetchStrategy(VCSFetchStrategy):
             status = self.svn("status", "--no-ignore", output=str)
             self.svn("status", "--no-ignore")
             for line in status.split("\n"):
-                if not re.match("^[I?]", line):
+                if not line.startswith(("I", "?")):
                     continue
                 path = line[8:].strip()
                 if os.path.isfile(path):

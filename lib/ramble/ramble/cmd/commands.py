@@ -25,6 +25,8 @@ import ramble.paths
 from ramble.main import section_descriptions
 from ramble.util.logger import logger
 
+_CMD_HEADER_RE = re.compile(r"\.\. _cmd-(ramble-.*):")
+
 description = "list available ramble commands"
 section = "developer"
 level = "long"
@@ -237,7 +239,7 @@ def rst(args, out):
     for filename in args.rst_files:
         with open(filename, encoding="utf-8") as f:
             for line in f:
-                match = re.match(r"\.\. _cmd-(ramble-.*):", line)
+                match = _CMD_HEADER_RE.match(line)
                 if match:
                     documented_commands.add(match.group(1).strip())
 

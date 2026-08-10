@@ -17,8 +17,8 @@ from ramble.workspace import TEMPLATE_EXTENSION, workspace
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    "mutable_mock_workspace_path",
     "config",
+    "mutable_mock_workspace_path",
     "mutable_mock_apps_repo",
     "workspace_deactivate",
 )
@@ -165,3 +165,24 @@ def test_all_workspace_names_multiple_dirs(tmpdir, monkeypatch):
 
     assert "ws1" in names
     assert "ws2" in names
+
+
+def test_add_experiments_with_zips(make_workspace_from_config):
+    ws, _ = make_workspace_from_config(activate=True)
+    ws.add_experiments(
+        application="basic",
+        workload_name_variable=None,
+        workload_filters=["test_wl"],
+        include_default_variables=False,
+        default_variable_value="",
+        variable_filters=["*"],
+        variable_definitions=["var1=['a', 'b']", "var2=['c', 'd']"],
+        variant_definitions=[],
+        experiment_name="test_exp",
+        zips=["my_zip=[var1,var2]"],
+    )
+    ws._re_read()
+    app_config = ws.get_applications()
+    exp_config = app_config["basic"]["workloads"]["test_wl"]["experiments"]["test_exp"]
+    assert "zips" in exp_config
+    assert exp_config["zips"]["my_zip"] == ["var1", "var2"]

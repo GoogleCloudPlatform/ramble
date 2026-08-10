@@ -21,6 +21,8 @@ import ramble.paths
 
 __all__ = ["substitute_config_variables", "substitute_path_variables", "canonicalize_path"]
 
+_PATH_VAR_RE = re.compile(r"(\$\w+\b|\$\{\w+\})")
+
 # Substitutions to perform
 replacements = {
     "ramble": ramble.paths.prefix,
@@ -50,7 +52,7 @@ def substitute_config_variables(path, local_replacements):
         return replacements.get(lower_key, local_replacements.get(lower_key, match.group(0)))
 
     # Replace $var or ${var}.
-    return re.sub(r"(\$\w+\b|\$\{\w+\})", repl, path)
+    return _PATH_VAR_RE.sub(repl, path)
 
 
 def substitute_path_variables(path, local_replacements=None):

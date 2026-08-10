@@ -47,6 +47,10 @@ import spack.util.debug
 import spack.util.environment
 from spack.util.executable import CommandNotFoundError
 
+_USAGE_SPACES_RE = re.compile(r"[ ]{2,}")
+_USAGE_CHARS_RE = re.compile(r"\[-(.)\]")
+_USAGE_OPT_RE = re.compile(r"\[-.\] ?")
+
 #: names of profile statistics
 stat_names = pstats.Stats.sort_arg_dict_default
 
@@ -131,12 +135,12 @@ class RambleHelpFormatter(argparse.RawTextHelpFormatter):
         usage = super()._format_actions_usage(actions, groups)
 
         # Eliminate any occurrence of two or more consecutive spaces
-        usage = re.sub(r"[ ]{2,}", " ", usage)
+        usage = _USAGE_SPACES_RE.sub(" ", usage)
 
         # compress single-character flags that are not mutually exclusive
         # at the beginning of the usage string
-        chars = "".join(re.findall(r"\[-(.)\]", usage))
-        usage = re.sub(r"\[-.\] ?", "", usage)
+        chars = "".join(_USAGE_CHARS_RE.findall(usage))
+        usage = _USAGE_OPT_RE.sub("", usage)
         if chars:
             usage = f"[-{chars}] {usage}"
         return usage.strip()
