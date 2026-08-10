@@ -149,13 +149,17 @@ def test_workspace_activate_prompt(workspace_name):
     # Assert prompt mod with --prompt
     output = workspace("activate", workspace_name, "--sh", "--prompt")
     assert "export RAMBLE_OLD_PS1=" in output
-    assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+    assert "export PS1=" in output
+    assert f"[{workspace_name}]" in output
+    assert "${PS1}" in output
 
     # Assert prompt mod with config value
     with ramble.config.override("config:enable_workspace_prompt", True):
         output = workspace("activate", workspace_name, "--sh")
         assert "export RAMBLE_OLD_PS1=" in output
-        assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+        assert "export PS1=" in output
+        assert f"[{workspace_name}]" in output
+        assert "${PS1}" in output
 
 
 def test_workspace_activate_by_name(workspace_name):

@@ -293,6 +293,8 @@ def test_analyze_experiments_skips_none_fom(mutable_mock_apps_repo, monkeypatch,
 
     class MockExpander:
         def expand_var(self, val, extra_vars=None):
+            if val == "{experiment_run_dir}":
+                return str(tmpdir)
             return val
 
     app_inst.expander = MockExpander()
