@@ -42,7 +42,8 @@ To start, create a new workspace using ``ramble workspace create``:
 
    $ ramble workspace create -d manage-workspace
 
-This creates a workspace with the default ``ramble.yaml`` configuration:
+This creates an anonymous workspace (see note below) with the default ``ramble.yaml``
+configuration:
 
 .. code-block:: yaml
 
@@ -82,10 +83,16 @@ And there are no experiments listed in the output from ``ramble -D manage-worksp
 
 .. note::
    Throughout this tutorial, we will use the ``-D manage-workspace`` flag to direct
-   commands to our new workspace without needing to activate it explicitly.
+   commands to our new anonymous workspace without needing to activate it explicitly.
+   In these examples the ``manage-workspace`` directory is relative to our current working
+   directory, but you may specify an absolute path to a workspace directory as well - e.g.,
+   ``-D ${HOME}/manage-workspace``.
+
+   For more information on named and anonymous workspaces, see the
+   :ref:`Ramble workspace documentation<ramble-workspaces>`.
 
 -------------------------------
-Generating Baseline Experiments
+Generating Default Experiments
 -------------------------------
 
 The simplest usage of ``ramble workspace manage experiments`` is to generate default

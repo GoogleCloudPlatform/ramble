@@ -370,11 +370,7 @@ class VariantSet:
             for_output (bool): If True, returns expanded set for output formatting.
 
         Returns:
-<<<<<<< HEAD
-            (set): Set of expanded variant definitions
-=======
             set[str]: Set of exanded variant definitions
->>>>>>> fd3f15757 (Documentation cleanups and clarifications)
         """
         cache = self._output_set_cache if for_output else self._set_cache
         has_templates = (
@@ -404,17 +400,8 @@ class VariantSet:
             for_output (bool): If True, only include primary variant definitions
                                (e.g., +name or ~name for boolean variants) for display/output.
 
-<<<<<<< HEAD
-        Returns:
-            set: A set consisting of strings with the variant definitions
-=======
-        Args:
-            expander (ramble.expander.Expander): Expander to use when expanding
-                                                 variant definitions
-
         Returns:
             set[str]: A set consisting of strings with the variant definitions
->>>>>>> fd3f15757 (Documentation cleanups and clarifications)
         """
         cache = self._output_set_cache if for_output else self._set_cache
         if cache is not None:
