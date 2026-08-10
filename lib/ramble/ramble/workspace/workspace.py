@@ -1341,12 +1341,12 @@ ramble:
             exp_context.variables[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
-        missing_vars = set()
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         is_dry_run = self.dry_run
         self.dry_run = True
         for workload_name in workload_names:
             edited = True
+            missing_vars = set()
             exp_set = ramble.experiment_set.ExperimentSet(self)
             exp_list = exp_set.render_experiment_set(
                 app_inst.name,

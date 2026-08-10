@@ -4777,8 +4777,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     value = 0
 
                 if value is not None:
-                    self.missing_mpi_variables.add(var_name)
                     self.define_variable(var_name, value)
+                else:
+                    self.missing_mpi_variables.add(var_name)
 
             if mpi_required:
                 required_dict = {
