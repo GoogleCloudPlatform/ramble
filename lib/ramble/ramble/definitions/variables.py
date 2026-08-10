@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import copy
-import shlex
 import subprocess
 from typing import Any, Dict, List, Optional, Set
 
@@ -154,39 +153,23 @@ class CommandVariable(Variable):
         result = self.dry_run_value
 
         if not workspace.dry_run:
-            split_command = shlex.split(expanded_command)
-            cur_command = ""
-            command_chains = []
-            command_ps = []
-            for cmd_part in split_command:
-                if cmd_part == "|":
-                    command_chains.append(cur_command)
-                    cur_command = ""
-                else:
-                    cur_command += f" {cmd_part}"
-
-            if cur_command and cur_command != " ":
-                command_chains.append(cur_command)
-
             try:
-                while command_chains:
-                    cur_command = command_chains.pop(0)
-                    if command_ps:
-                        new_p = subprocess.Popen(
-                            shlex.split(cur_command),
-                            stdin=command_ps[-1].stdout,
-                            stdout=subprocess.PIPE,
-                        )
-                    else:
-                        new_p = subprocess.Popen(shlex.split(cur_command), stdout=subprocess.PIPE)
-                    command_ps.append(new_p)
-
-                for idx in range(len(command_ps) - 1):
-                    command_ps[idx].stdout.close()
-
-                result = command_ps[-1].communicate()[0].decode("utf-8").strip()
-            except FileNotFoundError:
-                pass
+                p = subprocess.Popen(
+                    expanded_command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                stdout, stderr = p.communicate()
+                result = stdout.decode("utf-8", errors="replace").strip()
+                if p.returncode != 0:
+                    err_out = stderr.decode("utf-8", errors="replace").strip()
+                    logger.debug(
+                        f"Command '{expanded_command}' returned "
+                        f"non-zero code {p.returncode}: {err_out}"
+                    )
+            except Exception as e:
+                logger.debug(f"Exception while running command '{expanded_command}': {e}")
 
         logger.debug(f"  Result: {result}")
 
