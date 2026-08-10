@@ -647,7 +647,7 @@ _ramble_style() {
 _ramble_unit_test() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -H --pytest-help --lib --obj -r --repo-path --perf --fast --slow -l --list -L --list-long -N --list-names -s -k --showlocals"
+        RAMBLE_COMPREPLY="-h --help -H --pytest-help --lib --obj -r --repo-path --perf --fail-on-style --fast --slow -l --list -L --list-long -N --list-names -s -k --showlocals"
     else
         _unit_tests
     fi

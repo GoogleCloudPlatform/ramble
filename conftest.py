@@ -52,6 +52,12 @@ def pytest_addoption(parser):
         help='runs only "fast" unit tests, instead of the whole suite',
     )
     group.addoption(
+        "--fail-on-style",
+        action="store_true",
+        default=False,
+        help="fail unit tests if style is bad in the repository",
+    )
+    group.addoption(
         "--slow",
         action="store_true",
         default=False,

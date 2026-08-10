@@ -62,6 +62,12 @@ def setup_parser(subparser):
         default=False,
         help="run only performance tests",
     )
+    subparser.add_argument(
+        "--fail-on-style",
+        action="store_true",
+        default=False,
+        help="fail unit tests if style is bad in the repository",
+    )
     speed = subparser.add_mutually_exclusive_group()
     speed.add_argument(
         "--fast",
@@ -211,6 +217,8 @@ def add_back_pytest_args(args, unknown_args):
         result += ["--fast"]
     if args.slow:
         result += ["--slow"]
+    if args.fail_on_style:
+        result += ["--fail-on-style"]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:

@@ -507,9 +507,22 @@ def run_black(black_cmd, file_list, args):
                 file=sys.stderr,
             )
 
+    help_out = black_cmd("-h", output=str, error=str)
+    supported_versions = set()
+    help_match = re.search(r"--target-version\s+\[([^\]]+)\]", help_out)
+    if help_match:
+        supported_versions = set(help_match.group(1).split("|"))
+
+    desired_versions = ["py36", "py37", "py38", "py39", "py310", "py311", "py312", "py313"]
+    target_args = []
+    for ver in desired_versions:
+        if ver in supported_versions:
+            target_args.extend(["--target-version", ver])
+
     common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         common_args += ("--check", "--diff")
+    common_args += tuple(target_args)
     common_args += tuple(get_tool_args(args, "black"))
     primary_files, obj_files = _split_file_list(file_list, args)
     output = ""
@@ -569,15 +582,21 @@ def run_isort(isort_cmd, file_list, args):
 
 @tool("mypy")
 def run_mypy(mypy_cmd, file_list, args):
-    del file_list
     if args.repo_path is not None:
         print("Skipping mypy for external repository.")
         return 0
-    print_tool_header("mypy", [])
+    print_tool_header("mypy", file_list)
 
     config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
-    mypy_args = ("--config-file", config_file)
-    mypy_args += tuple(get_tool_args(args, "mypy"))
+    mypy_args = ["--config-file", config_file]
+    mypy_args.extend(get_tool_args(args, "mypy"))
+
+    if file_list:
+        mypy_files = [f for f in file_list if f.startswith("lib/ramble/ramble/")]
+        if not mypy_files:
+            print_tool_result("mypy", 0)
+            return 0
+        mypy_args.extend(mypy_files)
 
     output = mypy_cmd(*mypy_args, fail_on_error=False, output=str, error=str)
     returncode = mypy_cmd.returncode
