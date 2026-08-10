@@ -738,3 +738,40 @@ class TestApplicationBase(unittest.TestCase):
             self.assertNotIn("application::name::version", non_reserved)
             self.assertNotIn("modifier_version", non_reserved)
             self.assertEqual(len(non_reserved), 1)
+
+
+@pytest.mark.parametrize(
+    "n_nodes,mpi_cmd,expect_warning",
+    [
+        ("2", "", True),
+        ("1", "", False),
+        ("2", "mpirun -n {n_ranks}", False),
+    ],
+)
+def test_multi_node_mpi_command_warning(
+    make_workspace_from_config, mutable_mock_apps_repo, n_nodes, mpi_cmd, expect_warning
+):
+    workspace = ramble.main.RambleCommand("workspace")
+
+    test_config = f"""
+ramble:
+  variables:
+    mpi_command: '{mpi_cmd}'
+    batch_submit: '{{execute_experiment}}'
+    processes_per_node: 1
+    n_nodes: {n_nodes}
+  applications:
+    basic:
+      workloads:
+        test_wl2:
+          experiments:
+            test_exp: {{}}
+"""
+    ws, _ = make_workspace_from_config(test_config)
+    out = workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+    expected_msg = (
+        "Command bar requires a non-empty `mpi_command` variable in a multi-node experiment"
+    )
+    warning_present = expected_msg in out
+    assert warning_present == expect_warning

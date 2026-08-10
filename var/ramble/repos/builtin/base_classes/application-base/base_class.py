@@ -2224,8 +2224,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             n_nodes = self.expander.expand_var_name(
                                 self.keywords.n_nodes
                             )
-                            n_nodes = 1 if "{n_nodes}" else n_nodes
-                            n_nodes = 1 if not n_nodes else int(n_nodes)
+                            n_nodes = (
+                                1
+                                if n_nodes in ("{n_nodes}", None, "")
+                                else int(n_nodes)
+                            )
                             if not raw_mpi_cmd and n_nodes > 1:
                                 logger.warn(
                                     f"Command {cmd_conf.name} requires a non-empty `mpi_command` "
