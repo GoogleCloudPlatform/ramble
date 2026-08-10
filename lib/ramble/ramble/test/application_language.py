@@ -192,7 +192,7 @@ def add_input_file(app_inst, input_num=1):
 def add_compiler(app_inst, spec_num=1):
     spec_name = f"Compiler{spec_num}"
     spec_pkg_spec = f"compiler_base@{spec_num}.0 +var1 ~var2"
-    spec_compiler_spec = "compiler1_base@{spec_num}"
+    spec_compiler_spec = f"compiler1_base@{spec_num}"
 
     spec_defs = {}
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
@@ -201,7 +201,7 @@ def add_compiler(app_inst, spec_num=1):
 
     spec_name = f"OtherCompiler{spec_num}"
     spec_pkg_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
-    spec_compiler_spec = "compiler2_base@{spec_num}"
+    spec_compiler_spec = f"compiler2_base@{spec_num}"
 
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
