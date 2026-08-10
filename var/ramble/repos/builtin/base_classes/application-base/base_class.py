@@ -4746,7 +4746,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for mpi_var in self.mpi_definitions:
             if mpi_var in self.variables:
-                mpi_vars_defined.add(mpi_var)
+                val = self.variables[mpi_var]
+                if val != "" and val is not None:
+                    mpi_vars_defined.add(mpi_var)
 
         return mpi_vars_defined
 
@@ -4777,8 +4779,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     value = 0
 
                 if value is not None:
-                    self.missing_mpi_variables.add(var_name)
                     self.define_variable(var_name, value)
+                else:
+                    self.missing_mpi_variables.add(var_name)
 
             if mpi_required:
                 required_dict = {
