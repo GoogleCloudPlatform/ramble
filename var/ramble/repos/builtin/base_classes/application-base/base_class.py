@@ -63,6 +63,7 @@ from ramble.language.shared_language import (
 )
 from ramble.util import cleaner, conversions, json_util
 from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
+from ramble.util.format import when_order
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
@@ -441,9 +442,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     found = True
 
         if not found:
+            sorted_variants = sorted(
+                self.experiment_variants().as_set(for_output=True),
+                key=when_order,
+            )
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.experiment_variants().as_set()}"
+                f"  {sorted_variants}"
             )
 
     def _set_package_manager(self):
@@ -3087,10 +3092,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for _, obj in self.objects():
             variant_definitions = variant_definitions.union(
-                obj.experiment_variants(app_inst=self).as_set()
+                obj.experiment_variants(app_inst=self).as_set(for_output=True)
             )
 
-        return sorted(variant_definitions)
+        return sorted(variant_definitions, key=when_order)
 
     def _purge_inventory(self):
         self.hash_inventory = {

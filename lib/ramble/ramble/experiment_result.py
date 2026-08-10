@@ -13,6 +13,7 @@ from ramble.namespace import namespace
 from ramble.software_info import SoftwareInfo
 from ramble.util import json_util
 from ramble.util.file_util import get_newest_experiment_file
+from ramble.util.format import when_order
 from ramble.util.logger import logger
 
 
@@ -145,7 +146,9 @@ class ExperimentResult:
             if var not in app_inst.keywords.keys or not app_inst.keywords.is_key_level(var):
                 self.variables[var] = app_inst.expander.expand_var(val)
 
-        self.variants = sorted(app_inst.experiment_variants().as_set())
+        self.variants = sorted(
+            app_inst.experiment_variants().as_set(for_output=True), key=when_order
+        )
 
         self.object_definitions = app_inst.object_inventory()
 
