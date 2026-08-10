@@ -26,7 +26,6 @@ from ramble.util import naming
 from ramble.util.logger import logger
 from ramble.util.path import substitute_config_variables
 
-_ast_cache: Dict[str, str] = {}
 # Regex for detecting math operators or keywords
 # We check for: + - * / % ^ & | ~ < > = ( ) [ ] { } , ' "
 # And keywords: and, or, in, is, not
@@ -92,18 +91,13 @@ def _get_source_segment(source, node):
         return None
 
 
+@functools.lru_cache(maxsize=2048)
 def _ast_parse(in_str):
-    """Parse a string into an AST, with caching."""
-    if in_str in _ast_cache:
-        return _ast_cache[in_str]
-
+    """Parse a string into an AST, with LRU caching."""
     try:
-        math_ast = ast.parse(in_str, mode="eval")
+        return ast.parse(in_str, mode="eval")
     except SyntaxError:
-        math_ast = None
-
-    _ast_cache[in_str] = math_ast
-    return math_ast
+        return None
 
 
 def _and(a, b):
