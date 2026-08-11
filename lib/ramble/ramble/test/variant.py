@@ -736,3 +736,53 @@ def test_workflow_manager_containerized_propagation(request):
         exp_set = ws.build_experiment_set()
         for _, app, _ in exp_set.all_experiments():
             assert not app.object_variants.value("containerized")
+
+
+def test_containerized_app_variable_guarding(request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        # Define mpi_command variable to satisfy keyword validation
+        config("add", "variables:mpi_command:mpirun -n {n_ranks}", global_args=global_args)
+
+        # By default, workflow manager is user-managed, so containerized=False.
+        # Verify container_only_var is NOT defined as a workload variable.
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" not in app.variables
+
+        # Switch to a containerized workflow manager (gke-mpi)
+        config("add", "variants:workflow_manager:gke-mpi", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" in app.variables
+
+        # Switch back to user-managed workflow manager but explicitly set containerized: true
+        config("add", "variants:workflow_manager:user-managed", global_args=global_args)
+        config("add", "variants:containerized:true", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" in app.variables
