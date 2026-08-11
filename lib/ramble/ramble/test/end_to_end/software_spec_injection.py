@@ -243,3 +243,56 @@ def test_software_spec_compiler_injection_works(
         info_out = workspace("info", "--software", global_args=global_args)
 
         assert "injected_compiler" in info_out
+
+
+def test_conflict_resolution_inject_if_missing(
+    mock_modifiers, ensure_spack_runner, make_workspace_from_config
+):
+    test_config = """
+ramble:
+  variants:
+    package_manager: spack
+    implicit_compiler: True
+  variables:
+    mpi_command: 'mpirun -n {n_ranks}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    partition: 'part1'
+    processes_per_node: '16'
+    n_threads: '1'
+  applications:
+    gromacs:
+      workloads:
+        water_bare:
+          experiments:
+            test_exp:
+              variables:
+                n_nodes: '1'
+                n_ranks: '1'
+              modifiers:
+                - name: spack-mod
+  software:
+    environments:
+      gromacs:
+        packages:
+          - my_custom_package
+    packages:
+      my_custom_package:
+        pkg_spec: missing_package@2.0
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+    global_args = ["-w", ws_name]
+
+    # Concretize the workspace. If the conflict resolution is correct,
+    # it should NOT concretize/inject `missing_mod_package` because
+    # `my_custom_package` (which defines `missing_package`) is already defined.
+    workspace("concretize", global_args=global_args)
+
+    info_output = workspace("info", "--software", global_args=global_args)
+
+    # `missing_mod_package` should NOT be in the environment.
+    assert "missing_mod_package" not in info_output
+    assert "missing_package@1.1" not in info_output
+
+    # `my_custom_package` (which is `missing_package@2.0`) should be in the environment.
+    assert "my_custom_package" in info_output
+    assert "missing_package@2.0" in info_output

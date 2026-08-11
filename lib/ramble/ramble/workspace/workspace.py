@@ -1539,37 +1539,71 @@ ramble:
                 if namespace.packages in environments_dict[env_name]:
                     app_packages = environments_dict[env_name][namespace.packages].copy()
 
+            defined_pm_packages = set()
+            for pkg in app_packages:
+                if pkg in packages_dict:
+                    pkg_spec = None
+                    for key in packages_dict[pkg]:
+                        if key == "pkg_spec" or key.endswith("_pkg_spec"):
+                            pkg_spec = packages_dict[pkg][key]
+                            break
+                    if pkg_spec:
+                        pm_package_name = app_inst.package_manager.package_name_from_spec(pkg_spec)
+                        if pm_package_name:
+                            defined_pm_packages.add(pm_package_name)
+
             software_packages = app_inst.package_manager.get_experiment_specs(
                 app_inst=app_inst, prefixed=force_prefix
             )
-            for spec_name, definitions in software_packages.items():
-                for info in definitions:
-                    logger.debug(f"    Found spec: {spec_name}")
-                    if (
-                        not quiet
-                        and spec_name in packages_dict
-                        and info.conflict_dict(packages_dict[spec_name])
-                    ):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
-                        raise RambleConflictingDefinitionError(
-                            f"Package {spec_name} would be defined in multiple " "conflicting ways"
+            specs_to_process = [
+                (spec_name, info)
+                for spec_name, definitions in software_packages.items()
+                for info in definitions
+            ]
+
+            # Sort specs: inject_if_missing=False first
+            specs_to_process.sort(key=lambda x: x[1].inject_if_missing)
+
+            for spec_name, info in specs_to_process:
+                logger.debug(f"    Found spec: {spec_name}")
+                pm_package_name = app_inst.package_manager.package_name_from_spec(info.pkg_spec)
+
+                if info.inject_if_missing:
+                    if pm_package_name in defined_pm_packages:
+                        logger.debug(
+                            f"    Skipping inject_if_missing spec {spec_name} "
+                            f"because package {pm_package_name} is already defined."
                         )
+                        continue
 
-                    if spec_name not in packages_dict or (
-                        force and spec_name not in newly_created_packages
-                    ):
-                        packages_dict[spec_name] = syaml.syaml_dict()
+                if (
+                    not quiet
+                    and spec_name in packages_dict
+                    and info.conflict_dict(packages_dict[spec_name])
+                ):
+                    logger.debug(f"  Spec 1: {str(info)}")
+                    logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                    raise RambleConflictingDefinitionError(
+                        f"Package {spec_name} would be defined in multiple " "conflicting ways"
+                    )
 
-                    # Check for usage of compilers
-                    expanded_compiler = app_inst.expander.expand_var(info.compiler)
-                    if expanded_compiler in compiler_packages:
-                        compiler_packages[expanded_compiler] = True
+                if spec_name not in packages_dict or (
+                    force and spec_name not in newly_created_packages
+                ):
+                    packages_dict[spec_name] = syaml.syaml_dict()
 
-                    packages_dict[spec_name].update(info.to_dict(apply_prefix=force_prefix))
+                # Check for usage of compilers
+                expanded_compiler = app_inst.expander.expand_var(info.compiler)
+                if expanded_compiler in compiler_packages:
+                    compiler_packages[expanded_compiler] = True
 
-                    if spec_name not in app_packages:
-                        app_packages.append(spec_name)
+                packages_dict[spec_name].update(info.to_dict(apply_prefix=force_prefix))
+
+                if spec_name not in app_packages:
+                    app_packages.append(spec_name)
+
+                if pm_package_name:
+                    defined_pm_packages.add(pm_package_name)
 
             if app_packages:
                 if env_name not in environments_dict:
