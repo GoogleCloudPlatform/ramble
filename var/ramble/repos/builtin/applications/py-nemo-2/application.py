@@ -75,19 +75,20 @@ class PyNemo2(BasePyNemo):
         workload_group="pretraining",
     )
 
-    workload_variable(
-        "results_mount",
-        environment_variable_name="NEMO_CONTAINER_MOUNTS",
-        default="{experiment_run_dir}:{experiment_run_dir}",
-        description="Container mount for results data",
-        workload_group="pretraining",
-    )
-    workload_variable(
-        "container_mounts",
-        default="{results_mount}",
-        description="All container mounts in a ramble variable",
-        workload_group="pretraining",
-    )
+    with when("+containerized"):
+        workload_variable(
+            "results_mount",
+            environment_variable_name="NEMO_CONTAINER_MOUNTS",
+            default="{experiment_run_dir}:{experiment_run_dir}",
+            description="Container mount for results data",
+            workload_group="pretraining",
+        )
+        workload_variable(
+            "container_mounts",
+            default="{results_mount}",
+            description="All container mounts in a ramble variable",
+            workload_group="pretraining",
+        )
 
     register_phase(
         "copy_config", pipeline="setup", run_after=["make_experiments"]
