@@ -66,6 +66,7 @@ class namespace:
     system = "system"
     platform = "platform"
     version = "version"
+    containerized = "containerized"
 
     metadata = "metadata"
     include = "include"
