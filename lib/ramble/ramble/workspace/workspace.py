@@ -1541,11 +1541,11 @@ ramble:
 
             defined_pm_packages = set()
             for pkg in app_packages:
-                if pkg in packages_dict:
+                if pkg in packages_dict and isinstance(packages_dict[pkg], dict):
                     pkg_spec = None
-                    for key in packages_dict[pkg]:
+                    for key, val in packages_dict[pkg].items():
                         if key == "pkg_spec" or key.endswith("_pkg_spec"):
-                            pkg_spec = packages_dict[pkg][key]
+                            pkg_spec = val
                             break
                     if pkg_spec:
                         pm_package_name = app_inst.package_manager.package_name_from_spec(pkg_spec)
@@ -1566,10 +1566,14 @@ ramble:
 
             for spec_name, info in specs_to_process:
                 logger.debug(f"    Found spec: {spec_name}")
-                pm_package_name = app_inst.package_manager.package_name_from_spec(info.pkg_spec)
+                pm_package_name = None
+                if info.pkg_spec:
+                    pm_package_name = app_inst.package_manager.package_name_from_spec(
+                        info.pkg_spec
+                    )
 
                 if info.inject_if_missing:
-                    if pm_package_name in defined_pm_packages:
+                    if pm_package_name and pm_package_name in defined_pm_packages:
                         logger.debug(
                             f"    Skipping inject_if_missing spec {spec_name} "
                             f"because package {pm_package_name} is already defined."
