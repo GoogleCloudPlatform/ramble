@@ -429,7 +429,7 @@ _ramble_docs() {
 _ramble_edit() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --type -c --command -d --docs -t --test -m --module -r --repo -N --namespace"
+        RAMBLE_COMPREPLY="-h --help -t --type -r --repo -N --namespace"
     else
         RAMBLE_COMPREPLY=""
     fi

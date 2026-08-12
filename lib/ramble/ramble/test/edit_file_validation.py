@@ -215,3 +215,298 @@ def test_edit_file_directive_empty_app():
     edit_func = edit_file("my_edit", "/path/f", match="a", replace="b")
     edit_func(app)
     assert "my_edit" in app.executables[frozenset()]
+
+
+@pytest.fixture
+def editor_script_path(tmpdir):
+    from ramble.util.file_editor import get_file_editor_script
+
+    script_path = tmpdir.join("test_file_editor.py")
+    script_path.write(get_file_editor_script())
+    return str(script_path)
+
+
+@pytest.fixture
+def run_editor(editor_script_path):
+    import subprocess
+    import sys
+
+    def _run(*args):
+        return subprocess.run(
+            [sys.executable, editor_script_path] + list(args),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+
+    return _run
+
+
+def test_editor_script_regex_basic(tmpdir, run_editor):
+    # Create a test file
+    test_file = tmpdir.join("test.txt")
+    test_file.write("hello world\nthis is a test\n")
+
+    # Run the editor script to replace "world" with "ramble"
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--match",
+        "world",
+        "--replace",
+        "ramble",
+    )
+
+    assert res.returncode == 0
+    assert test_file.read() == "hello ramble\nthis is a test\n"
+
+
+def test_editor_script_regex_append_prepend(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("content\n")
+
+    # Run editor script with append and prepend
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--append",
+        "\\nfooter\\n",
+        "--prepend",
+        "header\\n\\n",
+    )
+
+    assert res.returncode == 0
+    assert test_file.read() == "header\n\ncontent\n\nfooter\n"
+
+
+def test_editor_script_custom_function(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("original content")
+
+    # Create a custom module with an edit function
+    module_file = tmpdir.join("custom_funcs.py")
+    module_file.write(
+        "def my_edit(content):\n" "    return content.replace('original', 'modified')\n"
+    )
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--import-module",
+        str(module_file),
+        "--function",
+        "my_edit",
+    )
+
+    assert res.returncode == 0
+    assert test_file.read() == "modified content"
+
+
+def test_editor_script_custom_function_invalid_return(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("content")
+
+    module_file = tmpdir.join("custom_funcs.py")
+    module_file.write("def invalid_edit(content):\n" "    return 123\n")
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--import-module",
+        str(module_file),
+        "--function",
+        "invalid_edit",
+    )
+
+    assert res.returncode == 1
+    assert "must return a string, not int" in (res.stdout + res.stderr)
+
+
+def test_editor_script_custom_function_not_found(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("content")
+
+    module_file = tmpdir.join("custom_funcs.py")
+    module_file.write("def valid_edit(content):\n" "    return content\n")
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--import-module",
+        str(module_file),
+        "--function",
+        "missing_edit",
+    )
+
+    assert res.returncode == 1
+    assert "Function missing_edit not found" in (res.stdout + res.stderr)
+
+
+def test_editor_script_module_not_found(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("content")
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--import-module",
+        str(tmpdir.join("non_existent_module.py")),
+        "--function",
+        "my_edit",
+    )
+
+    assert res.returncode == 1
+    output = res.stdout + res.stderr
+    assert "Module file" in output
+    assert "not found" in output
+
+
+def test_editor_script_patch_success(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("line 1\nline 2\nline 3\n")
+
+    patch_file = tmpdir.join("test.patch")
+    patch_file.write(
+        "--- test.txt\n"
+        "+++ test.txt\n"
+        "@@ -1,3 +1,3 @@\n"
+        " line 1\n"
+        "-line 2\n"
+        "+line 2 modified\n"
+        " line 3\n"
+    )
+
+    res = run_editor(
+        "--mode",
+        "patch",
+        "--file",
+        str(test_file),
+        "--patch-file",
+        str(patch_file),
+    )
+
+    assert res.returncode == 0
+    assert "line 2 modified" in test_file.read()
+
+
+def test_editor_script_patch_failure(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("line 1\nline 2\nline 3\n")
+
+    # Invalid patch file contents
+    patch_file = tmpdir.join("test.patch")
+    patch_file.write("invalid patch contents\n")
+
+    res = run_editor(
+        "--mode",
+        "patch",
+        "--file",
+        str(test_file),
+        "--patch-file",
+        str(patch_file),
+    )
+
+    assert res.returncode == 1
+    assert "Error applying patch" in (res.stdout + res.stderr)
+
+
+def test_editor_script_preserves_line_endings(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write_binary(b"line1\r\nline2\r\n")
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--match",
+        "line1",
+        "--replace",
+        "modified1",
+    )
+
+    assert res.returncode == 0
+    content = test_file.read_binary()
+    assert b"\r\n" in content
+    assert b"\n" not in content.replace(b"\r\n", b"")
+    assert content == b"modified1\r\nline2\r\n"
+
+
+def test_editor_script_create_directory(tmpdir, run_editor):
+    import os
+
+    nested_dir = os.path.join(str(tmpdir), "new_sub_dir")
+    test_file = os.path.join(nested_dir, "test.txt")
+
+    assert not os.path.exists(nested_dir)
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        test_file,
+        "--prepend",
+        "new file content",
+    )
+
+    assert res.returncode == 0
+    assert os.path.exists(test_file)
+    with open(test_file, encoding="utf-8") as f:
+        assert f.read() == "new file content"
+
+
+def test_editor_script_no_unnecessary_write(tmpdir, run_editor):
+    import os
+    import time
+
+    test_file = tmpdir.join("test.txt")
+    test_file.write("hello world")
+
+    # Set mtime back in the past
+    past_time = time.time() - 3600
+    os.utime(str(test_file), (past_time, past_time))
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--match",
+        "not_present",
+        "--replace",
+        "something",
+    )
+
+    assert res.returncode == 0
+    # The file mtime should remain unchanged
+    assert os.path.getmtime(str(test_file)) == pytest.approx(past_time, abs=1)
+
+
+def test_editor_script_globals_function_not_found(tmpdir, run_editor):
+    test_file = tmpdir.join("test.txt")
+    test_file.write("content")
+
+    res = run_editor(
+        "--mode",
+        "regex",
+        "--file",
+        str(test_file),
+        "--function",
+        "my_edit",
+    )
+
+    assert res.returncode == 1
+    assert "Function my_edit not found" in (res.stdout + res.stderr)
