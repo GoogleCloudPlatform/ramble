@@ -422,3 +422,42 @@ def test_is_used_property(request, mutable_mock_workspace_path):
         assert rendered_pkg.is_used is True
         assert env_template.is_used is True
         assert pkg_template.is_used is True
+
+
+def test_undefined_environment_auto_construction(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace("create", ws_name)
+
+    with ramble.workspace.read(ws_name) as ws:
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        assert "completely-undefined-env" not in software_environments._environment_templates
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+        rendered_env = software_environments.render_environment(
+            "completely-undefined-env", env_expander, _get_package_manager()
+        )
+        assert rendered_env.name == "completely-undefined-env"
+        assert "completely-undefined-env" in software_environments._environment_templates
+        assert len(rendered_env._packages) == 0
+
+
+def test_check_all_environments_warning(request, mutable_mock_workspace_path, capsys):
+    ws_name = request.node.name
+    workspace("create", ws_name)
+
+    with ramble.workspace.read(ws_name) as ws:
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+        _ = software_environments.render_environment(
+            "completely-undefined-env", env_expander, _get_package_manager()
+        )
+
+        software_environments.check_all_environments()
+        captured = capsys.readouterr()
+        assert (
+            "Software environment 'completely-undefined-env' was auto-constructed" in captured.err
+        )
