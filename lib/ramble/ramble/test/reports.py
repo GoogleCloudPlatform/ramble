@@ -43,16 +43,18 @@ def create_test_fom_result(
     units,
     origin,
     origin_type,
-    fom_type,
+    fom_type=None,
 ):
-    return {
+    fom_dict = {
         "name": name,
         "value": value,
         "units": units,
         "origin": origin,
         "origin_type": origin_type,
-        "fom_type": foms.FomType.to_dict(fom_type),
     }
+    if fom_type is not None:
+        fom_dict["fom_type"] = foms.FomType.to_dict(fom_type)
+    return fom_dict
 
 
 def create_test_exp_result(
@@ -106,7 +108,7 @@ def create_test_exp_result(
 
     for context, fom in foms:
         if context not in foms_list:
-            foms_list["context"] = []
+            foms_list[context] = []
         foms_list[context].append(create_test_fom_result(*fom))
 
     for context, foms in foms_list.items():
@@ -434,6 +436,74 @@ def test_where_query(mutable_mock_workspace_path):
 
     assert "fom_1" in filtered_foms
     assert "fom_2" not in filtered_foms
+
+
+def test_extract_data_without_fom_type():
+    """Test extract_data with older data exports that do not have fom_type stored."""
+    legacy_exp = create_test_exp_result(
+        ramble_status="SUCCESS",
+        experiment_name="legacy_exp_1",
+        application_name=app_name,
+        workload_name=wl_name,
+        foms=[
+            ("null", ("legacy_fom", 100.0, "s", app_name, "application")),
+            ("null", ("modern_fom", 50.0, "MB", app_name, "application", foms.FomType.MEASURE)),
+        ],
+        ramble_vars={"repeat_index": "0"},
+        ramble_raw_vars={},
+    )
+
+    df_legacy = ramble.reports.extract_data([legacy_exp], ["legacy_fom"], [])
+    assert len(df_legacy) == 1
+    row_legacy = df_legacy.iloc[0]
+    assert row_legacy["fom_name"] == "legacy_fom"
+    assert row_legacy["fom_value"] == 100.0
+    assert row_legacy["fom_units"] == "s"
+    assert row_legacy["fom_type"] == foms.FomType.UNDEFINED
+    assert row_legacy["better_direction"] == foms.BetterDirection.INDETERMINATE
+
+    df_both = ramble.reports.extract_data([legacy_exp], ["legacy_fom", "modern_fom"], [])
+    assert len(df_both) == 2
+
+    row_legacy_both = df_both[df_both["fom_name"] == "legacy_fom"].iloc[0]
+    assert row_legacy_both["fom_type"] == foms.FomType.UNDEFINED
+    assert row_legacy_both["better_direction"] == foms.BetterDirection.INDETERMINATE
+
+    row_modern = df_both[df_both["fom_name"] == "modern_fom"].iloc[0]
+    assert row_modern["fom_type"] == foms.FomType.MEASURE
+    assert row_modern["better_direction"] == foms.BetterDirection.INDETERMINATE
+
+
+def test_extract_data_variables():
+    """Test variable extraction in extract_data across all variable sources."""
+    exp = create_test_exp_result(
+        ramble_status="SUCCESS",
+        experiment_name="var_exp_1",
+        application_name=app_name,
+        workload_name=wl_name,
+        foms=[
+            ("null", ("fom_1", 42.0, "s", app_name, "application", foms.FomType.TIME)),
+        ],
+        ramble_vars={"var_in_ramble": "ramble_val"},
+        ramble_raw_vars={},
+        var_in_exp="exp_val",
+    )
+    # Remove top-level context_name to test _ADDITIONAL_VARS handling
+    exp.pop("context_name", None)
+
+    variables = [
+        "var_in_exp",
+        "var_in_ramble",
+        "context_name",
+        "non_existent_var",
+    ]
+    df = ramble.reports.extract_data([exp], ["fom_1"], variables)
+    assert len(df) == 1
+    row = df.iloc[0]
+    assert row["var_in_exp"] == "exp_val"
+    assert row["var_in_ramble"] == "ramble_val"
+    assert row["context_name"] == "null"
+    assert "non_existent_var" not in df.columns
 
 
 def test_multiple_groupby(mutable_mock_workspace_path, tmpdir_factory, capsys):
