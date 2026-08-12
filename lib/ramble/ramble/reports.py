@@ -507,23 +507,21 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
                                 fom["fom_type"][ReportVars.BETTER_DIRECTION.value]
                             )
 
-                        # older data exports may not have fom_type stored
-                        if "fom_type" not in exp_data:
-                            exp_data["fom_type"] = FomType.UNDEFINED
-                            exp_data[ReportVars.BETTER_DIRECTION.value] = (
-                                BetterDirection.INDETERMINATE
-                            )
+                    # older data exports may not have fom_type stored
+                    if "fom_type" not in exp_data:
+                        exp_data["fom_type"] = FomType.UNDEFINED
+                        exp_data[ReportVars.BETTER_DIRECTION.value] = BetterDirection.INDETERMINATE
 
-                        if variables:
-                            for var in variables:
-                                if var in exp:
-                                    exp_data[var] = exp[var]
-                                elif var in exp["RAMBLE_VARIABLES"]:
-                                    exp_data[var] = exp["RAMBLE_VARIABLES"][var]
-                                elif var in _ADDITIONAL_VARS:
-                                    continue
-                                else:
-                                    logger.debug(f"{var} not found in the results data. Skipping.")
+                    if variables:
+                        for var in variables:
+                            if var in exp:
+                                exp_data[var] = exp[var]
+                            elif var in exp["RAMBLE_VARIABLES"]:
+                                exp_data[var] = exp["RAMBLE_VARIABLES"][var]
+                            elif var in _ADDITIONAL_VARS:
+                                continue
+                            else:
+                                logger.debug(f"{var} not found in the results data. Skipping.")
 
                     extracted_data.append(exp_data)
 
