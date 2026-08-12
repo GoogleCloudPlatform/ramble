@@ -885,6 +885,9 @@ ramble:
 
         experiment_set.build_experiment_chains()
 
+        if self.software_environments is not None:
+            self.software_environments.check_all_environments()
+
         return experiment_set
 
     def all_applications(self):

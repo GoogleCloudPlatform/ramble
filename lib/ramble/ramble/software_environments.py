@@ -397,6 +397,7 @@ class SoftwareEnvironment:
         self._packages: List[SoftwarePackage] = []
         self._environment_type = "Base"
         self._used = False
+        self.auto_constructed = False
 
     @property
     def is_used(self):
@@ -635,6 +636,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         pm_name = package_manager.name
 
         new_env = RenderedEnvironment(name, package_manager)
+        new_env.auto_constructed = self.auto_constructed
 
         # Stores a mapping from rendered package name to template.
         # This helps with more efficient env package matching and
@@ -1069,10 +1071,33 @@ class SoftwareEnvironments:
                     return rendered_env
 
         if require:
-            raise RambleSoftwareEnvironmentError(
-                f"No defined environment matches required name {env_name}"
+            new_env_tmpl = TemplateEnvironment(env_name)
+            new_env_tmpl.auto_constructed = True
+            self._environment_templates[env_name] = new_env_tmpl
+            expander.flush_used_variable_stage()
+            expander.merge_used_variable_stage()
+            rendered_env = new_env_tmpl.render_environment(
+                expander, self._package_templates, self._rendered_packages, package_manager
             )
+            new_env_tmpl.add_rendered_environment(
+                rendered_env, self._rendered_environments, self._rendered_packages, pm_name
+            )
+            self.define_compiler_packages(rendered_env, expander)
+            self._check_environment(rendered_env)
+            return rendered_env
         return None
+
+    def check_all_environments(self):
+        """Check all rendered environments for issues after they have been fully set up"""
+        for pm_name, envs in self._rendered_environments.items():
+            for env in envs.values():
+                if getattr(env, "auto_constructed", False) and len(env._packages) == 0:
+                    logger.warn(
+                        f"Software environment '{env.name}' was auto-constructed "
+                        f"for package manager '{pm_name}' and contains no packages. "
+                        "If this was not intended, please define the environment "
+                        "or packages in your configuration."
+                    )
 
 
 class RambleSoftwareEnvironmentError(ramble.error.RambleError):
