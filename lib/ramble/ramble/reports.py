@@ -982,12 +982,11 @@ class ScalingPlotGenerator(PlotGenerator):
         return selected_data
 
     def validate_spec(self, chart_spec, result_index):
+        if len(chart_spec) < 2:
+            logger.die(
+                "Scaling plot requires two arguments: " "performance metric and scaling metric"
+            )
         super().validate_spec(chart_spec, result_index)
-        for chart_spec in self.spec:
-            if len(chart_spec) < 2:
-                logger.die(
-                    "Scaling plot requires two arguments: " "performance metric and scaling metric"
-                )
 
     def validate_data(self, data):
         has_duplicate_index = any(data.index.duplicated())

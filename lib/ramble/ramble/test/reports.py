@@ -522,7 +522,7 @@ def test_scaling_fom_as_scale_var(tmpdir_factory):
                 (
                     "null",
                     (
-                        "fom_perf",
+                        "y",
                         fom_perf_val,
                         "GFLOPs",
                         "app_v1",
@@ -533,7 +533,7 @@ def test_scaling_fom_as_scale_var(tmpdir_factory):
                 (
                     "null",
                     (
-                        "fom_scale",
+                        "x",
                         fom_scale_val,
                         "MB",
                         "app_v1",
@@ -547,7 +547,7 @@ def test_scaling_fom_as_scale_var(tmpdir_factory):
         )
         experiments.append(experiment)
 
-    test_spec = ["fom_perf", "fom_scale"]
+    test_spec = ["y", "x"]
     logx = False
     logy = False
     split_by = "workload_name"
@@ -559,9 +559,7 @@ def test_scaling_fom_as_scale_var(tmpdir_factory):
         plot.generate_plot_data(pdf_report)
 
     assert os.path.isfile(pdf_path)
-    assert os.path.isfile(
-        os.path.join(report_dir_path, "multi_line_fom_perf_vs_fom_scale_all-series.png")
-    )
+    assert os.path.isfile(os.path.join(report_dir_path, "multi_line_y_vs_x_all-series.png"))
 
     # Test normalized plot (covers normalize=True y_label)
     plot_norm = ramble.reports.MultiLinePlot(
@@ -569,6 +567,29 @@ def test_scaling_fom_as_scale_var(tmpdir_factory):
     )
     with PdfPages(pdf_path) as pdf_report:
         plot_norm.generate_plot_data(pdf_report)
+
+
+def test_scaling_plot_invalid_spec(tmpdir_factory, capsys):
+    """Test ScalingPlotGenerator.validate_spec rejects specs with fewer than two arguments."""
+    report_name = "unit_test_invalid_spec"
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
+
+    invalid_spec = ["fom_1"]
+    plot_invalid = ramble.reports.StrongScalingPlot(
+        invalid_spec,
+        False,
+        report_dir_path,
+        single_experiments,
+        False,
+        False,
+        "workload_namespace",
+    )
+    with PdfPages(pdf_path) as pdf_report:
+        with pytest.raises(SystemExit):
+            plot_invalid.generate_plot_data(pdf_report)
+        captured = capsys.readouterr().err
+        assert "Scaling plot requires two arguments" in captured
 
 
 def test_scaling_plot_empty_results(tmpdir_factory):
