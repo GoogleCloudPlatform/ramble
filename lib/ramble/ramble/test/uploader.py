@@ -389,3 +389,56 @@ def test_fom_validation_fails_with_none():
 
     with pytest.raises(jsonschema.exceptions.ValidationError):
         validate_data(bad_fom, schema)
+
+
+def test_determine_node_type():
+    """Test that determine_node_type prioritizes machine-type
+    over Model name regardless of order.
+    """
+    import types
+
+    from ramble.uploader import default_node_type_val, determine_node_type
+
+    exp1 = types.SimpleNamespace(node_type=default_node_type_val)
+    contexts1 = [
+        {
+            "foms": [
+                {"name": "machine-type", "value": "c2-standard-60"},
+                {"name": "Model name", "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz"},
+            ]
+        }
+    ]
+    determine_node_type(exp1, contexts1)
+    assert exp1.node_type == "c2-standard-60"
+
+    exp2 = types.SimpleNamespace(node_type=default_node_type_val)
+    contexts2 = [
+        {
+            "foms": [
+                {"name": "Model name", "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz"},
+                {"name": "machine-type", "value": "c2-standard-60"},
+            ]
+        }
+    ]
+    determine_node_type(exp2, contexts2)
+    assert exp2.node_type == "c2-standard-60"
+
+    exp3 = types.SimpleNamespace(node_type=default_node_type_val)
+    contexts3 = [
+        {"foms": [{"name": "machine-type", "value": "c2-standard-60"}]},
+        {"foms": [{"name": "Model name", "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz"}]},
+    ]
+    determine_node_type(exp3, contexts3)
+    assert exp3.node_type == "c2-standard-60"
+
+    exp4 = types.SimpleNamespace(node_type=default_node_type_val)
+    contexts4 = [
+        {"foms": [{"name": "Model name", "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz"}]}
+    ]
+    determine_node_type(exp4, contexts4)
+    assert exp4.node_type == "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz"
+
+    exp5 = types.SimpleNamespace(node_type=default_node_type_val)
+    contexts5 = [{"foms": [{"name": "other_fom", "value": "123"}]}]
+    determine_node_type(exp5, contexts5)
+    assert exp5.node_type == default_node_type_val
