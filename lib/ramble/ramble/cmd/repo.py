@@ -360,7 +360,7 @@ def repo(parser, args):
         "rm": repo_remove,
     }
 
-    if args.type != "any" and args.type not in ramble.repository.OBJECT_NAMES:
-        logger.die(f"Repository type '{args.type}' is not valid.")
+    if args.type != "any":
+        args.type = ramble.repository.simplify_object_type(args.type).name
 
     action[args.repo_command](args)

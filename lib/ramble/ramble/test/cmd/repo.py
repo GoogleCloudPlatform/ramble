@@ -181,3 +181,19 @@ def test_add_repo_missing_config_file(mutable_config, tmpdir):
 
     expected_error_message = f"No valid config file found in '{repo_path}'"
     assert expected_error_message in str(e.value)
+
+
+@pytest.mark.parametrize("type_arg", ["application", "app"])
+def test_singular_type_repo_commands(mutable_config, tmpdir, type_arg):
+    repo_path = str(tmpdir.join(f"test_repo_{type_arg}"))
+    repo("create", repo_path, f"mockrepo_{type_arg}", "-t", type_arg)
+    assert os.path.exists(os.path.join(repo_path, "application_repo.yaml"))
+    assert os.path.exists(os.path.join(repo_path, "applications"))
+
+    repo("add", "-t", type_arg, "--scope=site", repo_path)
+    output = repo("list", "-t", type_arg, "--scope=site", output=str)
+    assert f"mockrepo_{type_arg}" in output
+
+    repo("remove", "-t", type_arg, "--scope=site", repo_path)
+    output = repo("list", "-t", type_arg, "--scope=site", output=str)
+    assert f"mockrepo_{type_arg}" not in output

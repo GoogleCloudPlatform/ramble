@@ -205,26 +205,65 @@ _ALL_ACCEPTED_CONFIGS = {
 }
 
 
-@functools.lru_cache(maxsize=1)
+def _normalize_type_key(key):
+    return str(key).lower().replace("-", "_").replace(" ", "_")
+
+
+_TYPE_ALIASES = {
+    "pkg": ObjectTypes.package_managers,
+    "package": ObjectTypes.package_managers,
+    "packages": ObjectTypes.package_managers,
+    "base_pkg": ObjectTypes.base_package_managers,
+    "workflow": ObjectTypes.workflow_managers,
+    "workflows": ObjectTypes.workflow_managers,
+    "base": ObjectTypes.base_classes,
+}
+
+for _obj in ObjectTypes:
+    _tdef = type_definitions.get(_obj, {})
+    for _val in (_obj.name, _tdef.get("singular"), _tdef.get("abbrev"), _tdef.get("dir_name")):
+        if isinstance(_val, str):
+            for _v in (_val, f"{_val}s"):
+                _norm = _normalize_type_key(_v)
+                _TYPE_ALIASES[_norm] = _obj
+                _TYPE_ALIASES[_norm.replace("_", "-")] = _obj
+
+
 def get_object_type_map():
     """Returns a mapping from string representations of object types (singular,
     plural, abbrev, hyphens/underscores) to their corresponding ObjectType enum."""
-    mapping = {}
-    for obj_type, type_def in type_definitions.items():
-        candidates = set()
-        for key in ("abbrev", "dir_name", "singular"):
-            val = type_def.get(key)
-            if val:
-                val = val.replace(" ", "_")
-                candidates.update([val, val.replace("_", "-"), val.replace("-", "_")])
+    return _TYPE_ALIASES
 
-        for cand in candidates:
-            mapping[cand] = obj_type
-    return mapping
+
+def simplify_object_type(type_name):
+    """Convert a type string or ObjectTypes member to an ObjectTypes enum member.
+
+    Args:
+        type_name (ObjectTypes | str): Object type to simplify / normalize.
+
+    Returns:
+        (ObjectTypes): The matching ObjectTypes enum member.
+
+    Raises:
+        UnknownObjectTypeError: If type_name does not match any valid object type.
+    """
+    if isinstance(type_name, ObjectTypes):
+        return type_name
+
+    if isinstance(type_name, str):
+        key = _normalize_type_key(type_name)
+        if key in _TYPE_ALIASES:
+            return _TYPE_ALIASES[key]
+
+    raise UnknownObjectTypeError(type_name)
+
+
+get_object_type = simplify_object_type
 
 
 def _gen_path(repo_dirs=None, obj_type=default_type):
     """Create a RepoPath for a specific object, add it to sys.meta_path, and return it."""
+    obj_type = simplify_object_type(obj_type)
     section_name = type_definitions[obj_type]["config_section"]
     singular_name = type_definitions[obj_type]["singular"]
     repo_dirs = repo_dirs or ramble.config.get(section_name)
@@ -259,6 +298,7 @@ def list_object_files(obj_inst, object_type):
     This is currently used by `ramble deployment` to copy relevant files
     to create a self-contained repo.
     """
+    object_type = simplify_object_type(object_type)
     type_def = type_definitions[object_type]
     base_type = ObjectTypes[f"base_{type_def['dir_name']}"]
     base_type_def = type_definitions[base_type]
@@ -299,11 +339,13 @@ def list_object_files(obj_inst, object_type):
 
 def all_object_names(object_type=default_type):
     """Convenience wrapper around ``ramble.repository.all_object_names()``."""
+    object_type = simplify_object_type(object_type)
     return paths[object_type].all_object_names()
 
 
 def get(spec, object_type=default_type):
     """Convenience wrapper around ``ramble.repository.get()``."""
+    object_type = simplify_object_type(object_type)
     return paths[object_type].get(spec)
 
 
@@ -314,6 +356,7 @@ def get_base_class(spec):
 
 def get_obj_class(spec, object_type=default_type):
     """Convenience wrapper around ``ramble.repository.get_obj_class()``."""
+    object_type = simplify_object_type(object_type)
     return paths[object_type].get_obj_class(spec)
 
 
@@ -324,6 +367,7 @@ def set_path(repo, object_type=default_type):
     ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.
     """
     global paths  # noqa: F824
+    object_type = simplify_object_type(object_type)
     paths[object_type] = repo
 
     # make the new repo_path an importer if needed
@@ -345,6 +389,7 @@ def use_repositories(*paths_and_repos, object_type=default_type):
         RepoPath: Corresponding RepoPath object
     """
     global paths  # noqa: F824
+    object_type = simplify_object_type(object_type)
 
     # Construct a temporary RepoPath object from
     temporary_repositories = RepoPath(*paths_and_repos, object_type=object_type)
@@ -1570,6 +1615,18 @@ for obj in ObjectTypes:
 
 class RepoError(ramble.error.RambleError):
     """Superclass for repository-related errors."""
+
+
+class UnknownObjectTypeError(RepoError):
+    """Raised when an unknown or invalid object type is specified."""
+
+    def __init__(self, type_name):
+        valid_types = ", ".join(OBJECT_NAMES)
+        super().__init__(
+            f"Unknown object type '{type_name}'.",
+            f"Allowed types are: {valid_types} "
+            "(singular, plural, and abbreviation forms are accepted).",
+        )
 
 
 class NoRepoConfiguredError(RepoError):

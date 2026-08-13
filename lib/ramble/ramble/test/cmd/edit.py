@@ -265,6 +265,10 @@ def test_edit_no_name_with_type_editor(mock_editor):
     assert len(mock_editor) == 2
     assert "var/ramble/repos/builtin" in mock_editor[1]
 
+    edit("-t", "application")
+    assert len(mock_editor) == 3
+    assert "var/ramble/repos/builtin" in mock_editor[2]
+
 
 def test_edit_no_name_with_custom_type_repo_editor(mock_editor):
     edit("-t", "applications", "--repo", "/non-existent-path")

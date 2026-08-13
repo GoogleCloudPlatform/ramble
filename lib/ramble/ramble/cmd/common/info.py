@@ -484,7 +484,7 @@ def print_info(args):
     if spec.object_type:
         object_type = spec.object_type
     else:
-        object_type = ramble.repository.ObjectTypes[args.type]
+        object_type = ramble.repository.simplify_object_type(args.type)
 
     obj = ramble.repository.get(spec, object_type=object_type)
 

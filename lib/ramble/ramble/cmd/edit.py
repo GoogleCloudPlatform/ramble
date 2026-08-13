@@ -41,12 +41,10 @@ def normalize_type_name(type_name):
     if norm_type in extra_type_aliases:
         return extra_type_aliases[norm_type]
 
-    # Map object types using repository's get_object_type_map()
-    type_map = ramble.repository.get_object_type_map()
-    if norm_type in type_map:
-        return type_map[norm_type].name
-
-    return type_name
+    try:
+        return ramble.repository.simplify_object_type(type_name).name
+    except ramble.repository.UnknownObjectTypeError:
+        return type_name
 
 
 def find_all_matches(name, repo_path=None, namespace=None, obj_type=None):
