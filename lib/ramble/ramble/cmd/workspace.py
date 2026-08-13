@@ -704,7 +704,6 @@ def workspace_push_to_cache(args):
     pipeline = pipeline_cls(ws, filters, spack_cache_path=args.cache_path)
 
     workspace_run_pipeline(args, pipeline)
-    pipeline.run()
 
 
 def workspace_push_to_cache_setup_parser(subparser):

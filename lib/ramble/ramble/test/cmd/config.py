@@ -831,3 +831,18 @@ def test_command_alias(mutable_config):
     output = f.getvalue()
     assert ret == 0
     assert "ramble info" not in output
+
+
+def test_config_blame(mock_low_high_config):
+    low_path = mock_low_high_config.scopes["low"].path
+    fs.mkdirp(low_path)
+    with open(os.path.join(low_path, "config.yaml"), "w", encoding="utf-8") as f:
+        f.write("""\
+config:
+  verbose: true
+""")
+
+    output = config("blame", "config")
+    assert "config:" in output
+    assert "verbose: true" in output
+    assert "config.yaml:" in output

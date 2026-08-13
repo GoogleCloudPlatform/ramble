@@ -332,6 +332,8 @@ def make_argument_parser(**kwargs):
         # See https://docs.python.org/3/library/argparse.html#color.
         kwargs.pop("color")
 
+    kwargs.setdefault("prog", "ramble")
+
     parser = RambleArgumentParser(
         formatter_class=RambleHelpFormatter,
         add_help=False,

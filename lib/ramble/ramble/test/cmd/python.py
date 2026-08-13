@@ -45,3 +45,23 @@ def test_python_with_module():
 def test_python_raises():
     out = python("--foobar", fail_on_error=False)
     assert "Error: Unknown arguments" in out
+
+
+def test_python_script(tmpdir):
+    script = tmpdir.join("test_script.py")
+    script.write("""
+import sys
+import ramble
+print(f"ARG:{sys.argv[1]}")
+print(f"VER:{ramble.ramble_version}")
+""")
+    out = python(str(script), "hello")
+    assert "ARG:hello" in out
+    assert f"VER:{ramble.ramble_version}" in out
+
+
+def test_python_command_and_script(tmpdir):
+    script = tmpdir.join("dummy.py")
+    script.write("print('hello')")
+    out = python("-c", "print('cmd')", str(script), fail_on_error=False)
+    assert "You can only specify a command OR script" in out

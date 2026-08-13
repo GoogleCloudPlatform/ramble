@@ -429,6 +429,7 @@ def mutable_config(tmpdir_factory, configuration_dir):
         ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
         for name in ["site", "system", "user"]
     ]
+    scopes.append(ramble.config.InternalConfigScope("command_line"))
 
     with ramble.config.use_configuration(*scopes) as cfg:
         yield cfg
@@ -442,6 +443,7 @@ def mutable_empty_config(tmpdir_factory, configuration_dir):
         ramble.config.ConfigScope(name, str(mutable_dir.join(name)))
         for name in ["site", "system", "user"]
     ]
+    scopes.append(ramble.config.InternalConfigScope("command_line"))
 
     with ramble.config.use_configuration(*scopes) as cfg:
         yield cfg

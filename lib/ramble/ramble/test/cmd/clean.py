@@ -34,29 +34,41 @@ def mock_calls_for_clean(monkeypatch):
     monkeypatch.setattr(ramble.caches.fetch_cache, "destroy", Counter("downloads"), raising=False)
     monkeypatch.setattr(ramble.caches.misc_cache, "destroy", Counter("caches"))
     monkeypatch.setattr(ramble.cmd.clean, "remove_python_caches", Counter("python_caches"))
+    monkeypatch.setattr(ramble.cmd.clean, "remove_reports_files", Counter("reports"))
 
     yield counts
 
 
-all_effects = ["downloads", "caches", "python_caches"]
+# All possible effect categories monitored by the test harness
+all_monitored_effects = ["downloads", "caches", "python_caches", "reports"]
+
+# '-a' / '--all' is defined as AllClean (equivalent to -dmp) and excludes 'reports'
+all_flag_effects = ["downloads", "caches", "python_caches"]
 
 
 @pytest.mark.usefixtures("config")
 @pytest.mark.parametrize(
-    "command_line,effects",
+    "args,effects",
     [
-        ("-d", ["downloads"]),
-        ("-m", ["caches"]),
-        ("-p", ["python_caches"]),
-        ("-a", all_effects),
+        ([], ["downloads"]),
+        (["-d"], ["downloads"]),
+        (["--downloads"], ["downloads"]),
+        (["-m"], ["caches"]),
+        (["--misc-cache"], ["caches"]),
+        (["-p"], ["python_caches"]),
+        (["--python-cache"], ["python_caches"]),
+        (["-r"], ["reports"]),
+        (["--reports"], ["reports"]),
+        (["-a"], all_flag_effects),
+        (["--all"], all_flag_effects),
     ],
 )
-def test_function_calls(command_line, effects, mock_calls_for_clean):
+def test_function_calls(args, effects, mock_calls_for_clean):
 
     # Call the command with the supplied command line
-    clean(command_line)
+    clean(*args)
 
     # Assert that we called the expected functions the correct
     # number of times
-    for name in all_effects:
+    for name in all_monitored_effects:
         assert mock_calls_for_clean[name] == (1 if name in effects else 0)
