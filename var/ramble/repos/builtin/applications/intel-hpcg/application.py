@@ -69,7 +69,21 @@ class IntelHpcg(HpcgBase, IntelMklBenchmarksBase):
         ],
     )
 
-    workload_group("all_workloads", workloads=["standard"], mode="append")
+    workload(
+        "calculator",
+        executables=[
+            "set_vars",
+            "execute",
+            "move-log",
+            "reformat-summary",
+            "reformat-rating",
+        ],
+    )
+
+    workload_group(
+        "all_workloads", workloads=["standard", "calculator"], mode="append"
+    )
+    workload_group("calculator", workloads=["calculator"], mode="append")
 
     workload_variable(
         "exec_name",
