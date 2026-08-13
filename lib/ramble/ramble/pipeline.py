@@ -397,12 +397,13 @@ class ArchivePipeline(Pipeline):
         for root, dirs, files in os.walk(self.workspace.shared_dir):
             if "bootstrapped_utilities" in dirs:
                 dirs.remove("bootstrapped_utilities")
+            rel_dir = os.path.relpath(root, self.workspace.shared_dir)
+            target_dir = os.path.join(archive_shared, rel_dir)
             for name in files:
                 if name not in excluded_secrets:
-                    src_dir = os.path.join(self.workspace.shared_dir, root)
-                    src = os.path.join(src_dir, name)
-                    dest = src.replace(self.workspace.shared_dir, archive_shared)
-                    fs.mkdirp(os.path.dirname(dest))
+                    src = os.path.join(root, name)
+                    dest = os.path.join(target_dir, name)
+                    fs.mkdirp(target_dir)
                     shutil.copy(src, dest)
 
         # Copy logs, but omit all symlinks (i.e. "latest")
@@ -411,12 +412,15 @@ class ArchivePipeline(Pipeline):
         )
         fs.mkdirp(archive_logs)
         for root, _, files in os.walk(self.workspace.log_dir):
+            if os.path.islink(root):
+                continue
+            rel_dir = os.path.relpath(root, self.workspace.log_dir)
+            target_dir = os.path.join(archive_logs, rel_dir)
             for name in files:
-                src_dir = os.path.join(self.workspace.log_dir, root)
-                src = os.path.join(src_dir, name)
-                if not (os.path.islink(src_dir) or os.path.islink(src)) and os.path.isfile(src):
-                    dest = src.replace(self.workspace.log_dir, archive_logs)
-                    fs.mkdirp(os.path.dirname(dest))
+                src = os.path.join(root, name)
+                if not os.path.islink(src) and os.path.isfile(src):
+                    dest = os.path.join(target_dir, name)
+                    fs.mkdirp(target_dir)
                     shutil.copyfile(src, dest)
 
         # Copy tools directory
@@ -823,7 +827,7 @@ class PushDeploymentPipeline(Pipeline):
         """Yield the full path to each file in a deployment"""
         for root, _, files in os.walk(self.workspace.named_deployment):
             for name in files:
-                yield os.path.join(self.workspace.named_deployment, root, name)
+                yield os.path.join(root, name)
 
     def _complete(self):
         super()._complete()
@@ -873,10 +877,12 @@ class PushDeploymentPipeline(Pipeline):
 def _copy_tree(src_dir, dest_dir):
     """Copy all files in src_dir to dest_dir"""
     for root, _, files in os.walk(src_dir):
+        rel_dir = os.path.relpath(root, src_dir)
+        target_dir = os.path.join(dest_dir, rel_dir)
         for name in files:
-            src = os.path.join(src_dir, root, name)
-            dest = src.replace(src_dir, dest_dir)
-            fs.mkdirp(os.path.dirname(dest))
+            src = os.path.join(root, name)
+            dest = os.path.join(target_dir, name)
+            fs.mkdirp(target_dir)
             shutil.copyfile(src, dest)
 
 
