@@ -84,10 +84,10 @@ class ObjectVersion:
 
         Args:
             n_indent (int): Number of spaces to indent string with
-            verbose: Print verbose
+            verbose (bool): Whether to include verbose information about the version
 
         Returns:
-            (str): Representation of this version
+            str: Representation of this version
         """
         indentation = " " * n_indent
         out_str = color.section_title(f"{indentation}{self.version}") + "\n"
@@ -135,8 +135,8 @@ class ObjectVersion:
             variant: A version variant containing the "@" sigil
 
         Returns:
-            (bool): True or False, based if the experiment's variant satisfies
-                    the version
+            bool: ``True`` or ``False``, based if the experiment's variant satisfies
+            the version
         """
         # Convert the variant syntax to a python packaging specifier set
         variant_name, value = variant.split("@")

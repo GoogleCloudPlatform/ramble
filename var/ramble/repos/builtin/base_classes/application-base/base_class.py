@@ -3265,7 +3265,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 "any object in an experiment's hierarchy.\n"
                 "Hashes are compared to ensure experiments that are set up match the expected "
                 "contents from these sources.\n"
-                "Hashes can be overwritten if you are sure this is safe, and what you want."
+                "Hashes can be overwritten if you are sure this is safe, and what you want. "
                 "To overwrite the experiment hash, use the global --overwrite-inventories option."
             )
 

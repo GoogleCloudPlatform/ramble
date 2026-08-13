@@ -77,9 +77,10 @@ class Workload:
 
         Args:
             n_indent (int): Number of spaces to indent string with
+            verbose (bool): Whether to include verbose information
 
         Returns:
-            (str): Representation of this workload
+            str: Representation of this workload
         """
         attrs = [
             ("Executables", "executables"),
@@ -175,7 +176,7 @@ class Workload:
         """Test if this workload is considered valid
 
         Returns:
-            (bool): True if workload is valid, False otherwise
+            bool: ``True`` if workload is valid, ``False`` otherwise
         """
         if not self.executables:
             return False
@@ -189,7 +190,7 @@ class Workload:
             exec_name (str): Name of executable to find
 
         Returns:
-            (str | None): Name of executable if it exists, None if it is not found
+            str | None: Name of executable if it exists, ``None`` if it is not found
         """
         for executable in self.executables:
             if executable == exec_name:
@@ -203,7 +204,7 @@ class Workload:
             input_name (str): Name of input to find
 
         Returns:
-            (str | None): Name of input if it exists, None if it is not found
+            str | None: Name of input if it exists, ``None`` if it is not found
         """
         for input in self.inputs:
             if input == input_name:
@@ -217,8 +218,8 @@ class Workload:
             var_name (str): Name of variable to find
 
         Returns:
-            (ramble.definitions.variables.Variable | None): Variable instance if it exists, None if
-                it is not found
+            ramble.definitions.variables.Variable | None: Variable instance if it exists,
+            ``None`` if it is not found
         """
         named_vars = []
         for var_list in self.variables.values():
@@ -253,10 +254,11 @@ class WorkloadGroup:
         """String representation of this workload group
 
         Args:
-            n_indent: Number of spaces to indent string with
+            n_indent (int): Number of spaces to indent string with
+            verbose (bool): Whether to include verbose information
 
         Returns:
-            (str): Representation of this workload
+            str: Representation of this workload
 
         """
         indentation = " " * n_indent

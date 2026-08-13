@@ -1493,7 +1493,8 @@ def workspace_manage_experiments_setup_parser(subparser):
         "-p",
         dest="package_manager",
         default=None,
-        help="(DEPRECATED) name of (optional) package manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) package manager to use within the experiment scope. "
+        + "Use --variant-definition/-V package_manager=PACKAGE_MANAGER, instead",
     )
 
     # TODO: remove in 0.7.0
@@ -1502,7 +1503,8 @@ def workspace_manage_experiments_setup_parser(subparser):
         "--wm",
         dest="workflow_manager",
         default=None,
-        help="(DEPRECATED) name of (optional) workflow manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) workflow manager to use within the experiment "
+        + "scope. Use --variant-definition/-V workflow_manager=WORKFLOW_MANAGER, instead",
     )
 
     subparser.add_argument(

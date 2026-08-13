@@ -67,7 +67,7 @@ class SoftwarePackage:
         """Return if this package is used or not
 
         Returns:
-            (bool): Whether package is used or not
+            bool: Whether package is used or not
         """
         return self._used
 
@@ -83,7 +83,7 @@ class SoftwarePackage:
                                 different.
 
         Returns:
-            (str): String representation of the spec for this package definition
+            str: String representation of the spec for this package definition
         """
 
         return ""
@@ -100,7 +100,7 @@ class SoftwarePackage:
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): String representation of this package
+            str: String representation of this package
         """
 
         # Don't print if it is unused and we are only interested in used packages
@@ -121,7 +121,7 @@ class SoftwarePackage:
         """String representation of software package
 
         Returns:
-            (str): String representation of this software package
+            str: String representation of this software package
         """
 
         return self.info()
@@ -133,7 +133,7 @@ class SoftwarePackage:
             other (SoftwarePackage): Package to compare with self.
 
         Returns:
-            (bool): True if packages are the same, False otherwise
+            bool: ``True`` if packages are the same, ``False`` otherwise
         """
 
         return (
@@ -188,7 +188,7 @@ class RenderedPackage(SoftwarePackage):
                                 different.
 
         Returns:
-            (str): String representation of the spec for this package definition
+            str: String representation of the spec for this package definition
         """
         if not all_packages:
             all_packages = defaultdict(dict)
@@ -208,7 +208,7 @@ class RenderedPackage(SoftwarePackage):
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): String representation of this package
+            str: String representation of this package
         """
 
         # Don't print if it is unused and we are only interested in used packages
@@ -257,7 +257,7 @@ class TemplatePackage(SoftwarePackage):
         used.
 
         Returns:
-            (bool): Whether this template contains any used packages or not
+            bool: Whether this template contains any used packages or not
         """
         for pkgs in self._rendered_packages.values():
             for pkg in pkgs.values():
@@ -277,7 +277,7 @@ class TemplatePackage(SoftwarePackage):
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): String representation of this package
+            str: String representation of this package
         """
 
         # Don't print if it is unused and we are only interested in used packages
@@ -317,7 +317,7 @@ class TemplatePackage(SoftwarePackage):
                 package from this template
 
         Returns:
-            (SoftwarePackage): Rendered SoftwarePackage
+            ramble.software_environments.SoftwarePackage: Rendered SoftwarePackage
         """
         name = expander.expand_var(self.name, merge_used_stage=False)
         pm_name = package_manager.name
@@ -404,7 +404,7 @@ class SoftwareEnvironment:
         """Determine if environment is used or not
 
         Returns:
-            (bool): Whether environment is used or not
+            bool: Whether environment is used or not
         """
         return self._used
 
@@ -426,7 +426,7 @@ class SoftwareEnvironment:
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): information of this environment
+            str: information of this environment
         """
 
         # Don't print if it is unused and we are only interested in used packages
@@ -452,7 +452,7 @@ class SoftwareEnvironment:
         """String representation of this environment
 
         Returns:
-            (str): Representation of this environment
+            str: Representation of this environment
         """
         return self.info(indent=0)
 
@@ -471,7 +471,7 @@ class SoftwareEnvironment:
             other (SoftwareEnvironment): Environment to compare with self
 
         Returns:
-            (bool): True if environments are equivalent, False otherwise
+            bool: ``True`` if environments are equivalent, ``False`` otherwise
         """
         if not self.name == other.name:
             return False
@@ -553,7 +553,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         """Determine if TemplateEnvironment is used or not
 
         Returns:
-            (bool): Whether template environment is used or not
+            bool: Whether template environment is used or not
         """
         for envs in self._rendered_environments.values():
             for env in envs.values():
@@ -576,7 +576,7 @@ class TemplateEnvironment(SoftwareEnvironment):
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): information of this environment
+            str: information of this environment
         """
 
         # Don't print if it is unused and we are only interested in used packages
@@ -610,7 +610,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         """String representation of this environment
 
         Returns:
-            (str): String representation of this environment (none of its rendered environments)
+            str: String representation of this environment (none of its rendered environments)
         """
 
         return super().info()
@@ -630,7 +630,7 @@ class TemplateEnvironment(SoftwareEnvironment):
             package_manager: Package manager the environment is rendered with
 
         Returns:
-            (RenderedEnvironment) Reference to the rendered SoftwareEnvironment
+            RenderedEnvironment: Reference to the rendered SoftwareEnvironment
         """
         name = expander.expand_var(self.name)
         pm_name = package_manager.name
@@ -735,7 +735,7 @@ class SoftwareEnvironments:
             only_used (bool): Whether to only track used info (True) or all info (False)
 
         Returns:
-            (str): Representation of all packages and environments
+            str: Representation of all packages and environments
         """
         out_str = ""
         for pkg in self._package_templates.values():
@@ -789,7 +789,7 @@ class SoftwareEnvironments:
         """String representation of all packages and environments in this object
 
         Returns:
-            (str): Representation of all packages and environments
+            str: Representation of all packages and environments
         """
         return self.info(indent=0)
 
@@ -1017,8 +1017,8 @@ class SoftwareEnvironments:
             package_manager: Package manager the environment is rendered with
 
         Returns:
-            (SoftwareEnvironment): Reference to software environment for
-                                   the experiment
+            ramble.software_environments.SoftwareEnvironment: Reference to software environment
+            for the experiment
         """
 
         pm_name = package_manager.name

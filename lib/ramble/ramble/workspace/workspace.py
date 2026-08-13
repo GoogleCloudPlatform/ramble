@@ -383,7 +383,8 @@ def get_workspace(args, cmd_name, required=False):
                          is found; if ``False``, just return ``None``
 
     Returns:
-        (Workspace): if there is an arg or active workspace
+        ramble.workspace.Workspace | None: Workspace instance if there is an arg or active
+        workspace, ``None`` if no workspace is found and ``required`` is ``False``
     """
 
     logger.debug("In get_workspace()")
@@ -2292,7 +2293,7 @@ ramble:
         """Construct a list of all modifiers in this workspace, and their associated scope.
 
         Returns:
-            (list): List of tuples, of the form (scope, modifier_definition)
+            list[tuple]: List of tuples, of the form (scope, modifier_definition)
         """
         base_section = self._get_scope_section("workspace")
         ws_mods = base_section.get(namespace.modifiers, [])
@@ -2371,7 +2372,7 @@ ramble:
             dry_run: Whether to print the config instead of editing it, or to edit it directly.
 
         Returns:
-            (int) Number of modifiers removed
+            int: Number of modifiers removed
         """
         mod_list = self.index_modifiers()
         to_remove = []
@@ -2452,7 +2453,7 @@ ramble:
             dry_run: Whether to print the config instead of editing it, or to edit it directly.
 
         Returns:
-            (int) Number of modifiers added to workspace
+            int: Number of modifiers added to workspace
         """
         on_exec_list = None
         if on_executable is not None:

@@ -69,10 +69,11 @@ class Variable:
         """String representation of this variable
 
         Args:
-          n_indent (int): Number of spaces to indent string lines with
+            n_indent (int): Number of spaces to indent string lines with
+            verbose (bool): Whether to include verbose information about the variable
 
         Returns:
-            (str): Representation of this variable
+            str: Representation of this variable
         """
         indentation = " " * n_indent
 
@@ -229,10 +230,11 @@ class VariableModification:
         """String representation of this variable
 
         Args:
-          n_indent (int): Number of spaces to indent string lines with
+            n_indent (int): Number of spaces to indent string lines with
+            verbose (bool): Whether to include verbose information about the variable
 
         Returns:
-            (str): Representation of this variable
+            str: Representation of this variable
         """
         indentation = " " * n_indent
 
@@ -301,9 +303,11 @@ class EnvironmentVariable:
 
         Args:
             n_indent (int): Number of spaces to indent string representation by
+            verbose (bool): Whether to include verbose information about the
+                            environment variable
 
         Returns:
-            (str): String representing this environment variable
+            str: String representing this environment variable
         """
         indentation = " " * n_indent
 
@@ -382,10 +386,12 @@ class EnvironmentVariableModifications:
         """String representation of this environment variable modification
 
         Args:
-          n_indent (int): Number of spaces to indent string lines with
+            n_indent (int): Number of spaces to indent string lines with
+            verbose (bool): Whether to include verbose information about the
+                            environment variable modification
 
         Returns:
-            (str): Representation of this environment variable modification
+            str: Representation of this environment variable modification
         """
         indentation = " " * n_indent
 

@@ -127,6 +127,19 @@ This defines a new executable in the hostname application definition named
 ``hostname`` command. The remaining arguments are left as the default which
 will disable MPI on this executable.
 
+.. note::
+    Throughout these tutorials the directives such as ``executable`` are
+    called using positional parameters as above. However, named parameters -
+    or even a mix of positional and named parameters - are also allowed. For
+    example, the following is identical to the above example:
+
+    .. code-block:: python
+
+        executable(
+            name="local-execute",
+            template="hostname",
+        )
+
 Application Workloads
 ^^^^^^^^^^^^^^^^^^^^^
 

@@ -130,7 +130,7 @@ class FetchStrategy:
         """Fetch source code archive or repo.
 
         Returns:
-            bool: True on success, False on failure.
+            bool: ``True`` on success, ``False`` on failure.
         """
 
     def check(self):
@@ -161,7 +161,7 @@ class FetchStrategy:
         identifiably associated with a specific package version.
 
         Returns:
-            bool: True if can cache, False otherwise.
+            bool: ``True`` if can cache, ``False`` otherwise.
         """
 
     def source_id(self):
@@ -1246,7 +1246,7 @@ class HgFetchStrategy(VCSFetchStrategy):
     def hg(self):
         """
         Returns:
-            Executable: the hg executable
+            ramble.util.executable.Executable: the hg executable
         """
         if not self._hg:
             self._hg = which("hg", required=True)
@@ -1429,11 +1429,11 @@ def from_kwargs(**kwargs):
             ``version()`` directive in a package.
 
     Returns:
-        FetchStrategy: The fetch strategy that matches the args, based
-          on attribute names (e.g., ``git``, ``hg``, etc.)
+        ramble.fetch_strategy.FetchStrategy: The fetch strategy that matches the args,
+        based on attribute names (e.g., ``git``, ``hg``, etc.)
 
     Raises:
-        FetchError: If no ``fetch_strategy`` matches the args.
+        ramble.fetch_strategy.FetchError: If no ``fetch_strategy`` matches the args.
     """
     for fetcher in all_strategies:
         if fetcher.matches(kwargs):

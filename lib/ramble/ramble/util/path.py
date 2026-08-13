@@ -81,7 +81,7 @@ def normalize_path_or_url(path):
         path (str): Input path
 
     Returns:
-        (str): Absolute local path or cleaned remote url
+        str: Absolute local path or cleaned remote url
     """
 
     # Remove trailing back-slashes from path

@@ -30,9 +30,6 @@ def check_definition(
         single_arg_name: String name of the single_type argument in the directive
         multiple_arg_name: String name of the multiple_type argument in the directive
         directive_name: Name of the directive requiring a type
-
-    Returns:
-        List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
     if single_type and not isinstance(single_type, str):
         raise DirectiveError(
@@ -71,7 +68,8 @@ def merge_definitions(
         directive_name: Name of the directive requiring a type
 
     Returns:
-        List of all type names (Merged if both single_type and multiple_type definitions are valid)
+        list[str]: List of all type names (Merged if both ``single_type`` and ``multiple_type``
+        definitions are valid)
     """
 
     check_definition(
@@ -115,7 +113,8 @@ def require_definition(
         directive_name: Name of the directive requiring a type
 
     Returns:
-        List of all type names (Merged if both single_type and multiple_type definitions are valid)
+        list[str]: List of all type names (Merged if both single_type and multiple_type
+        definitions are valid)
     """
 
     if not (single_type or multiple_type):
@@ -159,7 +158,8 @@ def merge_conditions(
         modes (list(str) | None): List of modifier modes to be applied as when conditions
 
     Returns:
-        List of lists of strings, where each inner list is a list of when conditions for a mode.
+        list[list[str]]:List of lists of strings, where each inner list is a list of when
+        conditions for a mode.
     """
     single_arg_val = kwargs.get(single_arg_name) if single_arg_name else None
     multiple_arg_val = kwargs.get(multiple_arg_name) if multiple_arg_name else None
@@ -215,8 +215,8 @@ def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict
             dict) to match against patterns in merged_types
 
     Returns:
-        List of expanded patterns matching the names list plus patterns
-            not found in the names list.
+        list[str]: List of expanded patterns matching the names list plus
+        patterns not found in the names list.
     """
     expanded_patterns = OrderedDict()
     for input in merged_types:
@@ -290,7 +290,7 @@ def build_when_list(
         directive_name (str): Name of the calling directive
 
     Returns:
-        List of strings, for all of the when conditions.
+        list[str]: List of strings for all of the when conditions.
     """
     when_list = []
     if when_arg is not None:
@@ -473,7 +473,7 @@ def are_when_compatible(when_set1, when_set2):
         when_set2 (list): Second set of when conditions
 
     Returns:
-        (bool): True if they are compatible, False otherwise
+        bool: True if they are compatible, False otherwise
     """
     if not isinstance(when_set1, frozenset):
         when_set1 = frozenset(when_set1)
@@ -504,7 +504,7 @@ def is_when_impossible(when_list):
         when_list (list): list of when conditions
 
     Returns:
-        (bool, str): True and a message if it is impossible, False and None otherwise
+        tuple[bool, str | None]: True and a message if it is impossible, False and None otherwise
     """
     if when_list is None:
         return False, None

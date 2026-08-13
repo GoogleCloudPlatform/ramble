@@ -25,7 +25,7 @@ def filter_by_name(glob_patterns: List[str], search_description: bool, obj_type:
         obj_type: type of the Ramble objects to search for
 
     Returns:
-        filtered and sorted list of object names
+        list[str]: filtered and sorted list of object names
     """
     obj_names = set(ramble.repository.all_object_names(obj_type))
     if glob_patterns:

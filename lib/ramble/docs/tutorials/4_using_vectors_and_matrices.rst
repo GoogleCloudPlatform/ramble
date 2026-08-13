@@ -422,17 +422,17 @@ Which should contain the following output:
 
 .. code-block:: console
 
-Experiments:
-  Application: gromacs@2025.3
-    Workload: {app_workload}
-      Experiment 1: gromacs@2025.3.water_bare.pme_1ranks
-      Experiment 2: gromacs@2025.3.water_bare.pme_2ranks
-      Experiment 3: gromacs@2025.3.water_bare.rf_1ranks
-      Experiment 4: gromacs@2025.3.water_bare.rf_2ranks
-      Experiment 5: gromacs@2025.3.water_gmx50.pme_1ranks
-      Experiment 6: gromacs@2025.3.water_gmx50.pme_2ranks
-      Experiment 7: gromacs@2025.3.water_gmx50.rf_1ranks
-      Experiment 8: gromacs@2025.3.water_gmx50.rf_2ranks
+    Experiments:
+        Application: gromacs@2025.3
+            Workload: {app_workload}
+            Experiment 1: gromacs@2025.3.water_bare.pme_1ranks
+            Experiment 2: gromacs@2025.3.water_bare.pme_2ranks
+            Experiment 3: gromacs@2025.3.water_bare.rf_1ranks
+            Experiment 4: gromacs@2025.3.water_bare.rf_2ranks
+            Experiment 5: gromacs@2025.3.water_gmx50.pme_1ranks
+            Experiment 6: gromacs@2025.3.water_gmx50.pme_2ranks
+            Experiment 7: gromacs@2025.3.water_gmx50.rf_1ranks
+            Experiment 8: gromacs@2025.3.water_gmx50.rf_2ranks
 
 .. include:: shared/gromacs_execute.rst
 

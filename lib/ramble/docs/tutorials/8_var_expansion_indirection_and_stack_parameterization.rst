@@ -94,7 +94,7 @@ like the following:
 
     packages:
       openmpi:
-        pkg_spec: openmpi@5.0.8 +orterunprefix
+        pkg_spec: openmpi@5.0.8
 
 In the definition of the Intel MPI package above, you'll see we originally
 specified a ``compiler`` attribute (with the value of ``gcc14``). This can be

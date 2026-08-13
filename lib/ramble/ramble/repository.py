@@ -324,7 +324,7 @@ def use_repositories(*paths_and_repos, object_type=default_type):
             already constructed Repo objects
 
     Returns:
-        Corresponding RepoPath object
+        RepoPath: Corresponding RepoPath object
     """
     global paths  # noqa: F824
 
@@ -530,8 +530,7 @@ class Indexer(metaclass=abc.ABCMeta):
         """Whether an update is needed when the application file hasn't changed.
 
         Returns:
-            (bool): ``True`` if this application needs its index
-                updated, ``False`` otherwise.
+            bool: ``True`` if this application needs its index updated, ``False`` otherwise.
 
         We already automatically update indexes when object files
         change, but other files (like patches) may change underneath the

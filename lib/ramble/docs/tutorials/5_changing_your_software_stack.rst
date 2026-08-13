@@ -139,7 +139,7 @@ package, you can use:
 This command will output all of the supported versions of GROMACS, along with
 the variants for GROMACS which can modify its behavior. While you can change
 any of these, we'll begin by only modifying the version of GROMACS from
-``2024.1`` to ``2024.2``.
+``2025.3`` to ``2025.4``.
 
 To make editing the workspace easier, use the following command (assuming you
 have an ``EDITOR`` environment variable set):
@@ -151,8 +151,8 @@ have an ``EDITOR`` environment variable set):
 This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
 the workspace's ``configs`` directory.
 
-Once the ``ramble.yaml`` file is opened, change the version ``2024.1`` to
-``2024.2`` in the ``gromacs`` package definition. Then save and exit the files.
+Once the ``ramble.yaml`` file is opened, change the version ``2025.3`` to
+``2025.4`` in the ``gromacs`` package definition. Then save and exit the files.
 These changes should now be reflected in the output of:
 
 .. code-block:: console

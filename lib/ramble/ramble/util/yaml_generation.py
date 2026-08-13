@@ -40,7 +40,7 @@ def read_config_file(conf_path: str):
         conf_path (str): Path to input configuration file to read
 
     Returns:
-        (dict): Dictionary representation of the data contained in conf_path
+        dict[str, Any]: Dictionary representation of the data contained in conf_path
     """
     with open(conf_path, encoding="utf-8") as base_conf:
         logger.debug(f"Reading config from {conf_path}")
@@ -59,7 +59,7 @@ def all_config_options(config_data: Dict):
         config_data (dict): A config dictionary representing data read from a YAML file.
 
     Returns:
-        (set): Set containing all detected fully qualified option names
+        set[str]: Set containing all detected fully qualified option names
     """
 
     all_configs = set()
@@ -114,7 +114,7 @@ def get_config_value(config_data: Dict, option_name: str):
         option_name (str): Name of config option to get
 
     Returns:
-        (Any): Value of config option
+        Any: Value of config option
     """
     option_parts = option_name.split(".")
 

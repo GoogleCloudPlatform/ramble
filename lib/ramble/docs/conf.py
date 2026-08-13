@@ -208,6 +208,7 @@ nitpicky = True
 nitpick_ignore = [
     # Python classes that intersphinx is unable to resolve
     ("py:class", "argparse.HelpFormatter"),
+    ("py:class", "callable"),
     ("py:class", "contextlib.contextmanager"),
     ("py:class", "func"),
     ("py:class", "module"),

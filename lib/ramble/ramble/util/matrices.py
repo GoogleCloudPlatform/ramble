@@ -19,7 +19,7 @@ def extract_matrices(action, name, in_dict):
         in_dict: The dictionary containing definitions
 
     Returns:
-        list of matrix definitions
+        list[Any]: List of matrix definitions
     """
     matrices = []
 
