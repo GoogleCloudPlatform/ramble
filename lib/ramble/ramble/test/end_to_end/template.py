@@ -175,3 +175,81 @@ ramble:
     assert os.path.isfile(
         os.path.join(ws.experiment_dir, f"template/test_template/test/{template_src_name}")
     )
+
+
+def test_template_inclusion(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+  applications:
+    template:
+      workloads:
+        test_template:
+          experiments:
+            test:
+              variables:
+                n_nodes: 1
+                hello_name: inclusion_test
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    # 1. Create a child workspace template
+    child_path = os.path.join(ws.config_dir, "child_tpl.tpl")
+    with open(child_path, "w", encoding="utf-8") as f:
+        f.write("Child content: hello {hello_name}\n")
+
+    # 2. Create a parent workspace template that includes the child workspace template
+    # and the object template 'bar'
+    parent_path = os.path.join(ws.config_dir, "parent_tpl.tpl")
+    with open(parent_path, "w", encoding="utf-8") as f:
+        f.write("Parent header\n")
+        f.write("include({child_tpl})\n")
+        f.write("include({bar})\n")
+        f.write("Parent footer\n")
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    run_dir = os.path.join(ws.experiment_dir, "template/test_template/test/")
+
+    # Verify child_tpl rendered output
+    rendered_child_path = os.path.join(run_dir, "child_tpl")
+    assert os.path.isfile(rendered_child_path)
+    with open(rendered_child_path, encoding="utf-8") as f:
+        child_content = f.read()
+        assert child_content == "Child content: hello inclusion_test\n"
+
+    # Verify parent_tpl rendered output
+    rendered_parent_path = os.path.join(run_dir, "parent_tpl")
+    assert os.path.isfile(rendered_parent_path)
+    with open(rendered_parent_path, encoding="utf-8") as f:
+        parent_content = f.read()
+        # It should contain parent header
+        assert "Parent header\n" in parent_content
+        # It should expand child_tpl in-place (with variables expanded in child context)
+        assert "Child content: hello inclusion_test\n" in parent_content
+        # It should expand object template 'bar' in-place (with bar's extra_vars/func expanded)
+        assert "foobar\n" in parent_content  # dynamic_var1 from bar's extra_vars
+        # dynamic_hello_world from bar's extra_vars_func
+        assert "hello inclusion_test\n" in parent_content
+        # It should contain parent footer
+        assert "Parent footer\n" in parent_content
+
+    # 3. Test circular inclusion raises ApplicationError
+    circ_a_path = os.path.join(ws.config_dir, "circ_a.tpl")
+    circ_b_path = os.path.join(ws.config_dir, "circ_b.tpl")
+    with open(circ_a_path, "w", encoding="utf-8") as f:
+        f.write("include({circ_b})\n")
+    with open(circ_b_path, "w", encoding="utf-8") as f:
+        f.write("include({circ_a})\n")
+
+    # Re-read workspace to pick up new templates
+    ws._re_read()
+
+    with pytest.raises(
+        ApplicationError,
+        match="Circular template inclusion detected: circ_a -> circ_b -> circ_a",
+    ):
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])

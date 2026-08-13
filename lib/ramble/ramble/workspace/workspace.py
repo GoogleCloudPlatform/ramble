@@ -2212,7 +2212,7 @@ ramble:
 
     def all_templates(self):
         """Iterator over each template in the workspace"""
-        yield from self._templates.items()
+        yield from sorted(self._templates.items())
 
     def all_auxiliary_software_files(self):
         """Iterator over each auxiliary software file"""
