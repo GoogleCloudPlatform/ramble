@@ -1,9 +1,9 @@
 # Ramble Project Governance
 
-The Ramble project is dedicated to creating an open-source experimentation framework to:
- - Accelerate computational exploration
- - Enhance experimental reproducibility
- - Broaden access to scientific domains
+The Ramble project is dedicated to providing an open-source experimentation framework to:
+ - Accelerate computational and scientific exploration through experimentation
+ - Enhance the reproducibility and consistency of experiments it creates
+ - Provide a unified platform for computational scientific domains
 
 This governance explains how the project is run.
 
