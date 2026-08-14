@@ -259,17 +259,25 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             for pkg_spec in software_envs.package_specs_for_environment(
                 software_env
             ):
-                env_packages.add(self.package_name_from_spec(pkg_spec))
+                if pkg_spec:
+                    pkg_name = self.package_name_from_spec(pkg_spec)
+                    if pkg_name:
+                        env_packages.add(pkg_name)
 
             for _, obj in self.app_inst.objects():
                 required_compilers = set()
                 # Inject any specs that need to be injected.
                 for specs in obj.software_specs.values():
                     for spec in specs:
-                        pkg_name = self.package_name_from_spec(spec.pkg_spec)
+                        pkg_name = None
+                        if spec.pkg_spec:
+                            pkg_name = self.package_name_from_spec(
+                                spec.pkg_spec
+                            )
 
                         if (
                             spec.inject_if_missing
+                            and pkg_name
                             and pkg_name not in env_packages
                             and self.app_inst.expander.satisfies(
                                 spec.when,
