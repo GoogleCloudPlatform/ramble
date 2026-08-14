@@ -1060,7 +1060,14 @@ def requires_utility(
             obj.required_utilities[when_key] = {}
 
         obj.required_utilities[when_key][name] = kwargs.copy()
-        obj.required_utilities[when_key][name]["allow_external"] = allow_external
+
+        parsed_allow_external = True
+        if isinstance(allow_external, str) and allow_external.lower() == "false":
+            parsed_allow_external = False
+        elif not isinstance(allow_external, str):
+            parsed_allow_external = bool(allow_external)
+
+        obj.required_utilities[when_key][name]["allow_external"] = parsed_allow_external
         obj.required_utilities[when_key][name]["when"] = when_list
 
     return _define_requires_utility

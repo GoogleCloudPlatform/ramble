@@ -799,6 +799,7 @@ class SpackRunner(CommandRunner):
                 os.path.dirname(self.spack.exe[0])
             )
         except RunnerError:
+            self.shell = shell
             self.spack = None
             self.installer = None
             self.concretizer = None
@@ -810,6 +811,8 @@ class SpackRunner(CommandRunner):
             script = "setup-env.csh"
         elif self.shell == "fish":
             script = "setup-env.fish"
+        else:
+            script = "setup-env.sh"
         self.source_script = os.path.join(
             self.spack_dir, "share", "spack", script
         )
@@ -1106,7 +1109,7 @@ class SpackRunner(CommandRunner):
             del self.spack.default_env[self.env_key]
             del self.installer.default_env[self.env_key]
             del self.concretizer.default_env[self.env_key]
-            self.active = False
+        self.active = False
 
     def _check_active(self):
         if not self.env_path:
