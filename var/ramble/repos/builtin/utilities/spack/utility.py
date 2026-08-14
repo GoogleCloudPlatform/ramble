@@ -35,7 +35,7 @@ class Spack(UtilityBase):
     )
     variable(
         "spack_version",
-        default="v0.22.0",
+        default="v1.2.2",
         description="Version of spack to fetch",
     )
 
