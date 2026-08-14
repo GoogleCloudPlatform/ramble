@@ -26,8 +26,8 @@ def normalize_type_name(type_name):
     if not type_name:
         return None
 
-    # Map aliases
-    aliases = {
+    # Map non-object type aliases
+    extra_type_aliases = {
         "test": "test",
         "tests": "test",
         "command": "command",
@@ -37,18 +37,14 @@ def normalize_type_name(type_name):
         "module": "module",
         "modules": "module",
     }
-    if type_name in aliases:
-        return aliases[type_name]
+    norm_type = type_name.lower().strip().replace(" ", "_")
+    if norm_type in extra_type_aliases:
+        return extra_type_aliases[norm_type]
 
-    # Map singular to plural for ObjectTypes
-    norm_type = type_name.lower().replace("-", " ").replace("_", " ")
-    for obj_type in ramble.repository.ObjectTypes:
-        if norm_type == obj_type.name.lower().replace("_", " "):
-            return obj_type.name
-        if obj_type in ramble.repository.type_definitions:
-            singular = ramble.repository.type_definitions[obj_type]["singular"]
-            if norm_type == singular.lower().replace("_", " ").replace("-", " "):
-                return obj_type.name
+    # Map object types using repository's get_object_type_map()
+    type_map = ramble.repository.get_object_type_map()
+    if norm_type in type_map:
+        return type_map[norm_type].name
 
     return type_name
 
@@ -66,27 +62,36 @@ def find_all_matches(name, repo_path=None, namespace=None, obj_type=None):
     extra_types = ["test", "command", "docs", "module"]
     allowed_types = ramble.repository.OBJECT_NAMES + extra_types
 
-    types_to_check = [obj_type] if obj_type else allowed_types
+    # Parse spec if name might be a namespaced spec
+    spec = ramble.spec.Spec(name)
+    spec_obj_type = spec.object_type.name if spec.object_type else None
+    spec_namespace = spec.namespace
+    spec_name = spec.name if spec.name else name
+
+    effective_obj_type = obj_type or spec_obj_type
+    types_to_check = [effective_obj_type] if effective_obj_type else allowed_types
+
+    effective_namespace = namespace or spec_namespace
 
     for t in types_to_check:
         if t in ramble.repository.OBJECT_NAMES:
             # Check object type
-            obj_type = ramble.repository.ObjectTypes[t]
+            repo_obj_type = ramble.repository.ObjectTypes[t]
             if repo_path:
                 try:
-                    repos = [ramble.repository.Repo(repo_path, object_type=obj_type)]
+                    repos = [ramble.repository.Repo(repo_path, object_type=repo_obj_type)]
                 except Exception:
                     repos = []
-            elif namespace:
+            elif effective_namespace:
                 try:
-                    repos = [ramble.repository.paths[obj_type].get_repo(namespace)]
+                    repos = [ramble.repository.paths[repo_obj_type].get_repo(effective_namespace)]
                 except Exception:
                     repos = []
             else:
-                repos = ramble.repository.paths[obj_type].repos
+                repos = ramble.repository.paths[repo_obj_type].repos
 
             for repo in repos:
-                path = repo.filename_for_object_name(name)
+                path = repo.filename_for_object_name(spec_name)
                 if os.path.isfile(path):
                     matches.append({"type": t, "path": path, "repo_namespace": repo.namespace})
         elif t in extra_types:
@@ -212,7 +217,12 @@ def edit(parser, args):
 
         # If no matches found, reproduce the original behavior/messages:
         # 1. If type is specified/defaulted, we show type-specific "not found" messages.
-        type_name = args.type or ramble.repository.default_type.name
+        spec = ramble.spec.Spec(name)
+        spec_obj_type = spec.object_type.name if spec.object_type else None
+        type_name = args.type or spec_obj_type or ramble.repository.default_type.name
+        effective_namespace = args.namespace or spec.namespace
+        spec_name = spec.name if spec.name else name
+
         type_to_path = {
             "test": ramble.paths.test_path,
             "command": ramble.paths.command_path,
@@ -232,11 +242,11 @@ def edit(parser, args):
                 obj_type = ramble.repository.ObjectTypes[type_name]
                 if args.repo:
                     repo = ramble.repository.Repo(args.repo, object_type=obj_type)
-                elif args.namespace:
-                    repo = ramble.repository.paths[obj_type].get_repo(args.namespace)
+                elif effective_namespace:
+                    repo = ramble.repository.paths[obj_type].get_repo(effective_namespace)
                 else:
                     repo = ramble.repository.paths[obj_type]
-                path = repo.filename_for_object_name(name)
+                path = repo.filename_for_object_name(spec_name)
             except Exception:
                 path = None
 
