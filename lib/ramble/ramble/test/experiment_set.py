@@ -1056,6 +1056,15 @@ def test_chained_experiments_populate_new_experiments(workspace_name):
         assert "basic.test_wl.series2_6.chain.1.basic.test_wl.test1" in exp_set.chained_experiments
         assert "basic.test_wl.test1" in exp_set.experiments
 
+        assert exp_set.get_var_from_experiment("basic.test_wl.series2_4", "{n_ranks}") == "4"
+        assert (
+            exp_set.get_var_from_experiment(
+                "basic.test_wl.series2_4.chain.0.basic.test_wl.test1", "{n_ranks}"
+            )
+            == "2"
+        )
+        assert exp_set.get_var_from_experiment("non_existent.exp.name", "{n_ranks}") is None
+
 
 def test_chained_experiment_has_correct_directory(workspace_name):
     workspace("create", workspace_name)
