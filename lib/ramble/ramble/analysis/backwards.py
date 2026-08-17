@@ -85,8 +85,9 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                         logger.debug(
                             "Falling back to forward-reading strategy due to non-null context."
                         )
-                        import ramble.analysis
-                        forward_strategy = ramble.analysis.get_strategy("forward", app)
+                        import ramble.analysis as ra
+
+                        forward_strategy = ra.get_strategy("forward", app)
                         return forward_strategy(workspace)
                     else:
                         raise ValueError(
@@ -107,8 +108,9 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                             "Falling back to forward-reading strategy due to dynamic "
                             "FOM name or units."
                         )
-                        import ramble.analysis
-                        forward_strategy = ramble.analysis.get_strategy("forward", app)
+                        import ramble.analysis as ra
+
+                        forward_strategy = ra.get_strategy("forward", app)
                         return forward_strategy(workspace)
                     else:
                         raise ValueError(
