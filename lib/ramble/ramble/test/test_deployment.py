@@ -12,6 +12,8 @@ import tempfile
 import unittest
 from unittest import mock
 
+import llnl.util.filesystem as fs
+
 import ramble.workspace
 from ramble.filters import Filters
 from ramble.pipeline import PushDeploymentPipeline
@@ -65,3 +67,31 @@ class TestPushDeploymentPipeline(unittest.TestCase):
         self.assertTrue(
             os.path.exists(os.path.join(self.deployment_path, ramble.workspace.METADATA_FILE_NAME))
         )
+
+    def test_copy_tree_relative_path(self):
+        from ramble.pipeline import _copy_tree
+
+        src_dir = os.path.join(self.test_dir, "src")
+        os.makedirs(os.path.join(src_dir, "nested", "subdir"))
+        file_path = os.path.join(src_dir, "nested", "subdir", "test.txt")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write("hello")
+
+        with fs.working_dir(self.test_dir):
+            _copy_tree("src", "dest")
+            self.assertTrue(os.path.isfile(os.path.join("dest", "nested", "subdir", "test.txt")))
+
+    def test_deployment_files_yields_correct_paths(self):
+        pipeline = PushDeploymentPipeline(
+            self.workspace,
+            filters=Filters([]),
+            deployment_name=self.deployment_name,
+            create_tar=False,
+        )
+        os.makedirs(os.path.join(self.deployment_path, "sub"))
+        dummy_file = os.path.join(self.deployment_path, "sub", "file.txt")
+        with open(dummy_file, "w", encoding="utf-8") as f:
+            f.write("data")
+
+        files = list(pipeline._deployment_files())
+        self.assertEqual(files, [dummy_file])
