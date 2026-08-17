@@ -237,18 +237,16 @@ def determine_node_type(experiment, contexts):
     First prio is machine specific data, such as GCP meta data
     Second prio is more general data like CPU type
     """
+    node_type = default_node_type_val
     for context in contexts:
-        for fom in context["foms"]:
+        for fom in context.get("foms", []):
             if "machine-type" in fom["name"]:
                 experiment.node_type = fom["value"]
-                continue
-            elif "Model name" in fom["name"]:
-                experiment.node_type = fom["value"]
-                continue
+                return
+            elif "Model name" in fom["name"] and node_type == default_node_type_val:
+                node_type = fom["value"]
 
-        # Termination condition
-        if experiment.node_type != default_node_type_val:
-            continue
+    experiment.node_type = node_type
 
 
 def upload_results(results):

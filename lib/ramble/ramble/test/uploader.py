@@ -389,3 +389,80 @@ def test_fom_validation_fails_with_none():
 
     with pytest.raises(jsonschema.exceptions.ValidationError):
         validate_data(bad_fom, schema)
+
+
+@pytest.mark.parametrize(
+    "contexts,expected_node_type",
+    [
+        (
+            [
+                {
+                    "foms": [
+                        {"name": "machine-type", "value": "c2-standard-60"},
+                        {
+                            "name": "Model name",
+                            "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz",
+                        },
+                    ]
+                }
+            ],
+            "c2-standard-60",
+        ),
+        (
+            [
+                {
+                    "foms": [
+                        {
+                            "name": "Model name",
+                            "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz",
+                        },
+                        {"name": "machine-type", "value": "c2-standard-60"},
+                    ]
+                }
+            ],
+            "c2-standard-60",
+        ),
+        (
+            [
+                {"foms": [{"name": "machine-type", "value": "c2-standard-60"}]},
+                {
+                    "foms": [
+                        {
+                            "name": "Model name",
+                            "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz",
+                        }
+                    ]
+                },
+            ],
+            "c2-standard-60",
+        ),
+        (
+            [
+                {
+                    "foms": [
+                        {
+                            "name": "Model name",
+                            "value": "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz",
+                        }
+                    ]
+                }
+            ],
+            "Intel(R) Xeon(R) Gold 6268CL CPU @ 2.80GHz",
+        ),
+        (
+            [{"foms": [{"name": "other_fom", "value": "123"}]}],
+            ramble.uploader.default_node_type_val,
+        ),
+    ],
+)
+def test_determine_node_type(contexts, expected_node_type):
+    """Test that determine_node_type prioritizes machine-type
+    over Model name regardless of order.
+    """
+    import types
+
+    from ramble.uploader import default_node_type_val, determine_node_type
+
+    exp = types.SimpleNamespace(node_type=default_node_type_val)
+    determine_node_type(exp, contexts)
+    assert exp.node_type == expected_node_type
