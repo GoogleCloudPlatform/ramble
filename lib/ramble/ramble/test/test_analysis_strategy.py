@@ -11,7 +11,7 @@
 import pytest
 
 import ramble.analysis
-from ramble.analysis.default import DefaultAnalysisStrategy
+from ramble.analysis.forward import ForwardAnalysisStrategy
 
 
 class DummyApp:
@@ -21,8 +21,8 @@ class DummyApp:
 def test_get_strategy():
     app = DummyApp()
 
-    strategy = ramble.analysis.get_strategy("default", app)
-    assert isinstance(strategy, DefaultAnalysisStrategy)
+    strategy = ramble.analysis.get_strategy("forward", app)
+    assert isinstance(strategy, ForwardAnalysisStrategy)
     assert strategy.app_inst is app
 
     from ramble.analysis.backwards import BackwardsAnalysisStrategy
@@ -78,17 +78,17 @@ def test_backwards_strategy_validation():
 def test_backwards_strategy_fallback(monkeypatch):
     from ramble.analysis.backwards import BackwardsAnalysisStrategy
 
-    called_default = False
+    called_forward = False
 
-    class MockDefaultStrategy:
+    class MockForwardStrategy:
         def __init__(self, app):
             pass
 
         def __call__(self, workspace):
-            nonlocal called_default
-            called_default = True
+            nonlocal called_forward
+            called_forward = True
 
-    monkeypatch.setitem(ramble.analysis._strategy_registry, "default", MockDefaultStrategy)
+    monkeypatch.setitem(ramble.analysis._strategy_registry, "forward", MockForwardStrategy)
 
     class MockResult:
         def read_cache(self, workspace, app):
@@ -112,7 +112,7 @@ def test_backwards_strategy_fallback(monkeypatch):
         dry_run = False
 
     strategy(MockWorkspace())
-    assert called_default
+    assert called_forward
 
 
 def test_backwards_strategy_dynamic_foms_validation():
@@ -157,17 +157,17 @@ def test_backwards_strategy_dynamic_foms_validation():
 def test_backwards_strategy_dynamic_foms_fallback(monkeypatch):
     from ramble.analysis.backwards import BackwardsAnalysisStrategy
 
-    called_default = False
+    called_forward = False
 
-    class MockDefaultStrategy:
+    class MockForwardStrategy:
         def __init__(self, app):
             pass
 
         def __call__(self, workspace):
-            nonlocal called_default
-            called_default = True
+            nonlocal called_forward
+            called_forward = True
 
-    monkeypatch.setitem(ramble.analysis._strategy_registry, "default", MockDefaultStrategy)
+    monkeypatch.setitem(ramble.analysis._strategy_registry, "forward", MockForwardStrategy)
 
     class MockResult:
         def read_cache(self, workspace, app):
@@ -201,4 +201,4 @@ def test_backwards_strategy_dynamic_foms_fallback(monkeypatch):
         dry_run = False
 
     strategy(MockWorkspace())
-    assert called_default
+    assert called_forward

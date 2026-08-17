@@ -12,10 +12,10 @@ from ramble.analysis.backwards import BackwardsAnalysisStrategy
 
 # flake8: noqa: F401
 from ramble.analysis.base import AnalysisStrategyBase as AnalysisStrategyBase
-from ramble.analysis.default import DefaultAnalysisStrategy
+from ramble.analysis.forward import ForwardAnalysisStrategy
 
 _strategy_registry = {
-    "default": DefaultAnalysisStrategy,
+    "forward": ForwardAnalysisStrategy,
     "backwards": BackwardsAnalysisStrategy,
 }
 

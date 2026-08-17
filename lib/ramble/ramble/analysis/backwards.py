@@ -83,11 +83,10 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                 if context != _NULL_CONTEXT:
                     if getattr(app, "analysis_strategy", None) is None:
                         logger.debug(
-                            "Falling back to default forward-reading strategy due to non-null "
-                            "context."
+                            "Falling back to forward-reading strategy due to non-null context."
                         )
-                        default_strategy = ramble.analysis.get_strategy("default", app)
-                        return default_strategy(workspace)
+                        forward_strategy = ramble.analysis.get_strategy("forward", app)
+                        return forward_strategy(workspace)
                     else:
                         raise ValueError(
                             f"BackwardsAnalysisStrategy cannot be used because "
@@ -104,11 +103,11 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                 ):
                     if getattr(app, "analysis_strategy", None) is None:
                         logger.debug(
-                            "Falling back to default forward-reading strategy due to dynamic "
+                            "Falling back to forward-reading strategy due to dynamic "
                             "FOM name or units."
                         )
-                        default_strategy = ramble.analysis.get_strategy("default", app)
-                        return default_strategy(workspace)
+                        forward_strategy = ramble.analysis.get_strategy("forward", app)
+                        return forward_strategy(workspace)
                     else:
                         raise ValueError(
                             f"BackwardsAnalysisStrategy cannot be used because "

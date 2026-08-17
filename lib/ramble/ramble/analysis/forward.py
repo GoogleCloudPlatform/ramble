@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Define the default analysis strategy"""
+"""Define the forward-reading analysis strategy"""
 
 import os
 import string
@@ -26,8 +26,8 @@ def _get_context_display_name(context):
     )
 
 
-class DefaultAnalysisStrategy(AnalysisStrategyBase):
-    """Default regex-based analysis/extraction strategy."""
+class ForwardAnalysisStrategy(AnalysisStrategyBase):
+    """Forward regex-based analysis/extraction strategy."""
 
     def __call__(self, workspace):
         app = self.app_inst
