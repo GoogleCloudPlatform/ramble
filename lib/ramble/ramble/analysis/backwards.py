@@ -50,7 +50,7 @@ def _read_file_backwards(file_path, block_size=4096):
             for line in reversed(lines[1:]):
                 yield line.decode("utf-8", errors="replace") + "\n"
 
-        if buffer:
+        if file_size > 0:
             yield buffer.decode("utf-8", errors="replace") + "\n"
 
 
@@ -85,6 +85,7 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                         logger.debug(
                             "Falling back to forward-reading strategy due to non-null context."
                         )
+                        import ramble.analysis
                         forward_strategy = ramble.analysis.get_strategy("forward", app)
                         return forward_strategy(workspace)
                     else:
@@ -106,6 +107,7 @@ class BackwardsAnalysisStrategy(AnalysisStrategyBase):
                             "Falling back to forward-reading strategy due to dynamic "
                             "FOM name or units."
                         )
+                        import ramble.analysis
                         forward_strategy = ramble.analysis.get_strategy("forward", app)
                         return forward_strategy(workspace)
                     else:
