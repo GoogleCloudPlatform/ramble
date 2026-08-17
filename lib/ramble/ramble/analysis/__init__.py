@@ -8,12 +8,15 @@
 
 """Analysis package for Ramble"""
 
+from ramble.analysis.backwards import BackwardsAnalysisStrategy
+
 # flake8: noqa: F401
 from ramble.analysis.base import AnalysisStrategyBase as AnalysisStrategyBase
 from ramble.analysis.default import DefaultAnalysisStrategy
 
 _strategy_registry = {
     "default": DefaultAnalysisStrategy,
+    "backwards": BackwardsAnalysisStrategy,
 }
 
 

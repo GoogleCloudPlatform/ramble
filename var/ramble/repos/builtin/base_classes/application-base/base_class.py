@@ -3465,7 +3465,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """
         import ramble.analysis
 
-        strategy_name = getattr(self, "analysis_strategy", "default")
+        strategy_name = getattr(self, "analysis_strategy", None) or "backwards"
         strategy = ramble.analysis.get_strategy(strategy_name, self)
         strategy(workspace)
 
