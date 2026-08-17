@@ -10,9 +10,11 @@ import ast
 import difflib
 import fnmatch
 import inspect
+import io
 import os
 import re
 import sys
+import tokenize
 
 import ramble.keywords
 import ramble.repository
@@ -29,6 +31,18 @@ from ramble.util.logger import logger
 description = "find and simplify unused or unreachable sections in definitions"
 section = "developer"
 level = "long"
+
+_ALLOWED_MATH_NAMES = frozenset(
+    list(supported_scalar_function_pointers.keys())
+    + list(supported_list_function_pointers.keys())
+    + list(supported_scalar_function_with_self_arg_pointers.keys())
+    + list(supported_modules.keys())
+    + ["True", "False", "None"]
+)
+_RESERVED_PATTERNS = tuple(ramble.keywords.Keywords().reserved_patterns)
+_DOCSTRING_REGEX = re.compile(r'""".*?"""|\'\'\'.*?\'\'\'', flags=re.DOTALL)
+_COMMENT_REGEX = re.compile(r"#.*")
+_TEMPLATE_VAR_REGEX = re.compile(r"\{[a-zA-Z0-9_:-]+\}")
 
 
 def extract_referenced_names(template_str):
@@ -267,10 +281,9 @@ def iter_object_template_strings(cls, obj_path=None):
 
 def clean_source_code(source_code):
     """Strip comments, docstrings, and template braces from source code."""
-    cleaned = re.sub(r"#.*", "", source_code)
-    cleaned = re.sub(r'""".*?"""', "", cleaned, flags=re.DOTALL)
-    cleaned = re.sub(r"'''.*?'''", "", cleaned, flags=re.DOTALL)
-    return re.sub(r"\{[a-zA-Z0-9_:-]+\}", "", cleaned)
+    cleaned = _COMMENT_REGEX.sub("", source_code)
+    cleaned = _DOCSTRING_REGEX.sub("", cleaned)
+    return _TEMPLATE_VAR_REGEX.sub("", cleaned)
 
 
 def count_unreferenced_items(items, used_set, def_patterns, cleaned_code):
@@ -300,69 +313,32 @@ def get_arg_value(arg_node):
     return None
 
 
-def get_node_end_lineno(node, file_lines):
-    if hasattr(node, "end_lineno") and node.end_lineno is not None:
+def get_node_end_lineno(node, file_lines=None):
+    if getattr(node, "end_lineno", None) is not None:
         return node.end_lineno
 
-    # Fallback for Python < 3.8 which lacks end_lineno
-    start_idx = node.lineno - 1
-    if start_idx >= len(file_lines):
+    if not file_lines:
         return node.lineno
 
-    open_parens = 0
-    has_parens = False
-    in_single_quote = False
-    in_double_quote = False
-    in_triple_single = False
-    in_triple_double = False
-
-    curr_line_idx = start_idx
-    while curr_line_idx < len(file_lines):
-        line = file_lines[curr_line_idx]
-        i = 0
-        while i < len(line):
-            char = line[i]
-            # Handle comments: if we see '#' outside a string, ignore rest of line
-            if char == "#" and not (
-                in_single_quote or in_double_quote or in_triple_single or in_triple_double
-            ):
-                break
-
-            # Triple quotes
-            if not (in_single_quote or in_double_quote):
-                if line[i : i + 3] == "'''":
-                    in_triple_single = not in_triple_single
-                    i += 3
-                    continue
-                elif line[i : i + 3] == '"""':
-                    in_triple_double = not in_triple_double
-                    i += 3
-                    continue
-
-            # Single/double quotes
-            if not (in_triple_single or in_triple_double):
-                if char == "'" and (i == 0 or line[i - 1] != "\\"):
-                    in_single_quote = not in_single_quote
-                elif char == '"' and (i == 0 or line[i - 1] != "\\"):
-                    in_double_quote = not in_double_quote
-
-            # Parentheses counting
-            if not (in_single_quote or in_double_quote or in_triple_single or in_triple_double):
-                if char in "([{":
-                    open_parens += 1
-                    has_parens = True
-                elif char in ")]}":
-                    open_parens -= 1
-                    if has_parens and open_parens <= 0:
-                        return curr_line_idx + 1
-            i += 1
-
-        if not has_parens and curr_line_idx == start_idx:
-            # If no parens on the first line, assume single line statement
-            return node.lineno
-        curr_line_idx += 1
-
-    return len(file_lines)
+    # Fallback for Python versions lacking AST end_lineno
+    source = "\n".join(file_lines[node.lineno - 1 :])
+    try:
+        tokens = tokenize.generate_tokens(io.StringIO(source).readline)
+        depth = 0
+        saw_paren = False
+        for tok_type, tok_str, _, (erow, _), _ in tokens:
+            if tok_str in "([{":
+                depth += 1
+                saw_paren = True
+            elif tok_str in ")]}":
+                depth -= 1
+                if saw_paren and depth <= 0:
+                    return (node.lineno - 1) + erow
+            elif tok_type == tokenize.NEWLINE and not saw_paren:
+                return (node.lineno - 1) + erow
+    except Exception:
+        pass
+    return node.lineno
 
 
 DIRECTIVE_CATEGORIES = {
@@ -535,37 +511,19 @@ def is_valid_reference(
     source_code,
     fom_captures=None,
 ):
-    if var_name in all_defined_variables or var_name in defined_inputs:
-        return True
-    if var_name.endswith("_path") and var_name[:-5] in defined_software_specs:
-        return True
-    if var_name in ramble.keywords.default_keys:
-        return True
-    kw_inst = ramble.keywords.Keywords()
-    if any(pat.match(var_name) for pat in kw_inst.reserved_patterns):
-        return True
-    if fom_captures and var_name in fom_captures:
-        return True
-
-    # Math functions and constants are always valid references
-    _allowed_math_names = getattr(is_valid_reference, "_allowed_math_names", None)
-    if _allowed_math_names is None:
-        _allowed_math_names = set(
-            list(supported_scalar_function_pointers.keys())
-            + list(supported_list_function_pointers.keys())
-            + list(supported_scalar_function_with_self_arg_pointers.keys())
-            + list(supported_modules.keys())
-            + ["True", "False", "None"]
-        )
-        is_valid_reference._allowed_math_names = _allowed_math_names
-
-    if var_name in _allowed_math_names:
+    if (
+        var_name in all_defined_variables
+        or var_name in defined_inputs
+        or (var_name.endswith("_path") and var_name[:-5] in defined_software_specs)
+        or var_name in ramble.keywords.default_keys
+        or (fom_captures and var_name in fom_captures)
+        or var_name in _ALLOWED_MATH_NAMES
+        or any(pat.match(var_name) for pat in _RESERVED_PATTERNS)
+    ):
         return True
 
     # Strip quotes or match as literal token in source code (fallback for python references)
-    if re.search(r"\b" + re.escape(var_name) + r"\b", source_code):
-        return True
-    return False
+    return bool(re.search(r"\b" + re.escape(var_name) + r"\b", source_code))
 
 
 def _matches_any_pattern(val, defined_items):
@@ -756,11 +714,7 @@ def analyze_object(name, obj_type):
 
 def is_subclass_by_name(sub_cls, parent_cls):
     parent_qname = f"{parent_cls.__module__}.{parent_cls.__name__}"
-    for base in sub_cls.__mro__:
-        base_qname = f"{base.__module__}.{base.__name__}"
-        if base_qname == parent_qname:
-            return True
-    return False
+    return any(f"{b.__module__}.{b.__name__}" == parent_qname for b in sub_cls.__mro__)
 
 
 def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_results):
@@ -789,16 +743,13 @@ def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_resul
 
             for item_name, (_start, _end, source_text) in local_category_defs.items():
                 if item_name in unused_list:
-                    using_subclasses = []
-                    for child_name in subclasses:
-                        if child_name not in analysis_results:
-                            continue
-
-                        child_unused = analysis_results[child_name][res_idx]
-                        if (item_name not in child_unused) and (
-                            item_name not in local_defs[child_name][category]
-                        ):
-                            using_subclasses.append(child_name)
+                    using_subclasses = [
+                        child
+                        for child in subclasses
+                        if child in analysis_results
+                        and item_name not in analysis_results[child][res_idx]
+                        and item_name not in local_defs[child][category]
+                    ]
 
                     if using_subclasses:
                         proposed_moves.setdefault(name, {}).setdefault(category, []).append(
