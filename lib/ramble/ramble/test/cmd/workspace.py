@@ -3405,3 +3405,103 @@ def test_workspace_experiment_logs(workspace_name):
             ["experiments", "basic", "test_wl", "generated", "generated.out"]
         )
         assert expected_output in output
+
+
+def test_workspace_ls(workspace_name):
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        out = workspace("ls")
+        assert workspace_name in out
+
+
+def test_workspace_rm_alias(workspace_name):
+    workspace("create", workspace_name)
+    out = workspace("list")
+    assert workspace_name in out
+
+    workspace("rm", "-y", workspace_name)
+    out = workspace("list")
+    assert workspace_name not in out
+
+
+def test_workspace_push_to_cache(workspace_name, tmpdir):
+    global_args = ["-w", workspace_name]
+    cache_dir = tmpdir.mkdir("buildcache")
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+        workspace("concretize", global_args=global_args)
+        workspace(
+            "push-to-cache",
+            "-d",
+            str(cache_dir),
+            "--dry-run",
+            global_args=global_args,
+        )
+
+
+def test_workspace_bootstrap_command(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+        workspace("concretize", global_args=global_args)
+        workspace("bootstrap", global_args=global_args)
+
+
+def test_workspace_manage_filter_groups_rm_alias(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "filter-groups",
+            "add",
+            "-n",
+            "test-group",
+            "--where",
+            "{n_nodes} == 1",
+            global_args=global_args,
+        )
+        out = workspace("manage", "filter-groups", "list", global_args=global_args)
+        assert "test-group" in out
+
+        workspace(
+            "manage",
+            "filter-groups",
+            "rm",
+            "-n",
+            "test-group",
+            global_args=global_args,
+        )
+        out = workspace("manage", "filter-groups", "list", global_args=global_args)
+        assert "test-group" not in out

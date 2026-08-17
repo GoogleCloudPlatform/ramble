@@ -27,3 +27,41 @@ def test_command_argument_before_command_is_rejected(capsys):
     captured = capsys.readouterr()
     assert ret == 1
     assert "unrecognized arguments: --dry-run" in captured.err
+
+
+@pytest.mark.parametrize("flag", ["-V", "--version"])
+def test_global_version(flag, capsys):
+    ret = ramble.main.main(argv=[flag])
+    captured = capsys.readouterr()
+    assert ret == 0
+    assert str(ramble.ramble_version) in captured.out
+
+
+@pytest.mark.parametrize("flag", ["-h", "--help"])
+def test_global_help(flag, capsys):
+    ret = ramble.main.main(argv=[flag])
+    captured = capsys.readouterr()
+    assert ret == 0
+    assert "A flexible benchmark experiment manager" in captured.out
+
+
+@pytest.mark.parametrize("flag", ["-H", "--all-help"])
+def test_global_all_help(flag, capsys):
+    ret = ramble.main.main(argv=[flag])
+    captured = capsys.readouterr()
+    assert ret == 0
+    assert "Complete list of ramble commands:" in captured.out
+
+
+def test_global_config_var(capsys):
+    ret = ramble.main.main(argv=["-c", "config:debug:true", "help"])
+    captured = capsys.readouterr()
+    assert ret == 0
+    assert "A flexible benchmark experiment manager" in captured.out
+
+
+def test_global_config_scope(tmpdir, capsys):
+    ret = ramble.main.main(argv=["-C", str(tmpdir), "help"])
+    captured = capsys.readouterr()
+    assert ret == 0
+    assert "A flexible benchmark experiment manager" in captured.out

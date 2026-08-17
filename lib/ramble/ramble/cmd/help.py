@@ -77,3 +77,4 @@ def help(parser, args):
         parser.parse_args([args.help_command, "-h"])
     else:
         sys.stdout.write(parser.format_help(level=args.all))
+        return 0
