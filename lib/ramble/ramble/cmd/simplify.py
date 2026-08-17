@@ -136,6 +136,27 @@ def find_template_file(cls, src_path_config, obj_path=None):
     return None
 
 
+def get_nested_dict_keys(cls, attr_name):
+    """Extract all inner keys from a 2-level dictionary attribute."""
+    keys = set()
+
+    nested_dict = getattr(cls, attr_name, None)
+    if nested_dict:
+        for inner in nested_dict.values():
+            if isinstance(inner, dict):
+                keys.update(inner.keys())
+    return keys
+
+
+def iter_nested_dict_values(cls, attr_name):
+    """Yield all inner values from a 2-level dictionary attribute."""
+    nested_dict = getattr(cls, attr_name, None)
+    if nested_dict:
+        for inner in nested_dict.values():
+            if isinstance(inner, dict):
+                yield from inner.values()
+
+
 def iter_defined_variables(cls):
     """Yield all variable instances defined on an object class."""
     if hasattr(cls, "workloads") and cls.workloads:
@@ -154,16 +175,12 @@ def iter_defined_variables(cls):
 def iter_object_template_strings(cls, obj_path=None):
     """Yield (template_str, fom_captures, ignore_names) for all templates in an object."""
     # Executables
-    if hasattr(cls, "executables") and cls.executables:
-        for execs_dict in cls.executables.values():
-            for exec_obj in execs_dict.values():
-                templates = (
-                    exec_obj.template
-                    if isinstance(exec_obj.template, list)
-                    else [exec_obj.template]
-                )
-                for t in templates:
-                    yield (t, None, None)
+    for exec_obj in iter_nested_dict_values(cls, "executables"):
+        templates = (
+            exec_obj.template if isinstance(exec_obj.template, list) else [exec_obj.template]
+        )
+        for t in templates:
+            yield (t, None, None)
 
     # Workload and object variables
     for var in iter_defined_variables(cls):
@@ -192,14 +209,12 @@ def iter_object_template_strings(cls, obj_path=None):
                     yield (str(env_var.value), None, None)
 
     # Inputs
-    if hasattr(cls, "inputs") and cls.inputs:
-        for inputs_dict in cls.inputs.values():
-            for input_obj in inputs_dict.values():
-                url = getattr(input_obj, "url", None)
-                if url is None and isinstance(input_obj, dict):
-                    url = input_obj.get("url")
-                if url:
-                    yield (url, None, None)
+    for input_obj in iter_nested_dict_values(cls, "inputs"):
+        url = getattr(input_obj, "url", None)
+        if url is None and isinstance(input_obj, dict):
+            url = input_obj.get("url")
+        if url:
+            yield (url, None, None)
 
     # Figures of merit
     if hasattr(cls, "figures_of_merit") and cls.figures_of_merit:
@@ -238,18 +253,16 @@ def iter_object_template_strings(cls, obj_path=None):
                             yield (criteria_dict["formula"], None, ignore)
 
     # Registered templates
-    if hasattr(cls, "templates") and cls.templates:
-        for templates_dict in cls.templates.values():
-            for tpl_config in templates_dict.values():
-                src_path_config = tpl_config.get("src_path")
-                if src_path_config:
-                    tpl_file = find_template_file(cls, src_path_config, obj_path)
-                    if tpl_file:
-                        try:
-                            with open(tpl_file, encoding="utf-8") as f_tpl:
-                                yield (f_tpl.read(), None, None)
-                        except Exception:
-                            pass
+    for tpl_config in iter_nested_dict_values(cls, "templates"):
+        src_path_config = tpl_config.get("src_path") if isinstance(tpl_config, dict) else None
+        if src_path_config:
+            tpl_file = find_template_file(cls, src_path_config, obj_path)
+            if tpl_file:
+                try:
+                    with open(tpl_file, encoding="utf-8") as f_tpl:
+                        yield (f_tpl.read(), None, None)
+                except Exception:
+                    pass
 
 
 def clean_source_code(source_code):
@@ -365,30 +378,42 @@ DIRECTIVE_CATEGORIES = {
 def iter_class_directive_calls(tree):
     """Yield (node, call, func_name, category, first_arg_val) for class directive calls."""
     if not tree:
-
         return
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
-            for body_item in node.body:
-                if isinstance(body_item, ast.Expr) and isinstance(body_item.value, ast.Call):
-                    call = body_item.value
-                    if isinstance(call.func, ast.Name):
-                        func_name = call.func.id
-                        category = DIRECTIVE_CATEGORIES.get(func_name)
-                        first_val = get_arg_value(call.args[0]) if call.args else None
-                        yield (body_item, call, func_name, category, first_val)
+
+            def _walk_body(body):
+                for item in body:
+                    if isinstance(item, ast.Expr) and isinstance(item.value, ast.Call):
+                        call = item.value
+                        if isinstance(call.func, ast.Name):
+                            func_name = call.func.id
+                            category = DIRECTIVE_CATEGORIES.get(func_name)
+                            first_val = get_arg_value(call.args[0]) if call.args else None
+                            yield (item, call, func_name, category, first_val)
+                    elif isinstance(item, ast.With):
+                        yield from _walk_body(item.body)
+
+            yield from _walk_body(node.body)
             break
+
+
+def parse_source_tree(file_path):
+    """Read and parse an AST from a file path."""
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+        return content, ast.parse(content)
+    except (OSError, SyntaxError) as e:
+        logger.warn(f"Could not parse {file_path}: {e}")
+        return None, None
 
 
 def locate_directive_lines(
     file_path, unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars
 ):
-    try:
-        with open(file_path, encoding="utf-8") as f:
-            content = f.read()
-        tree = ast.parse(content)
-    except (OSError, SyntaxError) as e:
-        logger.warn(f"Could not parse {file_path}: {e}")
+    content, tree = parse_source_tree(file_path)
+    if not tree or not content:
         return []
 
     file_lines = content.splitlines()
@@ -409,12 +434,8 @@ def locate_directive_lines(
 
 def parse_local_definitions(file_path):
     defs = {"variables": {}, "inputs": {}, "executables": {}, "compilers": {}}
-    try:
-        with open(file_path, encoding="utf-8") as f:
-            content = f.read()
-        tree = ast.parse(content)
-    except (OSError, SyntaxError) as e:
-        logger.warn(f"Could not parse {file_path}: {e}")
+    content, tree = parse_source_tree(file_path)
+    if not tree or not content:
         return defs
 
     file_lines = content.splitlines(keepends=True)
@@ -547,49 +568,39 @@ def is_valid_reference(
     return False
 
 
+def _matches_any_pattern(val, defined_items):
+    return val == "*" or any(fnmatch.fnmatch(item, val) for item in defined_items)
+
+
+def _extract_kwarg_values(kw_node):
+    if isinstance(kw_node.value, ast.List):
+        return [get_arg_value(elt) for elt in kw_node.value.elts]
+    val = get_arg_value(kw_node.value)
+    return [val] if val is not None else []
+
+
 def is_variable_reference_broken(call, all_defined_workloads, all_defined_workload_groups):
     for kw in call.keywords:
-        if kw.arg == "workload":
-            wl_val = get_arg_value(kw.value)
-            if (
-                wl_val
-                and wl_val != "*"
-                and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
-            ):
-                return True
+        if kw.arg in ("workload", "workloads"):
+            for wl_val in _extract_kwarg_values(kw):
+                if wl_val and not _matches_any_pattern(wl_val, all_defined_workloads):
+                    return True
         elif kw.arg == "workload_group":
-            wg_val = get_arg_value(kw.value)
-            if (
-                wg_val
-                and wg_val != "*"
-                and not any(fnmatch.fnmatch(g, wg_val) for g in all_defined_workload_groups)
-            ):
-                return True
-        elif kw.arg == "workloads":
-            if isinstance(kw.value, ast.List):
-                for elt in kw.value.elts:
-                    wl_val = get_arg_value(elt)
-                    if (
-                        wl_val
-                        and wl_val != "*"
-                        and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
-                    ):
-                        return True
+            for wg_val in _extract_kwarg_values(kw):
+                if wg_val and not _matches_any_pattern(wg_val, all_defined_workload_groups):
+                    return True
     return False
 
 
 def check_broken_workload_groups(call, group_name, all_defined_workloads):
     broken = []
     for kw in call.keywords:
-        if kw.arg == "workloads" and isinstance(kw.value, ast.List):
-            for elt in kw.value.elts:
-                wl_val = get_arg_value(elt)
-                if (
-                    wl_val
-                    and wl_val != "*"
-                    and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
-                ):
-                    broken.append(f"{group_name} -> {wl_val}")
+        if kw.arg == "workloads":
+            broken.extend(
+                f"{group_name} -> {wl_val}"
+                for wl_val in _extract_kwarg_values(kw)
+                if wl_val and not _matches_any_pattern(wl_val, all_defined_workloads)
+            )
     return broken
 
 
@@ -620,58 +631,22 @@ def analyze_object(name, obj_type):
     except Exception:
         tree = None
 
-    # Collect all workloads and workload groups (including inherited ones)
-    all_defined_workloads = set()
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            for wl_name in app_workloads:
-                all_defined_workloads.add(wl_name)
+    # Collect defined entities (including inherited ones)
+    all_defined_workloads = get_nested_dict_keys(cls, "workloads")
+    all_defined_workload_groups = set(getattr(cls, "workload_groups", {}) or ())
+    defined_inputs = get_nested_dict_keys(cls, "inputs")
+    defined_executables = get_nested_dict_keys(cls, "executables")
+    defined_variables = {var.name for var in iter_defined_variables(cls)}
 
-    all_defined_workload_groups = set()
-    if hasattr(cls, "workload_groups") and cls.workload_groups:
-        for group_name in cls.workload_groups:
-            all_defined_workload_groups.add(group_name)
-
-    # Collect compilers and software specs (including inherited ones)
-    all_defined_compilers = set()
-    if hasattr(cls, "compilers") and cls.compilers:
-        for compiler_name in cls.compilers:
-            all_defined_compilers.add(compiler_name)
-
+    # Collect compilers and software specs
     all_referenced_compilers = set()
+    defined_software_specs = set(getattr(cls, "required_packages", {}) or ())
+
     if hasattr(cls, "software_specs") and cls.software_specs:
         for specs_list in cls.software_specs.values():
             for spec_obj in specs_list:
-                if hasattr(spec_obj, "compiler") and spec_obj.compiler:
+                if getattr(spec_obj, "compiler", None):
                     all_referenced_compilers.add(spec_obj.compiler)
-
-    # 1. Collect all defined inputs (only for applications)
-    defined_inputs = set()
-    if hasattr(cls, "inputs") and cls.inputs:
-        for inputs_dict in cls.inputs.values():
-            for input_name in inputs_dict:
-                defined_inputs.add(input_name)
-
-    # 2. Collect all defined executables (only for applications)
-    defined_executables = set()
-    if hasattr(cls, "executables") and cls.executables:
-        for execs_dict in cls.executables.values():
-            for exec_name in execs_dict:
-                defined_executables.add(exec_name)
-
-    # 3. Collect all defined variables
-    defined_variables = set()
-    variable_instances = {}
-    for var in iter_defined_variables(cls):
-        defined_variables.add(var.name)
-        variable_instances.setdefault(var.name, []).append(var)
-
-    # Collect all software spec names (including inherited ones), package names,
-    # and required packages
-    defined_software_specs = set()
-    if hasattr(cls, "software_specs") and cls.software_specs:
-        for specs_list in cls.software_specs.values():
-            for spec_obj in specs_list:
                 defined_software_specs.add(spec_obj.name)
                 # If spec name has braces/template parts, add prefix up to the first brace/hyphen
                 # E.g. 'orca-{version}' -> add 'orca'
@@ -685,12 +660,7 @@ def analyze_object(name, obj_type):
                     if pkg_match:
                         defined_software_specs.add(pkg_match.group(1))
 
-    if hasattr(cls, "required_packages") and cls.required_packages:
-        for pkgname in cls.required_packages:
-            defined_software_specs.add(pkgname)
-
-    # 4. Gather all templates/strings to extract referenced names and check
-    # broken template references
+    # Gather all templates/strings to extract referenced names and check broken template references
     all_referenced_names = set()
     broken_template_refs = set()
 
@@ -710,33 +680,26 @@ def analyze_object(name, obj_type):
             ):
                 broken_template_refs.add(r)
 
-    # 5. Extract workload relationships (executables and inputs used directly in workloads)
+    # Extract workload relationships (executables and inputs used directly in workloads)
     used_executables = set()
     used_inputs = set()
     if hasattr(cls, "workloads") and cls.workloads:
         for app_workloads in cls.workloads.values():
             for wl_obj in app_workloads.values():
-                if hasattr(wl_obj, "executables"):
-                    used_executables.update(wl_obj.executables)
-                if hasattr(wl_obj, "inputs"):
-                    used_inputs.update(wl_obj.inputs)
+                used_executables.update(getattr(wl_obj, "executables", ()) or ())
+                used_inputs.update(getattr(wl_obj, "inputs", ()) or ())
 
     # Also extract inputs referenced in other inputs/url or variables
     for name in all_referenced_names:
         if name in defined_inputs:
             used_inputs.add(name)
 
-    unused_variables = []
-    for var in count_unreferenced_items(
+    unused_variables = count_unreferenced_items(
         defined_variables,
         all_referenced_names,
         ["workload_variable", "variable"],
         cleaned_code,
-    ):
-        v_instances = variable_instances.get(var, [])
-        if v_instances and all(getattr(v, "when", None) for v in v_instances):
-            continue
-        unused_variables.append(var)
+    )
 
     # For each defined input, check if it's used
     unused_inputs = count_unreferenced_items(
@@ -981,25 +944,24 @@ def simplify(parser, args):
             ):
                 file_path = obj_path.filename_for_object_name(name)
                 color.cprint(f"@c{{=== {args.type.capitalize().rstrip('s')}: {name} ===}}")
-                if unused_vars:
-                    print(f"  Unused Variables: {unused_vars}")
-                    total_unused_vars += len(unused_vars)
-                if unused_inputs:
-                    print(f"  Unused Inputs: {unused_inputs}")
-                    total_unused_inputs += len(unused_inputs)
-                if unused_execs:
-                    print(f"  Unused Executables: {unused_execs}")
-                    total_unused_execs += len(unused_execs)
-                if unused_compilers:
-                    print(f"  Unused Compilers: {unused_compilers}")
-                    total_unused_compilers += len(unused_compilers)
-                if broken_vars:
-                    print(f"  Variables with Broken Workload/Group Refs: {broken_vars}")
-                    total_broken_vars += len(broken_vars)
-                if broken_groups:
-                    print(f"  Workload Groups with Broken Workload Refs: {broken_groups}")
-                if broken_templates:
-                    print(f"  Broken Variable References in Templates: {broken_templates}")
+                reports = [
+                    ("Unused Variables", unused_vars),
+                    ("Unused Inputs", unused_inputs),
+                    ("Unused Executables", unused_execs),
+                    ("Unused Compilers", unused_compilers),
+                    ("Variables with Broken Workload/Group Refs", broken_vars),
+                    ("Workload Groups with Broken Workload Refs", broken_groups),
+                    ("Broken Variable References in Templates", broken_templates),
+                ]
+                for label, items in reports:
+                    if items:
+                        print(f"  {label}: {items}")
+
+                total_unused_vars += len(unused_vars)
+                total_unused_inputs += len(unused_inputs)
+                total_unused_execs += len(unused_execs)
+                total_unused_compilers += len(unused_compilers)
+                total_broken_vars += len(broken_vars)
 
                 if has_moves:
                     print("  Move to Subclasses:")

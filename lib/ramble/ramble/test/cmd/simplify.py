@@ -914,3 +914,49 @@ class ChildB(ParentBase):
         assert "Move to Subclasses" not in out_clean
         assert "Move from Parents" not in out_clean
         assert "Found 0 unused variables" in out_clean
+
+
+def test_simplify_when_block_unused_variable(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("ramble_repo_when_var"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testwhenvar\n")
+
+    app_dir = os.path.join(repo_path, "applications", "whenapp")
+    os.makedirs(app_dir)
+    app_file = os.path.join(app_dir, "application.py")
+
+    code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class Whenapp(ExecutableApplication):
+    name = "whenapp"
+
+    with when("application_version@4.0:"):
+        executable('foo', 'echo {used_var}', use_mpi=False)
+        workload('test_wl', executable='foo')
+        workload_variable('used_var', default='val', workload='test_wl')
+        workload_variable('unused_when_var', default='junk', workload='test_wl')
+"""
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "applications", "whenapp")
+        assert "Unused Variables: ['unused_when_var']" in out
+        assert "used_var" not in out
+
+        out_apply = simplify_cmd("-t", "applications", "-a", "whenapp")
+        assert "Successfully simplified" in out_apply
+
+    with open(app_file, encoding="utf-8") as f:
+        content = f.read()
+        assert "unused_when_var" not in content
+        assert "used_var" in content
