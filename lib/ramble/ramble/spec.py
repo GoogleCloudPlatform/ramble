@@ -23,7 +23,7 @@ def _parse_spec_string(spec_like):
         return "", None, None
 
     # Strip any version suffix if present (e.g., app@1.0)
-    spec_like = spec_like.partition("@")[0]
+    spec_like = spec_like.partition("@")[0].lower()
 
     parts = spec_like.split(".")
 

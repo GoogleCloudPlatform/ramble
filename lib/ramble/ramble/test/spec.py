@@ -29,6 +29,11 @@ class TestSpec:
             ("org.project.repo.foo", "foo", "org.project.repo", "org.project.repo.foo"),
             ("foo@1.0", "foo", None, "foo"),
             ("builtin.app.foo@1.0", "foo", "builtin", "builtin.app.foo"),
+            ("MY-APP", "my-app", None, "my-app"),
+            ("Builtin.App.Foo", "foo", "builtin", "builtin.app.foo"),
+            ("APP.FOO", "foo", None, "app.foo"),
+            ("BUILTIN.APPLICATION.FOO@1.0", "foo", "builtin", "builtin.app.foo"),
+            ("Builtin.Foo", "foo", "builtin", "builtin.foo"),
         ],
     )
     def test_init_from_string(

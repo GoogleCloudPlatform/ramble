@@ -339,6 +339,20 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '1'
+    builtin.mock.basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '3'
+    app.basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '4'
 """
 
     ws1 = ramble.workspace.create(workspace_name)
@@ -355,8 +369,12 @@ ramble:
 
     assert "Application: builtin.mock.app.basic" in output
     assert "Application: basic" in output
+    assert "Application: builtin.mock.basic" in output
+    assert "Application: app.basic" in output
     assert "builtin.mock.app.basic.test_wl.test_experiment" in output
     assert "basic@1.0.test_wl.test_experiment" in output
+    assert "builtin.mock.basic.test_wl.test_experiment" in output
+    assert "app.basic.test_wl.test_experiment" in output
 
 
 def test_workspace_info_prints_all_levels(workspace_name):

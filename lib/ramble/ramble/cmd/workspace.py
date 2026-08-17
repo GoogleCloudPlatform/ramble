@@ -25,6 +25,7 @@ import ramble.config
 import ramble.expander
 import ramble.filters
 import ramble.pipeline
+import ramble.repository
 import ramble.software_environments
 import ramble.spec
 import ramble.util.colors as color
@@ -914,14 +915,23 @@ def workspace_info(args):
         app_ns_raw = app_inst.variables[app_inst.keywords.application_namespace]
         if app_ns_raw not in app_names_cache:
             app_ns_spec = ramble.spec.Spec(app_ns_raw)
-            app_ns = app_ns_spec.fullname
             app_name = app_inst.variables[app_inst.keywords.application_name]
-            app_ns_no_type = (
-                f"{app_ns_spec.namespace}.{app_ns_spec.name}"
-                if app_ns_spec.namespace
-                else app_name
-            )
-            app_names_cache[app_ns_raw] = tuple({app_ns, app_name, app_ns_no_type})
+            try:
+                repo_ns = (
+                    app_ns_spec.namespace
+                    or ramble.repository.paths[ramble.repository.ObjectTypes.applications]
+                    .repo_for_obj(app_name)
+                    .namespace
+                )
+            except Exception:
+                repo_ns = app_ns_spec.namespace
+
+            names = {app_name, app_ns_spec.fullname, f"app.{app_name}"}
+            if repo_ns:
+                names.add(f"{repo_ns}.{app_name}")
+                names.add(f"{repo_ns}.app.{app_name}")
+
+            app_names_cache[app_ns_raw] = tuple(names)
 
         for a_name in app_names_cache[app_ns_raw]:
             key = (
