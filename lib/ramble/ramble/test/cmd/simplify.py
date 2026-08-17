@@ -697,13 +697,11 @@ def test_simplify_repo_filter_with_names_and_all_names(tmpdir, mutable_config):
     app_dir = os.path.join(repo_path, "applications", "app1")
     os.makedirs(app_dir)
     with open(os.path.join(app_dir, "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 from ramble.appkit import *
 class App1(ExecutableApplication):
     name = "app1"
-"""
-        )
+""")
 
     obj_type = ramble.repository.ObjectTypes.applications
     try:
@@ -744,13 +742,11 @@ def test_simplify_analysis_error(tmpdir, mutable_config, monkeypatch):
     app_dir = os.path.join(repo_path, "applications", "errapp")
     os.makedirs(app_dir)
     with open(os.path.join(app_dir, "application.py"), "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 from ramble.appkit import *
 class Errapp(ExecutableApplication):
     name = "errapp"
-"""
-        )
+""")
 
     obj_type = ramble.repository.ObjectTypes.applications
     try:
@@ -778,13 +774,11 @@ def test_simplify_open_source_oserror(tmpdir, mutable_config, monkeypatch):
     os.makedirs(app_dir)
     app_file = os.path.join(app_dir, "application.py")
     with open(app_file, "w", encoding="utf-8") as f:
-        f.write(
-            """# Copyright 2022-2026 The Ramble Authors
+        f.write("""# Copyright 2022-2026 The Ramble Authors
 from ramble.appkit import *
 class Oserrapp(ExecutableApplication):
     name = "oserrapp"
-"""
-        )
+""")
 
     obj_type = ramble.repository.ObjectTypes.applications
     try:
@@ -811,3 +805,112 @@ class Oserrapp(ExecutableApplication):
     with ramble.repository.use_repositories(test_repo, object_type=obj_type):
         simplify_cmd("-t", "applications", "oserrapp")
         assert any("Could not read source file" in c for c in warn_calls)
+
+
+def test_simplify_inheritance_attribute_move(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("test_repo_inherit"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testns_inherit\n")
+
+    parent_dir = os.path.join(repo_path, "applications", "parent")
+    os.makedirs(parent_dir)
+    parent_file = os.path.join(parent_dir, "application.py")
+    parent_code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class Parent(ExecutableApplication):
+    name = "parent"
+    executable('foo', 'bar', use_mpi=False)
+    workload('test_wl', executable='foo')
+    workload_variable('parent_var', default='1.0', workload='test_wl')
+"""
+    with open(parent_file, "w", encoding="utf-8") as f:
+        f.write(parent_code)
+
+    child_a_dir = os.path.join(repo_path, "applications", "child_a")
+    os.makedirs(child_a_dir)
+    child_a_file = os.path.join(child_a_dir, "application.py")
+    child_a_code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.app.testns_inherit.parent import Parent as ParentBase
+from ramble.appkit import *
+
+class ChildA(ParentBase):
+    name = "child_a"
+    executable('foo_a', 'bar {parent_var}', use_mpi=False)
+    workload('test_wl_a', executable='foo_a')
+"""
+    with open(child_a_file, "w", encoding="utf-8") as f:
+        f.write(child_a_code)
+
+    child_b_dir = os.path.join(repo_path, "applications", "child_b")
+    os.makedirs(child_b_dir)
+    child_b_file = os.path.join(child_b_dir, "application.py")
+    child_b_code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.app.testns_inherit.parent import Parent as ParentBase
+from ramble.appkit import *
+
+class ChildB(ParentBase):
+    name = "child_b"
+    executable('foo_b', 'bar', use_mpi=False)
+    workload('test_wl_b', executable='foo_b')
+"""
+    with open(child_b_file, "w", encoding="utf-8") as f:
+        f.write(child_b_code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    # Clean sys.modules cache for the classes we are going to import/define
+    for m in [
+        "ramble.app.testns_inherit",
+        "ramble.app.testns_inherit.parent",
+        "ramble.app.testns_inherit.child_a",
+        "ramble.app.testns_inherit.child_b",
+    ]:
+        sys.modules.pop(m, None)
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "applications")
+        assert "Move to Subclasses:" in out
+        assert "parent_var -> ['child_a']" in out
+        assert "Move from Parents:" in out
+
+        # Now apply the simplification
+        out_apply = simplify_cmd("-t", "applications", "-a")
+        assert "Successfully simplified" in out_apply
+
+    # Verify parent has it removed
+    with open(parent_file, encoding="utf-8") as f:
+        parent_content = f.read()
+        assert "parent_var" not in parent_content
+
+    # Verify child_a has it added
+    with open(child_a_file, encoding="utf-8") as f:
+        child_a_content = f.read()
+        assert "workload_variable('parent_var'" in child_a_content
+
+    # Verify child_b is unchanged
+    with open(child_b_file, encoding="utf-8") as f:
+        child_b_content = f.read()
+        assert "parent_var" not in child_b_content
+
+    # Re-verify by reloading everything and running simplify again (should be clean)
+    sys.modules.pop("ramble.app.testns_inherit.parent", None)
+    sys.modules.pop("ramble.app.testns_inherit.child_a", None)
+    sys.modules.pop("ramble.app.testns_inherit.child_b", None)
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo_new = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo_new, object_type=obj_type):
+        out_clean = simplify_cmd("-t", "applications")
+        assert "Move to Subclasses" not in out_clean
+        assert "Move from Parents" not in out_clean
+        assert "Found 0 unused variables" in out_clean

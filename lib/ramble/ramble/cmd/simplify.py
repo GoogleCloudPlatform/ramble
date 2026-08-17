@@ -136,6 +136,149 @@ def find_template_file(cls, src_path_config, obj_path=None):
     return None
 
 
+def iter_defined_variables(cls):
+    """Yield all variable instances defined on an object class."""
+    if hasattr(cls, "workloads") and cls.workloads:
+        for app_workloads in cls.workloads.values():
+            for wl_obj in app_workloads.values():
+                for var_list in wl_obj.variables.values():
+                    for var in var_list:
+                        yield var
+
+    if hasattr(cls, "object_variables") and cls.object_variables:
+        for var_list in cls.object_variables.values():
+            for var in var_list:
+                yield var
+
+
+def iter_object_template_strings(cls, obj_path=None):
+    """Yield (template_str, fom_captures, ignore_names) for all templates in an object."""
+    # Executables
+    if hasattr(cls, "executables") and cls.executables:
+        for execs_dict in cls.executables.values():
+            for exec_obj in execs_dict.values():
+                templates = (
+                    exec_obj.template
+                    if isinstance(exec_obj.template, list)
+                    else [exec_obj.template]
+                )
+                for t in templates:
+                    yield (t, None, None)
+
+    # Workload and object variables
+    for var in iter_defined_variables(cls):
+        yield (str(var.default), None, None)
+
+    # Environment variables (object, workload group, workload level)
+    env_sources = []
+    if hasattr(cls, "object_environment_variables") and cls.object_environment_variables:
+        env_sources.append(cls.object_environment_variables.values())
+    if hasattr(cls, "workload_group_env_vars") and cls.workload_group_env_vars:
+        env_sources.append(cls.workload_group_env_vars.values())
+    if hasattr(cls, "workloads") and cls.workloads:
+        for app_workloads in cls.workloads.values():
+            env_sources.extend(
+                wl_obj.environment_variables.values()
+                for wl_obj in app_workloads.values()
+                if getattr(wl_obj, "environment_variables", None)
+            )
+
+    for source in env_sources:
+        for env_vars_list in source:
+            for env_var in env_vars_list:
+                if env_var.name:
+                    yield (env_var.name, None, None)
+                if env_var.value:
+                    yield (str(env_var.value), None, None)
+
+    # Inputs
+    if hasattr(cls, "inputs") and cls.inputs:
+        for inputs_dict in cls.inputs.values():
+            for input_obj in inputs_dict.values():
+                url = getattr(input_obj, "url", None)
+                if url is None and isinstance(input_obj, dict):
+                    url = input_obj.get("url")
+                if url:
+                    yield (url, None, None)
+
+    # Figures of merit
+    if hasattr(cls, "figures_of_merit") and cls.figures_of_merit:
+        for contexts_dict in cls.figures_of_merit.values():
+            for foms_dict in contexts_dict.values():
+                for fom_val in foms_dict.values():
+                    if isinstance(fom_val, dict):
+                        fom_captures = set()
+                        if "fom_regex" in fom_val:
+                            try:
+                                fom_captures.update(
+                                    re.compile(fom_val["fom_regex"]).groupindex.keys()
+                                )
+                            except re.error as e:
+                                logger.warn(
+                                    "Invalid regex for figure of merit: "
+                                    f"{fom_val['fom_regex']}. Error: {e}"
+                                )
+                        if "log_file" in fom_val:
+                            yield (fom_val["log_file"], fom_captures, None)
+
+    # Success criteria
+    if hasattr(cls, "success_criteria") and cls.success_criteria:
+        for when_dict in cls.success_criteria.values():
+            if isinstance(when_dict, dict):
+                for criteria_dict in when_dict.values():
+                    if isinstance(criteria_dict, dict):
+                        if "file" in criteria_dict:
+                            yield (criteria_dict["file"], None, None)
+                        if "formula" in criteria_dict:
+                            ignore = (
+                                {"value"}
+                                if criteria_dict.get("mode") == "fom_comparison"
+                                else None
+                            )
+                            yield (criteria_dict["formula"], None, ignore)
+
+    # Registered templates
+    if hasattr(cls, "templates") and cls.templates:
+        for templates_dict in cls.templates.values():
+            for tpl_config in templates_dict.values():
+                src_path_config = tpl_config.get("src_path")
+                if src_path_config:
+                    tpl_file = find_template_file(cls, src_path_config, obj_path)
+                    if tpl_file:
+                        try:
+                            with open(tpl_file, encoding="utf-8") as f_tpl:
+                                yield (f_tpl.read(), None, None)
+                        except Exception:
+                            pass
+
+
+def clean_source_code(source_code):
+    """Strip comments, docstrings, and template braces from source code."""
+    cleaned = re.sub(r"#.*", "", source_code)
+    cleaned = re.sub(r'""".*?"""', "", cleaned, flags=re.DOTALL)
+    cleaned = re.sub(r"'''.*?'''", "", cleaned, flags=re.DOTALL)
+    return re.sub(r"\{[a-zA-Z0-9_:-]+\}", "", cleaned)
+
+
+def count_unreferenced_items(items, used_set, def_patterns, cleaned_code):
+    """Find items not in used_set that are only referenced in their definitions."""
+    unused = []
+    pattern_prefix = r"\b(?:" + "|".join(def_patterns) + r")"
+    for item in sorted(items):
+        if item in used_set:
+            continue
+        occurrences = len(re.findall(rf"\b{re.escape(item)}\b", cleaned_code))
+        defs = len(
+            re.findall(
+                rf'{pattern_prefix}\s*\(\s*[\'"]{re.escape(item)}[\'"]',
+                cleaned_code,
+            )
+        )
+        if occurrences <= defs:
+            unused.append(item)
+    return unused
+
+
 def get_arg_value(arg_node):
     if isinstance(arg_node, ast.Constant):
         return arg_node.value
@@ -209,6 +352,34 @@ def get_node_end_lineno(node, file_lines):
     return len(file_lines)
 
 
+DIRECTIVE_CATEGORIES = {
+    "workload_variable": "variables",
+    "variable": "variables",
+    "input_file": "inputs",
+    "executable": "executables",
+    "formatted_executable": "executables",
+    "define_compiler": "compilers",
+}
+
+
+def iter_class_directive_calls(tree):
+    """Yield (node, call, func_name, category, first_arg_val) for class directive calls."""
+    if not tree:
+
+        return
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            for body_item in node.body:
+                if isinstance(body_item, ast.Expr) and isinstance(body_item.value, ast.Call):
+                    call = body_item.value
+                    if isinstance(call.func, ast.Name):
+                        func_name = call.func.id
+                        category = DIRECTIVE_CATEGORIES.get(func_name)
+                        first_val = get_arg_value(call.args[0]) if call.args else None
+                        yield (body_item, call, func_name, category, first_val)
+            break
+
+
 def locate_directive_lines(
     file_path, unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars
 ):
@@ -221,57 +392,42 @@ def locate_directive_lines(
         return []
 
     file_lines = content.splitlines()
-
-    # Find the first class definition in the file
-    class_node = None
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            class_node = node
-            break
-
-    if not class_node:
-        return []
+    unused_by_category = {
+        "variables": set(unused_vars) | set(broken_vars),
+        "inputs": set(unused_inputs),
+        "executables": set(unused_execs),
+        "compilers": set(unused_compilers),
+    }
 
     ranges_to_remove = []
-
-    for node in class_node.body:
-        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
-            call = node.value
-            if isinstance(call.func, ast.Name):
-                func_name = call.func.id
-                if func_name in ("workload_variable", "variable"):
-                    if call.args:
-                        val = get_arg_value(call.args[0])
-                        if val in unused_vars or val in broken_vars:
-                            ranges_to_remove.append(
-                                (node.lineno, get_node_end_lineno(node, file_lines))
-                            )
-                elif func_name == "input_file" and unused_inputs:
-                    if call.args:
-                        val = get_arg_value(call.args[0])
-                        if val in unused_inputs:
-                            ranges_to_remove.append(
-                                (node.lineno, get_node_end_lineno(node, file_lines))
-                            )
-                elif func_name in ("executable", "formatted_executable") and unused_execs:
-                    if call.args:
-                        val = get_arg_value(call.args[0])
-                        if val in unused_execs:
-                            ranges_to_remove.append(
-                                (node.lineno, get_node_end_lineno(node, file_lines))
-                            )
-                elif func_name == "define_compiler" and unused_compilers:
-                    if call.args:
-                        val = get_arg_value(call.args[0])
-                        if val in unused_compilers:
-                            ranges_to_remove.append(
-                                (node.lineno, get_node_end_lineno(node, file_lines))
-                            )
+    for node, _call, _func_name, category, val in iter_class_directive_calls(tree):
+        if category and val and val in unused_by_category.get(category, set()):
+            ranges_to_remove.append((node.lineno, get_node_end_lineno(node, file_lines)))
 
     return ranges_to_remove
 
 
-def apply_simplifications(file_path, ranges):
+def parse_local_definitions(file_path):
+    defs = {"variables": {}, "inputs": {}, "executables": {}, "compilers": {}}
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+        tree = ast.parse(content)
+    except (OSError, SyntaxError) as e:
+        logger.warn(f"Could not parse {file_path}: {e}")
+        return defs
+
+    file_lines = content.splitlines(keepends=True)
+    for node, _call, _func_name, category, val in iter_class_directive_calls(tree):
+        if category and val:
+            start = node.lineno
+            end = get_node_end_lineno(node, file_lines)
+            source_text = "".join(file_lines[start - 1 : end])
+            defs[category][val] = (start, end, source_text)
+    return defs
+
+
+def apply_simplifications(file_path, ranges, pending_insertions=None):
     with open(file_path, encoding="utf-8") as f:
         original_content = f.read()
 
@@ -283,6 +439,70 @@ def apply_simplifications(file_path, ranges):
         del new_lines[start - 1 : end]
 
     new_content = "".join(new_lines)
+
+    if pending_insertions:
+        try:
+            tree = ast.parse(new_content)
+        except Exception as e:
+            logger.warn(f"Could not parse simplified content of {file_path} for insertion: {e}")
+            return original_lines, new_lines, new_content
+
+        class_node = None
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                class_node = node
+                break
+
+        if class_node:
+            first_func_line = None
+            last_class_level_line = None
+            modified_lines = new_content.splitlines(keepends=True)
+
+            for node in class_node.body:
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    if first_func_line is None or node.lineno < first_func_line:
+                        first_func_line = node.lineno
+                else:
+                    end_line = get_node_end_lineno(node, modified_lines)
+                    if last_class_level_line is None or end_line > last_class_level_line:
+                        last_class_level_line = end_line
+
+            if first_func_line is not None:
+                insert_idx = first_func_line - 1
+            elif last_class_level_line is not None:
+                insert_idx = last_class_level_line
+            else:
+                insert_idx = class_node.lineno
+
+            indent = "    "
+            if class_node.body:
+                first_node = class_node.body[0]
+                if first_node.lineno - 1 < len(modified_lines):
+                    line = modified_lines[first_node.lineno - 1]
+                    indent = " " * (len(line) - len(line.lstrip()))
+
+            insert_lines = []
+            for _cat, _item_name, source_text in pending_insertions:
+                src_lines = source_text.splitlines()
+                non_empty_src_lines = [line for line in src_lines if line.strip()]
+                if non_empty_src_lines:
+                    min_spaces = min(
+                        len(line) - len(line.lstrip()) for line in non_empty_src_lines
+                    )
+                else:
+                    min_spaces = 0
+
+                for line in src_lines:
+                    stripped = line[min_spaces:]
+                    if stripped.strip():
+                        insert_lines.append(indent + stripped + "\n")
+                    else:
+                        insert_lines.append("\n")
+
+            modified_lines.insert(insert_idx, "".join(insert_lines))
+            new_content = "".join(modified_lines)
+            new_lines = new_content.splitlines(keepends=True)
+
     return original_lines, new_lines, new_content
 
 
@@ -327,6 +547,52 @@ def is_valid_reference(
     return False
 
 
+def is_variable_reference_broken(call, all_defined_workloads, all_defined_workload_groups):
+    for kw in call.keywords:
+        if kw.arg == "workload":
+            wl_val = get_arg_value(kw.value)
+            if (
+                wl_val
+                and wl_val != "*"
+                and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
+            ):
+                return True
+        elif kw.arg == "workload_group":
+            wg_val = get_arg_value(kw.value)
+            if (
+                wg_val
+                and wg_val != "*"
+                and not any(fnmatch.fnmatch(g, wg_val) for g in all_defined_workload_groups)
+            ):
+                return True
+        elif kw.arg == "workloads":
+            if isinstance(kw.value, ast.List):
+                for elt in kw.value.elts:
+                    wl_val = get_arg_value(elt)
+                    if (
+                        wl_val
+                        and wl_val != "*"
+                        and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
+                    ):
+                        return True
+    return False
+
+
+def check_broken_workload_groups(call, group_name, all_defined_workloads):
+    broken = []
+    for kw in call.keywords:
+        if kw.arg == "workloads" and isinstance(kw.value, ast.List):
+            for elt in kw.value.elts:
+                wl_val = get_arg_value(elt)
+                if (
+                    wl_val
+                    and wl_val != "*"
+                    and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads)
+                ):
+                    broken.append(f"{group_name} -> {wl_val}")
+    return broken
+
+
 def analyze_object(name, obj_type):
     obj_path = ramble.repository.paths[obj_type]
     cls = obj_path.get_obj_class(name)
@@ -344,13 +610,7 @@ def analyze_object(name, obj_type):
             except OSError as e:
                 logger.warn(f"Could not read source file {p_file_path}: {e}")
     source_code = "\n".join(source_codes)
-
-    # Clean the source code (strip comments/strings) for fallback scan
-    cleaned_code = re.sub(r"#.*", "", source_code)
-    cleaned_code = re.sub(r'""".*?"""', "", cleaned_code, flags=re.DOTALL)
-    cleaned_code = re.sub(r"'''.*?'''", "", cleaned_code, flags=re.DOTALL)
-    # Strip variable reference templates in braces (e.g. {var})
-    cleaned_code = re.sub(r"\{[a-zA-Z0-9_:-]+\}", "", cleaned_code)
+    cleaned_code = clean_source_code(source_code)
 
     # Parse AST of the target file
     try:
@@ -402,22 +662,9 @@ def analyze_object(name, obj_type):
     # 3. Collect all defined variables
     defined_variables = set()
     variable_instances = {}
-
-    # Workload variables (for applications)
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            for wl_obj in app_workloads.values():
-                for var_list in wl_obj.variables.values():
-                    for var in var_list:
-                        defined_variables.add(var.name)
-                        variable_instances.setdefault(var.name, []).append(var)
-
-    # Object variables (for modifiers, base classes, etc.)
-    if hasattr(cls, "object_variables") and cls.object_variables:
-        for var_list in cls.object_variables.values():
-            for var in var_list:
-                defined_variables.add(var.name)
-                variable_instances.setdefault(var.name, []).append(var)
+    for var in iter_defined_variables(cls):
+        defined_variables.add(var.name)
+        variable_instances.setdefault(var.name, []).append(var)
 
     # Collect all software spec names (including inherited ones), package names,
     # and required packages
@@ -447,226 +694,21 @@ def analyze_object(name, obj_type):
     all_referenced_names = set()
     broken_template_refs = set()
 
-    # Extract from executables templates
-    if hasattr(cls, "executables") and cls.executables:
-        for execs_dict in cls.executables.values():
-            for exec_obj in execs_dict.values():
-                templates = (
-                    exec_obj.template
-                    if isinstance(exec_obj.template, list)
-                    else [exec_obj.template]
-                )
-                for t in templates:
-                    refs = extract_referenced_names(t)
-                    all_referenced_names.update(refs)
-                    for r in refs:
-                        if not is_valid_reference(
-                            r,
-                            defined_variables,
-                            defined_inputs,
-                            defined_software_specs,
-                            cleaned_code,
-                        ):
-                            broken_template_refs.add(r)
-
-    # Extract from variables default values
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            for wl_obj in app_workloads.values():
-                for var_list in wl_obj.variables.values():
-                    for var in var_list:
-                        refs = extract_referenced_names(str(var.default))
-                        all_referenced_names.update(refs)
-                        for r in refs:
-                            if not is_valid_reference(
-                                r,
-                                defined_variables,
-                                defined_inputs,
-                                defined_software_specs,
-                                cleaned_code,
-                            ):
-                                broken_template_refs.add(r)
-
-    if hasattr(cls, "object_variables") and cls.object_variables:
-        for var_list in cls.object_variables.values():
-            for var in var_list:
-                refs = extract_referenced_names(str(var.default))
-                all_referenced_names.update(refs)
-                for r in refs:
-                    if not is_valid_reference(
-                        r, defined_variables, defined_inputs, defined_software_specs, cleaned_code
-                    ):
-                        broken_template_refs.add(r)
-
-    # Extract from object environment variables
-    if hasattr(cls, "object_environment_variables") and cls.object_environment_variables:
-        for env_vars_list in cls.object_environment_variables.values():
-            for env_var in env_vars_list:
-                refs = set()
-                if env_var.name:
-                    refs.update(extract_referenced_names(env_var.name))
-                if env_var.value:
-                    refs.update(extract_referenced_names(str(env_var.value)))
-                all_referenced_names.update(refs)
-                for r in refs:
-                    if not is_valid_reference(
-                        r,
-                        defined_variables,
-                        defined_inputs,
-                        defined_software_specs,
-                        cleaned_code,
-                    ):
-                        broken_template_refs.add(r)
-
-    # Extract from workload group environment variables
-    if hasattr(cls, "workload_group_env_vars") and cls.workload_group_env_vars:
-        for env_vars_list in cls.workload_group_env_vars.values():
-            for env_var in env_vars_list:
-                refs = set()
-                if env_var.name:
-                    refs.update(extract_referenced_names(env_var.name))
-                if env_var.value:
-                    refs.update(extract_referenced_names(str(env_var.value)))
-                all_referenced_names.update(refs)
-                for r in refs:
-                    if not is_valid_reference(
-                        r,
-                        defined_variables,
-                        defined_inputs,
-                        defined_software_specs,
-                        cleaned_code,
-                    ):
-                        broken_template_refs.add(r)
-
-    # Extract from workload environment variables
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            for wl_obj in app_workloads.values():
-                if hasattr(wl_obj, "environment_variables") and wl_obj.environment_variables:
-                    for env_vars_list in wl_obj.environment_variables.values():
-                        for env_var in env_vars_list:
-                            refs = set()
-                            if env_var.name:
-                                refs.update(extract_referenced_names(env_var.name))
-                            if env_var.value:
-                                refs.update(extract_referenced_names(str(env_var.value)))
-                            all_referenced_names.update(refs)
-                            for r in refs:
-                                if not is_valid_reference(
-                                    r,
-                                    defined_variables,
-                                    defined_inputs,
-                                    defined_software_specs,
-                                    cleaned_code,
-                                ):
-                                    broken_template_refs.add(r)
-
-    # Extract from inputs url/description
-    if hasattr(cls, "inputs") and cls.inputs:
-        for inputs_dict in cls.inputs.values():
-            for input_obj in inputs_dict.values():
-                url = None
-                if hasattr(input_obj, "url"):
-                    url = input_obj.url
-                elif isinstance(input_obj, dict) and "url" in input_obj:
-                    url = input_obj["url"]
-                if url:
-                    refs = extract_referenced_names(url)
-                    all_referenced_names.update(refs)
-                    for r in refs:
-                        if not is_valid_reference(
-                            r,
-                            defined_variables,
-                            defined_inputs,
-                            defined_software_specs,
-                            cleaned_code,
-                        ):
-                            broken_template_refs.add(r)
-
-    # Extract from figures of merit log_file
-    if hasattr(cls, "figures_of_merit") and cls.figures_of_merit:
-        for contexts_dict in cls.figures_of_merit.values():
-            for foms_dict in contexts_dict.values():
-                for fom_val in foms_dict.values():
-                    fom_captures: set[str] = set()
-                    if isinstance(fom_val, dict) and "fom_regex" in fom_val:
-                        try:
-                            fom_captures.update(re.compile(fom_val["fom_regex"]).groupindex.keys())
-                        except re.error as e:
-                            logger.warn(
-                                "Invalid regex for figure of merit: "
-                                f"{fom_val['fom_regex']}. Error: {e}"
-                            )
-                    if isinstance(fom_val, dict):
-                        if "log_file" in fom_val:
-                            refs = extract_referenced_names(fom_val["log_file"])
-                            all_referenced_names.update(refs)
-                            for r in refs:
-                                if not is_valid_reference(
-                                    r,
-                                    defined_variables,
-                                    defined_inputs,
-                                    defined_software_specs,
-                                    cleaned_code,
-                                    fom_captures,
-                                ):
-                                    broken_template_refs.add(r)
-
-    # Extract from success criteria files/formulas
-    if hasattr(cls, "success_criteria") and cls.success_criteria:
-        for criteria_dict in cls.success_criteria.values():
-            if isinstance(criteria_dict, dict):
-                if "file" in criteria_dict:
-                    refs = extract_referenced_names(criteria_dict["file"])
-                    all_referenced_names.update(refs)
-                    for r in refs:
-                        if not is_valid_reference(
-                            r,
-                            defined_variables,
-                            defined_inputs,
-                            defined_software_specs,
-                            cleaned_code,
-                        ):
-                            broken_template_refs.add(r)
-                if "formula" in criteria_dict:
-                    refs = extract_referenced_names(criteria_dict["formula"])
-                    all_referenced_names.update(refs)
-                    for r in refs:
-                        if criteria_dict.get("mode") == "fom_comparison" and r == "value":
-                            continue
-                        if not is_valid_reference(
-                            r,
-                            defined_variables,
-                            defined_inputs,
-                            defined_software_specs,
-                            cleaned_code,
-                        ):
-                            broken_template_refs.add(r)
-
-    # Extract from registered templates
-    if hasattr(cls, "templates") and cls.templates:
-        for templates_dict in cls.templates.values():
-            for tpl_config in templates_dict.values():
-                src_path_config = tpl_config.get("src_path")
-                if src_path_config:
-                    tpl_file = find_template_file(cls, src_path_config, obj_path)
-                    if tpl_file:
-                        try:
-                            with open(tpl_file, encoding="utf-8") as f_tpl:
-                                tpl_content = f_tpl.read()
-                            refs = extract_referenced_names(tpl_content)
-                            all_referenced_names.update(refs)
-                            for r in refs:
-                                if not is_valid_reference(
-                                    r,
-                                    defined_variables,
-                                    defined_inputs,
-                                    defined_software_specs,
-                                    cleaned_code,
-                                ):
-                                    broken_template_refs.add(r)
-                        except Exception:
-                            pass
+    for tpl_str, fom_captures, ignore_names in iter_object_template_strings(cls, obj_path):
+        refs = extract_referenced_names(tpl_str)
+        all_referenced_names.update(refs)
+        for r in refs:
+            if ignore_names and r in ignore_names:
+                continue
+            if not is_valid_reference(
+                r,
+                defined_variables,
+                defined_inputs,
+                defined_software_specs,
+                cleaned_code,
+                fom_captures,
+            ):
+                broken_template_refs.add(r)
 
     # 5. Extract workload relationships (executables and inputs used directly in workloads)
     used_executables = set()
@@ -685,49 +727,32 @@ def analyze_object(name, obj_type):
             used_inputs.add(name)
 
     unused_variables = []
-    for var in sorted(defined_variables):
-        if var in all_referenced_names:
+    for var in count_unreferenced_items(
+        defined_variables,
+        all_referenced_names,
+        ["workload_variable", "variable"],
+        cleaned_code,
+    ):
+        v_instances = variable_instances.get(var, [])
+        if v_instances and all(getattr(v, "when", None) for v in v_instances):
             continue
-        occurrences = len(re.findall(rf"\b{re.escape(var)}\b", cleaned_code))
-        defs = len(
-            re.findall(
-                rf'(?:workload_variable|variable)\s*\(\s*[\'"]{re.escape(var)}[\'"]', cleaned_code
-            )
-        )
-        if occurrences <= defs:
-            v_instances = variable_instances.get(var, [])
-            if v_instances and all(getattr(v, "when", None) for v in v_instances):
-                continue
-            unused_variables.append(var)
+        unused_variables.append(var)
 
     # For each defined input, check if it's used
-    unused_inputs = []
-    for inp in sorted(defined_inputs):
-        if inp in used_inputs:
-            continue
-        occurrences = len(re.findall(rf"\b{re.escape(inp)}\b", cleaned_code))
-        defs = len(re.findall(rf'input_file\s*\(\s*[\'"]{re.escape(inp)}[\'"]', cleaned_code))
-        if occurrences <= defs:
-            unused_inputs.append(inp)
+    unused_inputs = count_unreferenced_items(
+        defined_inputs,
+        used_inputs,
+        ["input_file"],
+        cleaned_code,
+    )
 
     # For each defined executable, check if it's used
-    unused_executables = []
-    for exe in sorted(defined_executables):
-        if exe in used_executables:
-            continue
-        occurrences = len(re.findall(rf"\b{re.escape(exe)}\b", cleaned_code))
-        defs = (
-            len(re.findall(rf'executable\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code))
-            + len(re.findall(rf'edit_file\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code))
-            + len(re.findall(rf'patch_file\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code))
-            + len(
-                re.findall(
-                    rf'formatted_executable\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code
-                )
-            )
-        )
-        if occurrences <= defs:
-            unused_executables.append(exe)
+    unused_executables = count_unreferenced_items(
+        defined_executables,
+        used_executables,
+        ["executable", "edit_file", "patch_file", "formatted_executable"],
+        cleaned_code,
+    )
 
     # Statically parse class body to find unused compilers, broken variables, and workload groups
     unused_compilers = []
@@ -735,94 +760,25 @@ def analyze_object(name, obj_type):
     broken_groups = []
 
     if tree:
-        class_node = None
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef):
-                class_node = node
-                break
+        for _node, call, func_name, _category, first_val in iter_class_directive_calls(tree):
+            if func_name == "define_compiler" and first_val:
+                if first_val not in all_referenced_compilers:
+                    occurrences = len(re.findall(rf"\b{re.escape(first_val)}\b", cleaned_code))
+                    pattern = rf"define_compiler\s*\(\s*[\'\"]{re.escape(first_val)}[\'\"]"
+                    defs = len(re.findall(pattern, cleaned_code))
+                    if occurrences <= defs:
+                        unused_compilers.append(first_val)
 
-        if class_node:
-            for node in class_node.body:
-                if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
-                    call = node.value
-                    if isinstance(call.func, ast.Name):
-                        func_name = call.func.id
+            elif func_name in ("workload_variable", "variable"):
+                if first_val and is_variable_reference_broken(
+                    call, all_defined_workloads, all_defined_workload_groups
+                ):
+                    broken_vars.append(first_val)
 
-                        # Compiler check
-                        if func_name == "define_compiler" and call.args:
-                            compiler_name = get_arg_value(call.args[0])
-                            if compiler_name and compiler_name not in all_referenced_compilers:
-                                occurrences = len(
-                                    re.findall(rf"\b{re.escape(compiler_name)}\b", cleaned_code)
-                                )
-                                pattern = (
-                                    rf"define_compiler\s*\(\s*[\'\"]"
-                                    rf"{re.escape(compiler_name)}[\'\"]"
-                                )
-                                defs = len(re.findall(pattern, cleaned_code))
-                                if occurrences <= defs:
-                                    unused_compilers.append(compiler_name)
-
-                        # Variable broken workload/group reference check
-                        elif func_name in ("workload_variable", "variable"):
-                            is_broken = False
-                            var_name = get_arg_value(call.args[0]) if call.args else None
-                            for kw in call.keywords:
-                                if kw.arg == "workload":
-                                    wl_val = get_arg_value(kw.value)
-                                    if (
-                                        wl_val
-                                        and wl_val != "*"
-                                        and not any(
-                                            fnmatch.fnmatch(w, wl_val)
-                                            for w in all_defined_workloads
-                                        )
-                                    ):
-                                        is_broken = True
-                                elif kw.arg == "workload_group":
-                                    wg_val = get_arg_value(kw.value)
-                                    if (
-                                        wg_val
-                                        and wg_val != "*"
-                                        and not any(
-                                            fnmatch.fnmatch(g, wg_val)
-                                            for g in all_defined_workload_groups
-                                        )
-                                    ):
-                                        is_broken = True
-                                elif kw.arg == "workloads":
-                                    if isinstance(kw.value, ast.List):
-                                        for elt in kw.value.elts:
-                                            wl_val = get_arg_value(elt)
-                                            if (
-                                                wl_val
-                                                and wl_val != "*"
-                                                and not any(
-                                                    fnmatch.fnmatch(w, wl_val)
-                                                    for w in all_defined_workloads
-                                                )
-                                            ):
-                                                is_broken = True
-                            if is_broken and var_name:
-                                broken_vars.append(var_name)
-
-                        # Workload group broken workload reference check
-                        elif func_name == "workload_group":
-                            group_name = get_arg_value(call.args[0]) if call.args else None
-                            for kw in call.keywords:
-                                if kw.arg == "workloads":
-                                    if isinstance(kw.value, ast.List):
-                                        for elt in kw.value.elts:
-                                            wl_val = get_arg_value(elt)
-                                            if (
-                                                wl_val
-                                                and wl_val != "*"
-                                                and not any(
-                                                    fnmatch.fnmatch(w, wl_val)
-                                                    for w in all_defined_workloads
-                                                )
-                                            ):
-                                                broken_groups.append(f"{group_name} -> {wl_val}")
+            elif func_name == "workload_group":
+                broken_groups.extend(
+                    check_broken_workload_groups(call, first_val, all_defined_workloads)
+                )
 
     return (
         unused_variables,
@@ -833,6 +789,70 @@ def analyze_object(name, obj_type):
         broken_groups,
         sorted(broken_template_refs),
     )
+
+
+def is_subclass_by_name(sub_cls, parent_cls):
+    parent_qname = f"{parent_cls.__module__}.{parent_cls.__name__}"
+    for base in sub_cls.__mro__:
+        base_qname = f"{base.__module__}.{base.__name__}"
+        if base_qname == parent_qname:
+            return True
+    return False
+
+
+def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_results):
+    """Compute proposed moves from parent classes to subclasses that use them."""
+    proposed_moves = {}
+    insertions = {}
+
+    category_map = {
+        "variables": 0,
+        "inputs": 1,
+        "executables": 2,
+        "compilers": 3,
+    }
+
+    for name in all_names:
+        if name not in local_defs or name not in analysis_results:
+            continue
+
+        subclasses = subclasses_map.get(name, [])
+        if not subclasses:
+            continue
+
+        for category, res_idx in category_map.items():
+            local_category_defs = local_defs[name][category]
+            unused_list = analysis_results[name][res_idx]
+
+            for item_name, (_start, _end, source_text) in local_category_defs.items():
+                if item_name in unused_list:
+                    using_subclasses = []
+                    for child_name in subclasses:
+                        if child_name not in analysis_results:
+                            continue
+
+                        child_unused = analysis_results[child_name][res_idx]
+                        if (item_name not in child_unused) and (
+                            item_name not in local_defs[child_name][category]
+                        ):
+                            using_subclasses.append(child_name)
+
+                    if using_subclasses:
+                        proposed_moves.setdefault(name, {}).setdefault(category, []).append(
+                            (item_name, using_subclasses, source_text)
+                        )
+                        for child_name in using_subclasses:
+                            insertions.setdefault(child_name, []).append(
+                                (category, item_name, source_text)
+                            )
+                        if item_name in analysis_results[name][res_idx]:
+                            analysis_results[name][res_idx].remove(item_name)
+                        for child_name in subclasses:
+                            if child_name in analysis_results:
+                                if item_name in analysis_results[child_name][res_idx]:
+                                    analysis_results[child_name][res_idx].remove(item_name)
+
+    return proposed_moves, insertions
 
 
 def setup_parser(subparser):
@@ -890,6 +910,38 @@ def simplify(parser, args):
         else:
             names = obj_path.all_object_names()
 
+    # Pre-analyze all objects in the repository to build global maps
+    all_names = obj_path.all_object_names()
+    global_classes = {}
+    local_defs = {}
+    analysis_results = {}
+    analysis_errors = {}
+
+    for name in all_names:
+        try:
+            cls = obj_path.get_obj_class(name)
+            file_path = obj_path.filename_for_object_name(name)
+            global_classes[name] = cls
+            local_defs[name] = parse_local_definitions(file_path)
+            analysis_results[name] = list(analyze_object(name, obj_type))
+        except Exception as e:
+            analysis_errors[name] = e
+            logger.debug(f"Error pre-analyzing {name}: {e}")
+
+    subclasses_map = {}
+    for name, cls in global_classes.items():
+        subclasses = [
+            other_name
+            for other_name, other_cls in global_classes.items()
+            if other_cls is not cls and is_subclass_by_name(other_cls, cls)
+        ]
+        subclasses_map[name] = subclasses
+
+    # Compute proposed moves and insertions
+    proposed_moves, insertions = compute_proposed_moves(
+        all_names, subclasses_map, local_defs, analysis_results
+    )
+
     total_unused_vars = 0
     total_unused_inputs = 0
     total_unused_execs = 0
@@ -897,8 +949,12 @@ def simplify(parser, args):
     total_broken_vars = 0
 
     for name in sorted(names):
+        if name in analysis_errors:
+            logger.warn(f"Error analyzing {name}: {analysis_errors[name]}")
+            continue
+
         try:
-            res = analyze_object(name, obj_type)
+            res = analysis_results.get(name) or list(analyze_object(name, obj_type))
             (
                 unused_vars,
                 unused_inputs,
@@ -909,6 +965,9 @@ def simplify(parser, args):
                 broken_templates,
             ) = res
 
+            has_moves = name in proposed_moves
+            has_insertions = name in insertions
+
             if (
                 unused_vars
                 or unused_inputs
@@ -917,6 +976,8 @@ def simplify(parser, args):
                 or broken_vars
                 or broken_groups
                 or broken_templates
+                or has_moves
+                or has_insertions
             ):
                 file_path = obj_path.filename_for_object_name(name)
                 color.cprint(f"@c{{=== {args.type.capitalize().rstrip('s')}: {name} ===}}")
@@ -940,19 +1001,39 @@ def simplify(parser, args):
                 if broken_templates:
                     print(f"  Broken Variable References in Templates: {broken_templates}")
 
-                # Locate line ranges to remove (including compilers and broken variables)
+                if has_moves:
+                    print("  Move to Subclasses:")
+                    for category, category_moves in proposed_moves[name].items():
+                        for item_name, targets, _ in category_moves:
+                            cat_singular = category.capitalize().rstrip("s")
+                            print(f"    {cat_singular}: {item_name} -> {targets}")
+
+                if has_insertions:
+                    print("  Move from Parents:")
+                    for category, item_name, _ in insertions[name]:
+                        print(f"    {category.capitalize().rstrip('s')}: {item_name}")
+
+                moved_by_category = {
+                    cat: [item[0] for item in proposed_moves.get(name, {}).get(cat, [])]
+                    for cat in ("variables", "inputs", "executables", "compilers")
+                }
+
+                # Locate line ranges to remove (including compilers,
+                # broken variables, and moved ones)
                 ranges = locate_directive_lines(
                     file_path,
-                    unused_vars,
-                    unused_inputs,
-                    unused_execs,
-                    unused_compilers,
+                    unused_vars + moved_by_category["variables"],
+                    unused_inputs + moved_by_category["inputs"],
+                    unused_execs + moved_by_category["executables"],
+                    unused_compilers + moved_by_category["compilers"],
                     broken_vars,
                 )
 
-                if ranges:
+                pending_insertions = insertions.get(name, [])
+
+                if ranges or pending_insertions:
                     original_lines, new_lines, new_content = apply_simplifications(
-                        file_path, ranges
+                        file_path, ranges, pending_insertions
                     )
 
                     if args.diff:

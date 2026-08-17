@@ -110,6 +110,12 @@ class DirectiveMeta(abc.ABCMeta):
     push_default_args = _push_default_args
     pop_default_args = _pop_default_args
 
+    @classmethod
+    def _reset_staging(cls):
+        cls._directives_to_be_executed.clear()
+        cls._when_constraints_from_context.clear()
+        cls._default_args.clear()
+
     def __new__(cls, name, bases, attr_dict):
         # Initialize the attribute containing the list of directives
         # to be executed. Here we go reversed because we want to execute
