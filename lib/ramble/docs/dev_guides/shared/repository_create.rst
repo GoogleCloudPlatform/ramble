@@ -104,7 +104,8 @@ Common object type abbreviations include:
 * ``sys`` or ``system`` for systems
 * ``plat`` or ``platform`` for platforms
 
+Base objects can be referenced with the ``base_<type_abbrev>`` prefix.
+
 These namespaced specs can be used in CLI commands (e.g., ``ramble info <spec>``,
 ``ramble edit <spec>``, ``ramble create <spec>``) and in workspace configuration files
 (``ramble.yaml``) under the ``applications:`` and ``environments:`` sections.
-
