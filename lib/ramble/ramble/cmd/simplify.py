@@ -15,6 +15,8 @@ import os
 import re
 import sys
 import tokenize
+from dataclasses import dataclass, field
+from typing import List
 
 import ramble.keywords
 import ramble.repository
@@ -40,9 +42,68 @@ _ALLOWED_MATH_NAMES = frozenset(
     + ["True", "False", "None"]
 )
 _RESERVED_PATTERNS = tuple(ramble.keywords.Keywords().reserved_patterns)
-_DOCSTRING_REGEX = re.compile(r'""".*?"""|\'\'\'.*?\'\'\'', flags=re.DOTALL)
-_COMMENT_REGEX = re.compile(r"#.*")
-_TEMPLATE_VAR_REGEX = re.compile(r"\{[a-zA-Z0-9_:-]+\}")
+
+
+@dataclass
+class ObjectAnalysis:
+    """Stores the analysis findings for a Ramble object definition."""
+
+    unused_variables: List[str] = field(default_factory=list)
+    unused_inputs: List[str] = field(default_factory=list)
+    unused_executables: List[str] = field(default_factory=list)
+    unused_compilers: List[str] = field(default_factory=list)
+    broken_vars: List[str] = field(default_factory=list)
+    broken_groups: List[str] = field(default_factory=list)
+    broken_templates: List[str] = field(default_factory=list)
+
+    def has_issues(self) -> bool:
+        return bool(
+            self.unused_variables
+            or self.unused_inputs
+            or self.unused_executables
+            or self.unused_compilers
+            or self.broken_vars
+            or self.broken_groups
+            or self.broken_templates
+        )
+
+    def get_category_unused(self, category: str) -> List[str]:
+        mapping = {
+            "variables": self.unused_variables,
+            "inputs": self.unused_inputs,
+            "executables": self.unused_executables,
+            "compilers": self.unused_compilers,
+        }
+        return mapping.get(category, [])
+
+    def __iter__(self):
+        return iter(
+            (
+                self.unused_variables,
+                self.unused_inputs,
+                self.unused_executables,
+                self.unused_compilers,
+                self.broken_vars,
+                self.broken_groups,
+                self.broken_templates,
+            )
+        )
+
+
+def _extract_ast_names(node, parent=None):
+    """Recursively extract variable and attribute names from an AST node."""
+    r = set()
+    if isinstance(node, ast.Name):
+        if not (isinstance(parent, ast.Attribute) and node is parent.value):
+            r.add(node.id)
+    elif isinstance(node, ast.Attribute):
+        if not (isinstance(parent, ast.Attribute) and node is parent.value):
+            r.add(node.attr)
+        r.update(_extract_ast_names(node.value, parent=node))
+    else:
+        for child in ast.iter_child_nodes(node):
+            r.update(_extract_ast_names(child, parent=node))
+    return r
 
 
 def extract_referenced_names(template_str):
@@ -65,7 +126,7 @@ def extract_referenced_names(template_str):
             stack = []
 
         if char == "\\":
-            escaped = True
+            escaped = not escaped
         else:
             escaped = False
 
@@ -78,26 +139,7 @@ def extract_referenced_names(template_str):
         ast_content = content.replace("::", ".")
         try:
             tree = ast.parse(ast_content, mode="eval")
-
-            def get_refs(node, parent=None):
-                r = set()
-                if isinstance(node, ast.Name):
-                    if isinstance(parent, ast.Attribute) and node is parent.value:
-                        pass
-                    else:
-                        r.add(node.id)
-                elif isinstance(node, ast.Attribute):
-                    if isinstance(parent, ast.Attribute) and node is parent.value:
-                        pass
-                    else:
-                        r.add(node.attr)
-                    r.update(get_refs(node.value, parent=node))
-                else:
-                    for child in ast.iter_child_nodes(node):
-                        r.update(get_refs(child, parent=node))
-                return r
-
-            referenced.update(get_refs(tree.body))
+            referenced.update(_extract_ast_names(tree.body))
         except SyntaxError:
             # Fallback to regex-based extraction if syntax is not valid Python
             words = re.findall(r"[a-zA-Z0-9_:-]+", content)
@@ -162,110 +204,103 @@ def get_nested_dict_keys(cls, attr_name):
     return keys
 
 
-def iter_nested_dict_values(cls, attr_name):
-    """Yield all inner values from a 2-level dictionary attribute."""
-    nested_dict = getattr(cls, attr_name, None)
-    if nested_dict:
-        for inner in nested_dict.values():
-            if isinstance(inner, dict):
-                yield from inner.values()
+def iter_leaf_values(container):
+    """Recursively yield all leaf entities (objects or entity dicts) from
+    arbitrarily nested dictionaries or iterables."""
+    if isinstance(container, dict):
+        for val in container.values():
+            if isinstance(val, dict):
+                if any(
+                    k in val for k in ("log_file", "formula", "src_path", "url", "mode", "match")
+                ):
+                    yield val
+                else:
+                    yield from iter_leaf_values(val)
+            elif isinstance(val, (list, tuple)):
+                yield from val
+            elif val is not None:
+                yield val
+
+
+def iter_nested_values(cls, attr_name):
+    """Yield all leaf values from a nested dictionary attribute on a class."""
+    root = getattr(cls, attr_name, None)
+    if root:
+        yield from iter_leaf_values(root)
 
 
 def iter_defined_variables(cls):
     """Yield all variable instances defined on an object class."""
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            for wl_obj in app_workloads.values():
-                for var_list in wl_obj.variables.values():
-                    yield from var_list
+    for wl in iter_nested_values(cls, "workloads"):
+        if hasattr(wl, "variables") and wl.variables:
+            yield from iter_leaf_values(wl.variables)
 
-    if hasattr(cls, "object_variables") and cls.object_variables:
-        for var_list in cls.object_variables.values():
-            yield from var_list
+    yield from iter_nested_values(cls, "object_variables")
 
 
 def iter_object_template_strings(cls, obj_path=None):
     """Yield (template_str, fom_captures, ignore_names) for all templates in an object."""
     # Executables
-    for exec_obj in iter_nested_dict_values(cls, "executables"):
-        templates = (
-            exec_obj.template if isinstance(exec_obj.template, list) else [exec_obj.template]
-        )
-        for t in templates:
-            yield (t, None, None)
+    for exec_obj in iter_nested_values(cls, "executables"):
+        template = getattr(exec_obj, "template", None)
+        if template:
+            templates = template if isinstance(template, list) else [template]
+            for t in templates:
+                yield (t, None, None)
 
     # Workload and object variables
     for var in iter_defined_variables(cls):
         yield (str(var.default), None, None)
 
     # Environment variables (object, workload group, workload level)
-    env_sources = []
-    if hasattr(cls, "object_environment_variables") and cls.object_environment_variables:
-        env_sources.append(cls.object_environment_variables.values())
-    if hasattr(cls, "workload_group_env_vars") and cls.workload_group_env_vars:
-        env_sources.append(cls.workload_group_env_vars.values())
-    if hasattr(cls, "workloads") and cls.workloads:
-        for app_workloads in cls.workloads.values():
-            env_sources.extend(
-                wl_obj.environment_variables.values()
-                for wl_obj in app_workloads.values()
-                if getattr(wl_obj, "environment_variables", None)
-            )
+    for attr in ("object_environment_variables", "workload_group_env_vars"):
+        for env_var in iter_nested_values(cls, attr):
+            if getattr(env_var, "name", None):
+                yield (env_var.name, None, None)
+            if getattr(env_var, "value", None):
+                yield (str(env_var.value), None, None)
 
-    for source in env_sources:
-        for env_vars_list in source:
-            for env_var in env_vars_list:
-                if env_var.name:
+    for wl in iter_nested_values(cls, "workloads"):
+        if hasattr(wl, "environment_variables") and wl.environment_variables:
+            for env_var in iter_leaf_values(wl.environment_variables):
+                if getattr(env_var, "name", None):
                     yield (env_var.name, None, None)
-                if env_var.value:
+                if getattr(env_var, "value", None):
                     yield (str(env_var.value), None, None)
 
     # Inputs
-    for input_obj in iter_nested_dict_values(cls, "inputs"):
-        url = getattr(input_obj, "url", None)
-        if url is None and isinstance(input_obj, dict):
-            url = input_obj.get("url")
+    for input_obj in iter_nested_values(cls, "inputs"):
+        url = getattr(input_obj, "url", None) or (
+            input_obj.get("url") if isinstance(input_obj, dict) else None
+        )
         if url:
             yield (url, None, None)
 
     # Figures of merit
-    if hasattr(cls, "figures_of_merit") and cls.figures_of_merit:
-        for contexts_dict in cls.figures_of_merit.values():
-            for foms_dict in contexts_dict.values():
-                for fom_val in foms_dict.values():
-                    if isinstance(fom_val, dict):
-                        fom_captures = set()
-                        if "fom_regex" in fom_val:
-                            try:
-                                fom_captures.update(
-                                    re.compile(fom_val["fom_regex"]).groupindex.keys()
-                                )
-                            except re.error as e:
-                                logger.warn(
-                                    "Invalid regex for figure of merit: "
-                                    f"{fom_val['fom_regex']}. Error: {e}"
-                                )
-                        if "log_file" in fom_val:
-                            yield (fom_val["log_file"], fom_captures, None)
+    for fom_val in iter_nested_values(cls, "figures_of_merit"):
+        if isinstance(fom_val, dict):
+            fom_captures = set()
+            if "fom_regex" in fom_val:
+                try:
+                    fom_captures.update(re.compile(fom_val["fom_regex"]).groupindex.keys())
+                except re.error as e:
+                    logger.warn(
+                        "Invalid regex for figure of merit: " f"{fom_val['fom_regex']}. Error: {e}"
+                    )
+            if "log_file" in fom_val:
+                yield (fom_val["log_file"], fom_captures, None)
 
     # Success criteria
-    if hasattr(cls, "success_criteria") and cls.success_criteria:
-        for when_dict in cls.success_criteria.values():
-            if isinstance(when_dict, dict):
-                for criteria_dict in when_dict.values():
-                    if isinstance(criteria_dict, dict):
-                        if "file" in criteria_dict:
-                            yield (criteria_dict["file"], None, None)
-                        if "formula" in criteria_dict:
-                            ignore = (
-                                {"value"}
-                                if criteria_dict.get("mode") == "fom_comparison"
-                                else None
-                            )
-                            yield (criteria_dict["formula"], None, ignore)
+    for criteria_dict in iter_nested_values(cls, "success_criteria"):
+        if isinstance(criteria_dict, dict):
+            if "file" in criteria_dict:
+                yield (criteria_dict["file"], None, None)
+            if "formula" in criteria_dict:
+                ignore = {"value"} if criteria_dict.get("mode") == "fom_comparison" else None
+                yield (criteria_dict["formula"], None, ignore)
 
     # Registered templates
-    for tpl_config in iter_nested_dict_values(cls, "templates"):
+    for tpl_config in iter_nested_values(cls, "templates"):
         src_path_config = tpl_config.get("src_path") if isinstance(tpl_config, dict) else None
         if src_path_config:
             tpl_file = find_template_file(cls, src_path_config, obj_path)
@@ -277,38 +312,138 @@ def iter_object_template_strings(cls, obj_path=None):
                     pass
 
 
-def clean_source_code(source_code):
-    """Strip comments, docstrings, and template braces from source code."""
-    cleaned = _COMMENT_REGEX.sub("", source_code)
-    cleaned = _DOCSTRING_REGEX.sub("", cleaned)
-    return _TEMPLATE_VAR_REGEX.sub("", cleaned)
-
-
-def count_unreferenced_items(items, used_set, def_patterns, cleaned_code):
-    """Find items not in used_set that are only referenced in their definitions."""
-    unused = []
-    pattern_prefix = r"\b(?:" + "|".join(def_patterns) + r")"
-    for item in sorted(items):
-        if item in used_set:
-            continue
-        occurrences = len(re.findall(rf"\b{re.escape(item)}\b", cleaned_code))
-        defs = len(
-            re.findall(
-                rf'{pattern_prefix}\s*\(\s*[\'"]{re.escape(item)}[\'"]',
-                cleaned_code,
-            )
-        )
-        if occurrences <= defs:
-            unused.append(item)
-    return unused
-
-
 def get_arg_value(arg_node):
     if isinstance(arg_node, ast.Constant):
         return arg_node.value
-    if hasattr(ast, "Str") and isinstance(arg_node, ast.Str):
+    if sys.version_info < (3, 8) and isinstance(arg_node, getattr(ast, "Str", ())):
         return arg_node.s
     return None
+
+
+def _collect_node_refs(node, refs):
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name):
+            refs.add(child.id)
+        elif isinstance(child, ast.Attribute):
+            refs.add(child.attr)
+        else:
+            val = get_arg_value(child)
+            if isinstance(val, str):
+                refs.add(val)
+
+
+ALL_DIRECTIVE_NAMES = frozenset(
+    {
+        "archive_pattern",
+        "auxiliary_software_file",
+        "available_platforms",
+        "bootstrappable",
+        "class_family",
+        "class_variant",
+        "cleanup",
+        "command_variable",
+        "conflict",
+        "default_mode",
+        "default_package_manager",
+        "default_platform",
+        "default_workflow_manager",
+        "define_compiler",
+        "edit_file",
+        "env_append",
+        "env_prepend",
+        "env_set",
+        "env_source",
+        "env_var",
+        "env_var_modification",
+        "environment_variable",
+        "environment_variables",
+        "executable",
+        "executable_modifier",
+        "export_env_var",
+        "fetch_mapping",
+        "figure_of_merit",
+        "figure_of_merit_context",
+        "formatted_executable",
+        "input_file",
+        "known_version",
+        "license_name",
+        "maintainers",
+        "missing_error_message",
+        "mode",
+        "modifier",
+        "modifier_conflict",
+        "modifier_variable",
+        "package_manager",
+        "package_manager_config",
+        "package_manager_family",
+        "package_manager_requirement",
+        "package_manager_variable",
+        "patch_file",
+        "platform_family",
+        "platform_variable_map",
+        "provides_executable",
+        "register_builtin",
+        "register_phase",
+        "register_template",
+        "register_validator",
+        "required_package",
+        "required_utility",
+        "required_variable",
+        "requires_utility",
+        "runner",
+        "runner_executable",
+        "script_to_source",
+        "software_spec",
+        "source_script",
+        "stage_files",
+        "strict_versions",
+        "success_criteria",
+        "system_family",
+        "tag",
+        "tags",
+        "target_shells",
+        "template_file",
+        "validation_variable",
+        "variable",
+        "variable_defaults",
+        "variable_modification",
+        "variant",
+        "version",
+        "workflow_manager_family",
+        "workflow_manager_variable",
+        "workload",
+        "workload_group",
+        "workload_variable",
+    }
+)
+
+
+def extract_python_refs(trees):
+    """Extract identifier names, attribute names, and string constants
+    from Python methods and custom code."""
+    refs = set()
+    for tree in trees:
+        if not tree:
+            continue
+
+        def _process_statement_list(stmts):
+            for item in stmts:
+                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    _collect_node_refs(item, refs)
+                elif isinstance(item, ast.ClassDef):
+                    _process_statement_list(item.body)
+                elif isinstance(item, ast.With):
+                    _process_statement_list(item.body)
+                elif isinstance(item, ast.Expr) and isinstance(item.value, ast.Call):
+                    call = item.value
+                    if isinstance(call.func, ast.Name) and call.func.id in ALL_DIRECTIVE_NAMES:
+                        continue
+                    _collect_node_refs(item, refs)
+                elif not isinstance(item, (ast.Import, ast.ImportFrom, ast.Expr)):
+                    _collect_node_refs(item, refs)
+
+        _process_statement_list(tree.body)
+    return refs
 
 
 def get_node_end_lineno(node, file_lines=None):
@@ -506,7 +641,7 @@ def is_valid_reference(
     all_defined_variables,
     defined_inputs,
     defined_software_specs,
-    source_code,
+    python_refs=None,
     fom_captures=None,
 ):
     if (
@@ -516,12 +651,12 @@ def is_valid_reference(
         or var_name in ramble.keywords.default_keys
         or (fom_captures and var_name in fom_captures)
         or var_name in _ALLOWED_MATH_NAMES
+        or (python_refs and var_name in python_refs)
         or any(pat.match(var_name) for pat in _RESERVED_PATTERNS)
     ):
         return True
 
-    # Strip quotes or match as literal token in source code (fallback for python references)
-    return bool(re.search(r"\b" + re.escape(var_name) + r"\b", source_code))
+    return False
 
 
 def _matches_any_pattern(val, defined_items):
@@ -566,18 +701,18 @@ def analyze_object(name, obj_type):
 
     target_file_path = obj_path.filename_for_object_name(name)
 
-    # Collect source codes from the class and all its parent classes in ramble/
-    source_codes = []
+    # Collect source ASTs from the class and all its parent classes in ramble/
+    source_trees = []
     for parent_cls in inspect.getmro(cls):
         p_file_path = find_class_file(parent_cls, obj_path)
         if p_file_path and (parent_cls.__module__.startswith("ramble") or "ramble" in p_file_path):
             try:
                 with open(p_file_path, encoding="utf-8") as f:
-                    source_codes.append(f.read())
-            except OSError as e:
+                    source_trees.append(ast.parse(f.read()))
+            except (OSError, SyntaxError) as e:
                 logger.warn(f"Could not read source file {p_file_path}: {e}")
-    source_code = "\n".join(source_codes)
-    cleaned_code = clean_source_code(source_code)
+
+    python_refs = extract_python_refs(source_trees)
 
     # Parse AST of the target file
     try:
@@ -593,6 +728,15 @@ def analyze_object(name, obj_type):
     defined_inputs = get_nested_dict_keys(cls, "inputs")
     defined_executables = get_nested_dict_keys(cls, "executables")
     defined_variables = {var.name for var in iter_defined_variables(cls)}
+
+    if tree:
+        for _node, _call, _func_name, category, val in iter_class_directive_calls(tree):
+            if category == "variables" and val:
+                defined_variables.add(val)
+            elif category == "inputs" and val:
+                defined_inputs.add(val)
+            elif category == "executables" and val:
+                defined_executables.add(val)
 
     # Collect compilers and software specs
     all_referenced_compilers = set()
@@ -631,7 +775,7 @@ def analyze_object(name, obj_type):
                 defined_variables,
                 defined_inputs,
                 defined_software_specs,
-                cleaned_code,
+                python_refs,
                 fom_captures,
             ):
                 broken_template_refs.add(r)
@@ -650,27 +794,22 @@ def analyze_object(name, obj_type):
         if name in defined_inputs:
             used_inputs.add(name)
 
-    unused_variables = count_unreferenced_items(
-        defined_variables,
-        all_referenced_names,
-        ["workload_variable", "variable"],
-        cleaned_code,
+    unused_variables = sorted(
+        var
+        for var in defined_variables
+        if var not in all_referenced_names and var not in python_refs
     )
 
     # For each defined input, check if it's used
-    unused_inputs = count_unreferenced_items(
-        defined_inputs,
-        used_inputs,
-        ["input_file"],
-        cleaned_code,
+    unused_inputs = sorted(
+        inp for inp in defined_inputs if inp not in used_inputs and inp not in python_refs
     )
 
     # For each defined executable, check if it's used
-    unused_executables = count_unreferenced_items(
-        defined_executables,
-        used_executables,
-        ["executable", "edit_file", "patch_file", "formatted_executable"],
-        cleaned_code,
+    unused_executables = sorted(
+        exe
+        for exe in defined_executables
+        if exe not in used_executables and exe not in python_refs
     )
 
     # Statically parse class body to find unused compilers, broken variables, and workload groups
@@ -681,12 +820,8 @@ def analyze_object(name, obj_type):
     if tree:
         for _node, call, func_name, _category, first_val in iter_class_directive_calls(tree):
             if func_name == "define_compiler" and first_val:
-                if first_val not in all_referenced_compilers:
-                    occurrences = len(re.findall(rf"\b{re.escape(first_val)}\b", cleaned_code))
-                    pattern = rf"define_compiler\s*\(\s*[\'\"]{re.escape(first_val)}[\'\"]"
-                    defs = len(re.findall(pattern, cleaned_code))
-                    if occurrences <= defs:
-                        unused_compilers.append(first_val)
+                if first_val not in all_referenced_compilers and first_val not in python_refs:
+                    unused_compilers.append(first_val)
 
             elif func_name in ("workload_variable", "variable"):
                 if first_val and is_variable_reference_broken(
@@ -699,14 +834,14 @@ def analyze_object(name, obj_type):
                     check_broken_workload_groups(call, first_val, all_defined_workloads)
                 )
 
-    return (
-        unused_variables,
-        unused_inputs,
-        unused_executables,
-        unused_compilers,
-        broken_vars,
-        broken_groups,
-        sorted(broken_template_refs),
+    return ObjectAnalysis(
+        unused_variables=unused_variables,
+        unused_inputs=unused_inputs,
+        unused_executables=unused_executables,
+        unused_compilers=unused_compilers,
+        broken_vars=broken_vars,
+        broken_groups=broken_groups,
+        broken_templates=sorted(broken_template_refs),
     )
 
 
@@ -720,13 +855,6 @@ def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_resul
     proposed_moves = {}
     insertions = {}
 
-    category_map = {
-        "variables": 0,
-        "inputs": 1,
-        "executables": 2,
-        "compilers": 3,
-    }
-
     for name in all_names:
         if name not in local_defs or name not in analysis_results:
             continue
@@ -735,9 +863,9 @@ def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_resul
         if not subclasses:
             continue
 
-        for category, res_idx in category_map.items():
-            local_category_defs = local_defs[name][category]
-            unused_list = analysis_results[name][res_idx]
+        for category in ("variables", "inputs", "executables", "compilers"):
+            local_category_defs = local_defs[name].get(category, {})
+            unused_list = analysis_results[name].get_category_unused(category)
 
             for item_name, (_start, _end, source_text) in local_category_defs.items():
                 if item_name in unused_list:
@@ -745,8 +873,8 @@ def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_resul
                         child
                         for child in subclasses
                         if child in analysis_results
-                        and item_name not in analysis_results[child][res_idx]
-                        and item_name not in local_defs[child][category]
+                        and item_name not in analysis_results[child].get_category_unused(category)
+                        and item_name not in local_defs.get(child, {}).get(category, {})
                     ]
 
                     if using_subclasses:
@@ -757,12 +885,15 @@ def compute_proposed_moves(all_names, subclasses_map, local_defs, analysis_resul
                             insertions.setdefault(child_name, []).append(
                                 (category, item_name, source_text)
                             )
-                        if item_name in analysis_results[name][res_idx]:
-                            analysis_results[name][res_idx].remove(item_name)
+                        if item_name in unused_list:
+                            unused_list.remove(item_name)
                         for child_name in subclasses:
                             if child_name in analysis_results:
-                                if item_name in analysis_results[child_name][res_idx]:
-                                    analysis_results[child_name][res_idx].remove(item_name)
+                                child_unused = analysis_results[child_name].get_category_unused(
+                                    category
+                                )
+                                if item_name in child_unused:
+                                    child_unused.remove(item_name)
 
     return proposed_moves, insertions
 
@@ -822,36 +953,64 @@ def simplify(parser, args):
         else:
             names = obj_path.all_object_names()
 
-    # Pre-analyze all objects in the repository to build global maps
-    all_names = obj_path.all_object_names()
+    # Lazy analysis helper for objects
+    all_candidate_names = names_in_repo if args.repo else obj_path.all_object_names()
     global_classes = {}
     local_defs = {}
     analysis_results = {}
     analysis_errors = {}
 
-    for name in all_names:
+    def _get_analysis(obj_name):
+        if obj_name in analysis_results:
+            return analysis_results[obj_name]
         try:
-            cls = obj_path.get_obj_class(name)
-            file_path = obj_path.filename_for_object_name(name)
-            global_classes[name] = cls
-            local_defs[name] = parse_local_definitions(file_path)
-            analysis_results[name] = list(analyze_object(name, obj_type))
+            cls = obj_path.get_obj_class(obj_name)
+            file_path = obj_path.filename_for_object_name(obj_name)
+            global_classes[obj_name] = cls
+            local_defs[obj_name] = parse_local_definitions(file_path)
+            res = analyze_object(obj_name, obj_type)
+            analysis_results[obj_name] = res
+            return res
         except Exception as e:
-            analysis_errors[name] = e
-            logger.debug(f"Error pre-analyzing {name}: {e}")
+            analysis_errors[obj_name] = e
+            logger.debug(f"Error analyzing {obj_name}: {e}")
+            return None
+
+    # Analyze requested objects
+    for name in names:
+        _get_analysis(name)
+
+    # If any analyzed object has unused items that could potentially move to subclasses,
+    # discover subclasses among the candidate repository objects
+    has_potential_moves = any(
+        res
+        and any(
+            res.get_category_unused(cat)
+            for cat in ("variables", "inputs", "executables", "compilers")
+        )
+        for res in analysis_results.values()
+    )
 
     subclasses_map = {}
-    for name, cls in global_classes.items():
-        subclasses = [
-            other_name
-            for other_name, other_cls in global_classes.items()
-            if other_cls is not cls and is_subclass_by_name(other_cls, cls)
-        ]
-        subclasses_map[name] = subclasses
+    if has_potential_moves:
+        for cand_name in all_candidate_names:
+            try:
+                cand_cls = global_classes.get(cand_name) or obj_path.get_obj_class(cand_name)
+                global_classes[cand_name] = cand_cls
+                for parent_name, parent_cls in list(global_classes.items()):
+                    if cand_cls is not parent_cls and is_subclass_by_name(cand_cls, parent_cls):
+                        subclasses_map.setdefault(parent_name, []).append(cand_name)
+            except Exception:
+                pass
+
+        # For any subclass that might receive moved attributes, ensure it is analyzed
+        for target_subclasses in subclasses_map.values():
+            for sub_name in target_subclasses:
+                _get_analysis(sub_name)
 
     # Compute proposed moves and insertions
     proposed_moves, insertions = compute_proposed_moves(
-        all_names, subclasses_map, local_defs, analysis_results
+        list(analysis_results.keys()), subclasses_map, local_defs, analysis_results
     )
 
     total_unused_vars = 0
@@ -866,51 +1025,31 @@ def simplify(parser, args):
             continue
 
         try:
-            res = analysis_results.get(name) or list(analyze_object(name, obj_type))
-            (
-                unused_vars,
-                unused_inputs,
-                unused_execs,
-                unused_compilers,
-                broken_vars,
-                broken_groups,
-                broken_templates,
-            ) = res
-
+            res = analysis_results.get(name) or analyze_object(name, obj_type)
             has_moves = name in proposed_moves
             has_insertions = name in insertions
 
-            if (
-                unused_vars
-                or unused_inputs
-                or unused_execs
-                or unused_compilers
-                or broken_vars
-                or broken_groups
-                or broken_templates
-                or has_moves
-                or has_insertions
-            ):
+            if res.has_issues() or has_moves or has_insertions:
                 file_path = obj_path.filename_for_object_name(name)
                 color.cprint(f"@c{{=== {args.type.capitalize().rstrip('s')}: {name} ===}}")
                 reports = [
-                    ("Unused Variables", unused_vars),
-                    ("Unused Inputs", unused_inputs),
-                    ("Unused Executables", unused_execs),
-                    ("Unused Compilers", unused_compilers),
-                    ("Variables with Broken Workload/Group Refs", broken_vars),
-                    ("Workload Groups with Broken Workload Refs", broken_groups),
-                    ("Broken Variable References in Templates", broken_templates),
+                    ("Unused Variables", res.unused_variables),
+                    ("Unused Inputs", res.unused_inputs),
+                    ("Unused Executables", res.unused_executables),
+                    ("Unused Compilers", res.unused_compilers),
+                    ("Variables with Broken Workload/Group Refs", res.broken_vars),
+                    ("Workload Groups with Broken Workload Refs", res.broken_groups),
+                    ("Broken Variable References in Templates", res.broken_templates),
                 ]
                 for label, items in reports:
                     if items:
                         print(f"  {label}: {items}")
 
-                total_unused_vars += len(unused_vars)
-                total_unused_inputs += len(unused_inputs)
-                total_unused_execs += len(unused_execs)
-                total_unused_compilers += len(unused_compilers)
-                total_broken_vars += len(broken_vars)
+                total_unused_vars += len(res.unused_variables)
+                total_unused_inputs += len(res.unused_inputs)
+                total_unused_execs += len(res.unused_executables)
+                total_unused_compilers += len(res.unused_compilers)
+                total_broken_vars += len(res.broken_vars)
 
                 if has_moves:
                     print("  Move to Subclasses:")
@@ -933,11 +1072,11 @@ def simplify(parser, args):
                 # broken variables, and moved ones)
                 ranges = locate_directive_lines(
                     file_path,
-                    unused_vars + moved_by_category["variables"],
-                    unused_inputs + moved_by_category["inputs"],
-                    unused_execs + moved_by_category["executables"],
-                    unused_compilers + moved_by_category["compilers"],
-                    broken_vars,
+                    res.unused_variables + moved_by_category["variables"],
+                    res.unused_inputs + moved_by_category["inputs"],
+                    res.unused_executables + moved_by_category["executables"],
+                    res.unused_compilers + moved_by_category["compilers"],
+                    res.broken_vars,
                 )
 
                 pending_insertions = insertions.get(name, [])
