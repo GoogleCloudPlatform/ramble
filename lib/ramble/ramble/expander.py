@@ -17,6 +17,7 @@ import re
 import string
 import sys
 from contextlib import contextmanager
+from enum import Enum
 from typing import Dict, FrozenSet, List, Optional, Union
 
 import ramble.config
@@ -941,7 +942,13 @@ class Expander:
                 "Value must be a boolean."
             )
 
+        if isinstance(in_str, Enum):
+            in_str = in_str.value
+
         if isinstance(in_str, str):
+            if ExpansionDelimiter.left not in in_str and ExpansionDelimiter.right not in in_str:
+                return str(self.perform_math_eval(in_str, expansion_vars=expansion_vars))
+
             str_graph = ExpansionGraph(in_str)
             for node in str_graph.walk():
                 node.define_value(
