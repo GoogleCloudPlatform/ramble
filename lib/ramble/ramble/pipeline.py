@@ -319,6 +319,7 @@ class AnalyzePipeline(Pipeline):
 
     def _complete(self):
         super()._complete()
+        self._experiment_set.clear_filter_cache()
         # Calculate statistics for repeats and inject into base experiment results
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
 
