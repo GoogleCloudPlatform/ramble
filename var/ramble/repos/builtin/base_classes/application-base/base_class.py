@@ -4267,39 +4267,33 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             return []
 
         base_exp_name = self.expander.experiment_name
-        base_exp_namespace = self.expander.experiment_namespace
+        is_chained = (
+            base_exp_name in self.experiment_set.chained_experiments
+            and base_exp_name not in self.experiment_set.experiments
+        )
 
-        repeat_namespaces = []
-        for n in range(1, self.repeats.n_repeats + 1):
-            if (
-                base_exp_name in self.experiment_set.chained_experiments
-                and base_exp_name not in self.experiment_set.experiments
-            ):
-                insert_idx = base_exp_name.find(".chain")
-                if insert_idx != -1:
-                    repeat_exp_namespace = (
-                        base_exp_name[:insert_idx]
-                        + f".{n}"
-                        + base_exp_name[insert_idx:]
-                    )
-                else:
-                    repeat_exp_namespace = f"{base_exp_name}.{n}"
-            else:
-                base_exp_namespace = self.expander.experiment_namespace
-                repeat_exp_namespace = f"{base_exp_namespace}.{n}"
-            repeat_namespaces.append(repeat_exp_namespace)
-        return repeat_namespaces
+        if is_chained and ".chain" in base_exp_name:
+            idx = base_exp_name.index(".chain")
+            prefix, suffix = base_exp_name[:idx], base_exp_name[idx:]
+            return [
+                f"{prefix}.{n}{suffix}"
+                for n in range(1, self.repeats.n_repeats + 1)
+            ]
+
+        base = (
+            base_exp_name if is_chained else self.expander.experiment_namespace
+        )
+        return [f"{base}.{n}" for n in range(1, self.repeats.n_repeats + 1)]
 
     def get_repeat_children(self):
         """Return a list of ApplicationBase instances for all repeat children"""
-        children = []
         if not self.experiment_set:
-            return children
+            return []
+        children = []
         for exp in self.get_repeat_child_namespaces():
-            if exp in self.experiment_set.experiments:
-                children.append(self.experiment_set.experiments[exp])
-            elif exp in self.experiment_set.chained_experiments:
-                children.append(self.experiment_set.chained_experiments[exp])
+            child = self.experiment_set.get_experiment(exp)
+            if child is not None:
+                children.append(child)
         return children
 
     def calculate_repeat_status(
@@ -4326,45 +4320,38 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             status = ExperimentStatus.UNKNOWN
             return (status, exp_status_list) if return_status_list else status
 
-        strict = True
-        if workspace and hasattr(workspace, "repeat_success_strict"):
-            strict = workspace.repeat_success_strict
-        elif self.workspace and hasattr(
-            self.workspace, "repeat_success_strict"
-        ):
-            strict = self.workspace.repeat_success_strict
-        else:
+        ws = workspace or self.workspace
+        strict = getattr(ws, "repeat_success_strict", None)
+        if strict is None:
             strict = ramble.config.get(
                 "config:repeat_success_strict", default=True
             )
 
+        failed_statuses = {
+            ExperimentStatus.FAILED,
+            ExperimentStatus.CANCELLED,
+            ExperimentStatus.TIMEOUT,
+        }
+        has_failed = any(s in failed_statuses for s in exp_status_list)
+        all_failed = all(s in failed_statuses for s in exp_status_list)
+        has_success = any(
+            s == ExperimentStatus.SUCCESS for s in exp_status_list
+        )
+        all_success = all(
+            s == ExperimentStatus.SUCCESS for s in exp_status_list
+        )
+
         if strict:
-            if any(
-                s
-                in (
-                    ExperimentStatus.FAILED,
-                    ExperimentStatus.CANCELLED,
-                    ExperimentStatus.TIMEOUT,
-                )
-                for s in exp_status_list
-            ):
+            if has_failed:
                 status = ExperimentStatus.FAILED
-            elif all(s == ExperimentStatus.SUCCESS for s in exp_status_list):
+            elif all_success:
                 status = ExperimentStatus.SUCCESS
             else:
                 status = ExperimentStatus.UNKNOWN
         else:
-            if any(s == ExperimentStatus.SUCCESS for s in exp_status_list):
+            if has_success:
                 status = ExperimentStatus.SUCCESS
-            elif all(
-                s
-                in (
-                    ExperimentStatus.FAILED,
-                    ExperimentStatus.CANCELLED,
-                    ExperimentStatus.TIMEOUT,
-                )
-                for s in exp_status_list
-            ):
+            elif all_failed:
                 status = ExperimentStatus.FAILED
             else:
                 status = ExperimentStatus.UNKNOWN
@@ -4379,8 +4366,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ExperimentStatus.UNKNOWN (or calculate from children if repeat base).
         """
         if self.repeats.is_repeat_base:
-            status = self.calculate_repeat_status()
-            self.set_status(status)
+            self.set_status(self.calculate_repeat_status())
             return
 
         status_path = os.path.join(
@@ -4408,12 +4394,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def get_status(self):
         """Get the status of this experiment"""
-        if self.repeats.is_repeat_base:
-            status = self.calculate_repeat_status()
-            self.set_status(status)
-            return status
-
-        if self.keywords.experiment_status not in self.variables:
+        if (
+            self.repeats.is_repeat_base
+            or self.keywords.experiment_status not in self.variables
+        ):
             self.read_status()
 
         return self.variables[self.keywords.experiment_status]
