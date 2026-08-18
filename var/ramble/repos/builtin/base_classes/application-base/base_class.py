@@ -4276,11 +4276,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 and base_exp_name not in self.experiment_set.experiments
             ):
                 insert_idx = base_exp_name.find(".chain")
-                repeat_exp_namespace = (
-                    base_exp_name[:insert_idx]
-                    + f".{n}"
-                    + base_exp_name[insert_idx:]
-                )
+                if insert_idx != -1:
+                    repeat_exp_namespace = (
+                        base_exp_name[:insert_idx]
+                        + f".{n}"
+                        + base_exp_name[insert_idx:]
+                    )
+                else:
+                    repeat_exp_namespace = f"{base_exp_name}.{n}"
             else:
                 base_exp_namespace = self.expander.experiment_namespace
                 repeat_exp_namespace = f"{base_exp_namespace}.{n}"
