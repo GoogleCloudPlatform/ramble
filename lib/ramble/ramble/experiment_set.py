@@ -991,10 +991,9 @@ class ExperimentSet:
             variable: Name of variable to look up
         """
 
-        if experiment not in self.experiments:
+        exp_app = self.get_experiment(experiment)
+        if not exp_app:
             return None
-
-        exp_app = self.experiments[experiment]
 
         return exp_app.expander.expand_var(variable)
 
