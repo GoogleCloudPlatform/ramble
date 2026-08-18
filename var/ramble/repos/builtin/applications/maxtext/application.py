@@ -114,14 +114,12 @@ class Maxtext(ExecutableApplication):
         default="{maxtext_path}:{maxtext_path}",
         description="Container mount for maxtext root",
         workloads=all_workloads,
-        when="workflow_manager=slurm-pyxis",
     )
     workload_variable(
         "container_mounts",
         default="{maxtext_mount}",
         description="All container mounts in a ramble variable",
         workloads=all_workloads,
-        when="workflow_manager=slurm-pyxis",
     )
 
     log_str = os.path.join("{experiment_run_dir}", "metrics.out")

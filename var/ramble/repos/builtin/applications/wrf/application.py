@@ -239,10 +239,6 @@ class Wrf(ExecutableApplication):
             workloads=["CONUS_2p5km", "CONUS_12km", "Maria_1km"],
         )
 
-        workload_variable(
-            "foo", default="bar", description="Junk", workload="CONUS_2p5km"
-        )
-
         with when("+wrf_tiles"):
             workload_variable(
                 "num_tiles",

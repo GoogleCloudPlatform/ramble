@@ -177,13 +177,11 @@ def iter_defined_variables(cls):
         for app_workloads in cls.workloads.values():
             for wl_obj in app_workloads.values():
                 for var_list in wl_obj.variables.values():
-                    for var in var_list:
-                        yield var
+                    yield from var_list
 
     if hasattr(cls, "object_variables") and cls.object_variables:
         for var_list in cls.object_variables.values():
-            for var in var_list:
-                yield var
+            yield from var_list
 
 
 def iter_object_template_strings(cls, obj_path=None):
