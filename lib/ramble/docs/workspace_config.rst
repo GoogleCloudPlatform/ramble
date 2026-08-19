@@ -93,7 +93,9 @@ In the above example, the experiment name would be: ``test_1_1`` when it is crea
 
 **NOTE:** Each experiment has a namespace that follows this pattern:
 ``application.workload.experiment``. Every experiment needs a unique namespace,
-or ramble will throw an error.
+or ramble will throw an error. Application entries can be specified with short names
+(e.g., ``hostname``), fully qualified namespaced specs (e.g., ``builtin.app.hostname``),
+or with version suffixes (e.g., ``builtin.app.wrf@{version}`` or ``wrf@4.2``).
 
 .. _variable-dictionaries:
 

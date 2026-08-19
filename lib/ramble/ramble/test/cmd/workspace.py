@@ -137,7 +137,8 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
     assert "To set up shell support" in out
 
 
-def test_workspace_activate_prompt(workspace_name):
+def test_workspace_activate_prompt(workspace_name, monkeypatch):
+    monkeypatch.delenv("TERM", raising=False)
     ramble.workspace.deactivate()
     ws = ramble.workspace.create(workspace_name)
     ws.write()
@@ -311,6 +312,69 @@ ramble:
     output = workspace("info", "--software", global_args=["-w", workspace_name])
 
     check_info_basic(output)
+
+
+def test_workspace_info_namespaced_application(workspace_name, mutable_mock_apps_repo):
+    test_config = """
+ramble:
+  config:
+    enable_strict_versions: false
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    builtin.mock.app.basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    basic@1.0:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '1'
+    builtin.mock.basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '3'
+    app.basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '4'
+"""
+
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+
+    with open(config_path, "w+", encoding="utf-8") as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace("info", global_args=["-w", workspace_name])
+
+    assert "Application: builtin.mock.app.basic" in output
+    assert "Application: basic" in output
+    assert "Application: builtin.mock.basic" in output
+    assert "Application: app.basic" in output
+    assert "builtin.mock.app.basic.test_wl.test_experiment" in output
+    assert "basic@1.0.test_wl.test_experiment" in output
+    assert "builtin.mock.basic.test_wl.test_experiment" in output
+    assert "app.basic.test_wl.test_experiment" in output
 
 
 def test_workspace_info_prints_all_levels(workspace_name):

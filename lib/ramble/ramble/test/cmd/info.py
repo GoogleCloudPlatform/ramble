@@ -13,9 +13,12 @@ from typing import Dict, List
 import pytest
 
 import ramble.cmd.common.info
+import ramble.repository
 from ramble.main import RambleCommand
 
 info = RambleCommand("info")
+repo = RambleCommand("repo")
+create = RambleCommand("create")
 
 
 @pytest.fixture(scope="module")
@@ -445,3 +448,27 @@ def test_info_conflicts_pattern(mutable_mock_apps_repo):
     )
     assert "turn_on_required_directives=True" not in out
     assert "turn_on_required_directives conflicts with variant_default" not in out
+
+
+def test_info_namespaced_spec(mutable_config, tmpdir):
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_ns = "mockrepo"
+
+    try:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        repo("create", repo_path, repo_ns)
+        repo("add", "-t", "applications", "--scope=site", repo_path)
+
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        create(f"{repo_ns}.app.test-app")
+
+        out = info(f"{repo_ns}.app.test-app")
+        assert "Description" in out
+
+    finally:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None

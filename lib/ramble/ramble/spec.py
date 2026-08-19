@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import functools
 import io
 from typing import Mapping
 
@@ -16,31 +17,71 @@ color_formats: Mapping[str, str] = {}
 default_format = "{name}"
 
 
+@functools.lru_cache(maxsize=None)
+def _parse_spec_string(spec_like):
+    if not spec_like:
+        return "", None, None
+
+    # Strip any version suffix if present (e.g., app@1.0)
+    spec_like = spec_like.partition("@")[0].lower()
+
+    parts = spec_like.split(".")
+
+    import ramble.repository
+
+    type_map = ramble.repository.get_object_type_map()
+
+    if len(parts) >= 3 and parts[-2] in type_map:
+        object_type = type_map[parts[-2]]
+        name = parts[-1]
+        namespace = ".".join(parts[:-2])
+    elif len(parts) >= 2:
+        if len(parts) == 2 and parts[0] in type_map:
+            object_type = type_map[parts[0]]
+            name = parts[1]
+            namespace = None
+        else:
+            object_type = None
+            name = parts[-1]
+            namespace = ".".join(parts[:-1])
+    else:
+        object_type = None
+        name = parts[0]
+        namespace = None
+
+    return name, namespace, object_type
+
+
 class Spec:
-    def __init__(self, spec_like=None):
+    def __init__(self, spec_like=None, object_type=None):
         """Create a new Spec.
 
         Arguments:
-          spec_like (optional string): If not provided we initialize an
+          spec_like (optional string or Spec): If not provided we initialize an
           anonymous Spec that matches any Spec object; if provided we parse
           this as a Spec string.
+          object_type (optional ObjectTypes): Optional object type enum.
         """
 
         # Copy if spec_like is a Spec.
         if isinstance(spec_like, Spec):
             self._dup(spec_like)
+            if object_type is not None:
+                self.object_type = object_type
             return
 
         # init an empty spec that matches anything.
         self.name = None
         self.namespace = None
+        self.object_type = object_type
 
         if isinstance(spec_like, str):
-            namespace, _, spec_name = spec_like.rpartition(".")
-            if not namespace:
-                namespace = None
-            self.name = spec_name
-            self.namespace = namespace
+            self._parse_spec_string(spec_like)
+
+    def _parse_spec_string(self, spec_like):
+        self.name, self.namespace, parsed_type = _parse_spec_string(spec_like)
+        if self.object_type is None:
+            self.object_type = parsed_type
 
     def copy(self):
         new_spec = Spec()
@@ -50,6 +91,7 @@ class Spec:
     def _dup(self, other):
         self.name = other.name
         self.namespace = other.namespace
+        self.object_type = getattr(other, "object_type", None)
 
     def format(self, format_string=default_format, **kwargs):
         r"""Prints out particular pieces of a spec, depending on what is
@@ -160,15 +202,24 @@ class Spec:
         return self.format(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name is not None else ""
 
     @property
     def fullname(self):
-        return (
-            (f"{self.namespace}.{self.name}")
-            if self.namespace
-            else (self.name if self.name else "")
-        )
+        if not self.name:
+            return ""
+        import ramble.repository
+
+        if self.namespace:
+            if self.object_type:
+                abbrev = ramble.repository.type_definitions[self.object_type]["abbrev"]
+                return f"{self.namespace}.{abbrev}.{self.name}"
+            return f"{self.namespace}.{self.name}"
+        else:
+            if self.object_type:
+                abbrev = ramble.repository.type_definitions[self.object_type]["abbrev"]
+                return f"{abbrev}.{self.name}"
+            return self.name
 
 
 class SpecFormatStringError(ramble.error.SpecError):

@@ -7,9 +7,11 @@
 # except according to those terms.
 
 import os
+import sys
 
 import pytest
 
+import ramble.repository
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 
@@ -103,19 +105,13 @@ def test_create_parameterized(
         import ramble.repository
 
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None
 
         repo_cmd("create", repo_path, repo_ns)
         repo_cmd("add", "-t", f"{obj_type}s", "--scope=site", repo_path)
 
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None
 
         parsed_args = [obj_type, obj_name] + actual_args
         if "--repo" not in actual_args and not fallback:
@@ -143,10 +139,7 @@ def test_create_parameterized(
         import ramble.repository
 
         for t in ramble.repository.ObjectTypes:
-            try:
-                ramble.repository.paths[t]._instance = None
-            except Exception:
-                pass
+            ramble.repository.paths[t]._instance = None
 
 
 def test_create_interactive_non_tty(mutable_config):
@@ -248,11 +241,7 @@ def test_create_missing_template(mutable_config, tmpdir, monkeypatch):
     repo_cmd("create", repo_path, "mockrepo")
     repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
 
-    import ramble.repository
-
     ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-    import os
 
     orig_exists = os.path.exists
 
@@ -271,8 +260,6 @@ def test_create_missing_template(mutable_config, tmpdir, monkeypatch):
             content = f.read()
             assert "class MyMissingTplApp:" in content
     finally:
-        import ramble.repository
-
         ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
 
 
@@ -284,11 +271,7 @@ def test_create_interactive_wizard(mutable_config, tmpdir, monkeypatch):
     repo_cmd("create", repo_path, repo_name)
     repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
 
-    import ramble.repository
-
     ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-    import sys
 
     monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
 
@@ -315,11 +298,7 @@ def test_create_interactive_wizard_validation_and_abort(mutable_config, tmpdir, 
     repo_cmd("create", repo_path, repo_name)
     repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
 
-    import ramble.repository
-
     ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-    import sys
 
     monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
 
@@ -341,3 +320,131 @@ def test_create_interactive_wizard_validation_and_abort(mutable_config, tmpdir, 
     # create_cmd should exit gracefully without raising exception
     out = create_cmd("-i", fail_on_error=False)
     assert "[ABORTED] Object creation cancelled" in out
+
+
+@pytest.mark.parametrize(
+    "spec_arg, expected_dir, expected_name, expected_file, expected_content",
+    [
+        (
+            "mockrepo.app.spec-app",
+            "applications",
+            "spec-app",
+            "application.py",
+            "class SpecApp(ExecutableApplication):",
+        ),
+        (
+            "mockrepo.application.spec-app2",
+            "applications",
+            "spec-app2",
+            "application.py",
+            "class SpecApp2(ExecutableApplication):",
+        ),
+        (
+            "mockrepo.mod.spec-mod",
+            "modifiers",
+            "spec-mod",
+            "modifier.py",
+            "class SpecMod(BasicModifier):",
+        ),
+        (
+            "mockrepo.sys.spec-sys",
+            "systems",
+            "spec-sys",
+            "system.py",
+            "class SpecSys:",
+        ),
+    ],
+)
+def test_create_namespaced_spec(
+    mutable_config,
+    tmpdir,
+    spec_arg,
+    expected_dir,
+    expected_name,
+    expected_file,
+    expected_content,
+):
+    """Verify object creation using namespaced specs (repo.type.name)."""
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_ns = "mockrepo"
+
+    try:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        repo_cmd("create", repo_path, repo_ns)
+        repo_cmd("add", "-t", expected_dir, "--scope=site", repo_path)
+
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        create_cmd(spec_arg)
+
+        full_path = os.path.join(repo_path, expected_dir, expected_name, expected_file)
+        assert os.path.exists(full_path)
+
+        with open(full_path, encoding="utf-8") as f:
+            content = f.read()
+            assert expected_content in content
+
+    finally:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+
+@pytest.mark.parametrize(
+    "type_alias, obj_name, expected_dir, expected_file, expected_content",
+    [
+        (
+            "app",
+            "alias-app",
+            "applications",
+            "application.py",
+            "class AliasApp(ExecutableApplication):",
+        ),
+        (
+            "applications",
+            "plural-app",
+            "applications",
+            "application.py",
+            "class PluralApp(ExecutableApplication):",
+        ),
+        ("mod", "alias-mod", "modifiers", "modifier.py", "class AliasMod(BasicModifier):"),
+        ("sys", "alias-sys", "systems", "system.py", "class AliasSys:"),
+    ],
+)
+def test_create_object_type_alias(
+    mutable_config,
+    tmpdir,
+    type_alias,
+    obj_name,
+    expected_dir,
+    expected_file,
+    expected_content,
+):
+    """Verify object creation using object type aliases and abbreviations (e.g., app, mod, sys)."""
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_ns = "mockrepo"
+
+    try:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        repo_cmd("create", repo_path, repo_ns)
+        repo_cmd("add", "-t", expected_dir, "--scope=site", repo_path)
+
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None
+
+        create_cmd(type_alias, obj_name, "--repo", repo_path)
+
+        full_path = os.path.join(repo_path, expected_dir, obj_name, expected_file)
+        assert os.path.exists(full_path)
+
+        with open(full_path, encoding="utf-8") as f:
+            content = f.read()
+            assert expected_content in content
+
+    finally:
+        for t in ramble.repository.ObjectTypes:
+            ramble.repository.paths[t]._instance = None

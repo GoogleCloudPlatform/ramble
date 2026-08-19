@@ -148,11 +148,41 @@ def test_edit_deduction_fails_correctly():
     assert "No application for 'non-existent-object-name' was found" in output
 
 
-def test_normalize_type_name_empty():
+def test_normalize_type_name():
     from ramble.cmd.edit import normalize_type_name
 
     assert normalize_type_name(None) is None
     assert normalize_type_name("") is None
+    assert normalize_type_name("app") == "applications"
+    assert normalize_type_name("application") == "applications"
+    assert normalize_type_name("applications") == "applications"
+    assert normalize_type_name("mod") == "modifiers"
+    assert normalize_type_name("modifier") == "modifiers"
+    assert normalize_type_name("modifiers") == "modifiers"
+    assert normalize_type_name("pkg_man") == "package_managers"
+    assert normalize_type_name("package-manager") == "package_managers"
+    assert normalize_type_name("package_manager") == "package_managers"
+    assert normalize_type_name("package manager") == "package_managers"
+    assert normalize_type_name("test") == "test"
+    assert normalize_type_name("tests") == "test"
+    assert normalize_type_name("command") == "command"
+    assert normalize_type_name("commands") == "command"
+    assert normalize_type_name("doc") == "docs"
+    assert normalize_type_name("docs") == "docs"
+    assert normalize_type_name("module") == "module"
+    assert normalize_type_name("modules") == "module"
+    assert normalize_type_name("TEST") == "test"
+    assert normalize_type_name("Command") == "command"
+    assert normalize_type_name("APP") == "applications"
+    assert normalize_type_name("MODIFIER") == "modifiers"
+    assert normalize_type_name("unknown_type") == "unknown_type"
+
+
+def test_edit_abbreviated_type(mock_modifiers, mock_editor):
+    """Test `ramble edit -t mod info` normalizes abbreviated type"""
+    edit("info", "-t", "mod")
+    assert len(mock_editor) == 1
+    assert "repos/builtin.mock/modifiers/info/modifier.py" in mock_editor[0]
 
 
 def test_edit_object_is_directory(mock_applications, monkeypatch):
@@ -254,3 +284,31 @@ def test_edit_no_name_no_editor(monkeypatch):
     monkeypatch.setattr("ramble.cmd.edit.editor", mock_fail_editor)
     output = edit(fail_on_error=False)
     assert "No valid editor was found" in output
+
+
+def test_edit_namespaced_spec_with_type(mock_modifiers, mock_editor):
+    """Test `ramble edit <repo>.<type>.<name>` covers lines 36 and 41 in edit.py."""
+    edit("builtin.mock.mod.info")
+    assert len(mock_editor) == 1
+    assert "repos/builtin.mock/modifiers/info/modifier.py" in mock_editor[0]
+
+
+def test_edit_namespaced_spec_without_type(mock_applications, mock_editor):
+    """Test `ramble edit <repo>.<name>` covers line 41 in edit.py."""
+    edit("builtin.mock.basic")
+    assert len(mock_editor) == 1
+    assert "repos/builtin.mock/applications/basic/application.py" in mock_editor[0]
+
+
+def test_edit_repo_path(mock_applications, mock_editor):
+    """Test `ramble edit --repo <path> <name>` covers line 47 in edit.py."""
+    import ramble.repository
+
+    repo_dir = (
+        ramble.repository.paths[ramble.repository.ObjectTypes.applications]
+        .get_repo("builtin.mock")
+        .root
+    )
+    edit("--repo", repo_dir, "basic")
+    assert len(mock_editor) == 1
+    assert "repos/builtin.mock/applications/basic/application.py" in mock_editor[0]

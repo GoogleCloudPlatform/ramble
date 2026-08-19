@@ -25,7 +25,9 @@ import ramble.config
 import ramble.expander
 import ramble.filters
 import ramble.pipeline
+import ramble.repository
 import ramble.software_environments
+import ramble.spec
 import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
@@ -901,6 +903,7 @@ def workspace_info(args):
 
     # Build an index of experiments to avoid re-rendering them in the loops below
     experiment_index_map = defaultdict(list)
+    app_names_cache = {}
     for exp_name, app_inst, _ in experiment_set.all_experiments():
         experiment_template_name = app_inst.variables[app_inst.keywords.experiment_template_name]
         if app_inst.repeats.repeat_index:
@@ -908,12 +911,34 @@ def workspace_info(args):
             if experiment_template_name.endswith(suffix):
                 experiment_template_name = experiment_template_name[: -len(suffix)]
 
-        key = (
-            app_inst.variables[app_inst.keywords.application_name],
-            app_inst.variables[app_inst.keywords.workload_template_name],
-            experiment_template_name,
-        )
-        experiment_index_map[key].append(exp_name)
+        app_ns_raw = app_inst.variables[app_inst.keywords.application_namespace]
+        if app_ns_raw not in app_names_cache:
+            app_ns_spec = ramble.spec.Spec(app_ns_raw)
+            app_name = app_inst.variables[app_inst.keywords.application_name]
+            try:
+                repo_ns = (
+                    app_ns_spec.namespace
+                    or ramble.repository.paths[ramble.repository.ObjectTypes.applications]
+                    .repo_for_obj(app_name)
+                    .namespace
+                )
+            except Exception:
+                repo_ns = app_ns_spec.namespace
+
+            names = {app_name, app_ns_spec.fullname, f"app.{app_name}"}
+            if repo_ns:
+                names.add(f"{repo_ns}.{app_name}")
+                names.add(f"{repo_ns}.app.{app_name}")
+
+            app_names_cache[app_ns_raw] = tuple(names)
+
+        for a_name in app_names_cache[app_ns_raw]:
+            key = (
+                a_name,
+                app_inst.variables[app_inst.keywords.workload_template_name],
+                experiment_template_name,
+            )
+            experiment_index_map[key].append(exp_name)
 
     # Construct filters here...
     filters = ramble.filters.Filters(
