@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import copy
+import functools
 import re
 from enum import Enum
 
@@ -35,16 +36,7 @@ class FomType(Enum):
     UNDEFINED = 6
 
     def better_direction(self):
-        direction = {
-            FomType.TIME: BetterDirection.LOWER,
-            FomType.THROUGHPUT: BetterDirection.HIGHER,
-            FomType.MEASURE: BetterDirection.INDETERMINATE,
-            FomType.CATEGORY: BetterDirection.INAPPLICABLE,
-            FomType.INFO: BetterDirection.INAPPLICABLE,
-            FomType.UNDEFINED: BetterDirection.INDETERMINATE,
-        }
-
-        return direction[self]
+        return _FOM_TYPE_DIRECTIONS[self]
 
     def copy(self):
         return copy.deepcopy(self)
@@ -58,13 +50,28 @@ class FomType(Enum):
 
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
-        return {"name": self.name, "better_direction": self.better_direction().name}
+        return _FOM_TYPE_DICTS[self]
 
 
 class SummaryFoms(Enum):
     SUMMARY = "Experiment Summary"
     N_TOTAL = "n_total_repeats"
     N_SUCCESS = "n_success_repeats"
+
+
+_FOM_TYPE_DIRECTIONS = {
+    FomType.TIME: BetterDirection.LOWER,
+    FomType.THROUGHPUT: BetterDirection.HIGHER,
+    FomType.MEASURE: BetterDirection.INDETERMINATE,
+    FomType.CATEGORY: BetterDirection.INAPPLICABLE,
+    FomType.INFO: BetterDirection.INAPPLICABLE,
+    FomType.UNDEFINED: BetterDirection.INDETERMINATE,
+}
+
+_FOM_TYPE_DICTS = {
+    member: {"name": member.name, "better_direction": _FOM_TYPE_DIRECTIONS[member].name}
+    for member in FomType
+}
 
 
 # Try to import the internal parser for the re module
@@ -79,14 +86,8 @@ except ImportError:
         sre_parse = None
 
 
-def get_literal_from_regex(regex_str: str) -> str:
-    """
-    Extracts a first-encountered required literal string from a regex pattern.
-
-    This is used to create fast string pre-filters to avoid executing complex regex matching.
-    This is not exhaustive, as it doesn't recurse into sub-patterns. It is only intended as a
-    heuristic to short-circuit the matching process.
-    """
+@functools.lru_cache(maxsize=1024)
+def _get_literal_from_regex_cached(regex_str: str) -> str:
     if not sre_parse:
         return ""
 
@@ -106,3 +107,17 @@ def get_literal_from_regex(regex_str: str) -> str:
             break
 
     return current_literal.strip()
+
+
+def get_literal_from_regex(regex_str: str) -> str:
+    """
+    Extracts a first-encountered required literal string from a regex pattern.
+
+    This is used to create fast string pre-filters to avoid executing complex regex matching.
+    This is not exhaustive, as it doesn't recurse into sub-patterns. It is only intended as a
+    heuristic to short-circuit the matching process.
+    """
+    if not regex_str or not sre_parse:
+        return ""
+
+    return _get_literal_from_regex_cached(regex_str)
