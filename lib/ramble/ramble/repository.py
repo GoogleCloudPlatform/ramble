@@ -101,6 +101,7 @@ type_definitions = {
         "config_section": "package_manager_repos",
         "accepted_configs": ["package_manager_repo.yaml", unified_config],
         "singular": "package manager",
+        "aliases": ["pkg", "package"],
     },
     ObjectTypes.workflow_managers: {
         "file_name": "workflow_manager.py",
@@ -109,6 +110,7 @@ type_definitions = {
         "config_section": "workflow_manager_repos",
         "accepted_configs": ["workflow_manager_repo.yaml", unified_config],
         "singular": "workflow manager",
+        "aliases": ["workflow"],
     },
     ObjectTypes.systems: {
         "file_name": "system.py",
@@ -133,6 +135,7 @@ type_definitions = {
         "config_section": "base_class_repos",
         "accepted_configs": ["base_class_repo.yaml", unified_config],
         "singular": "base class",
+        "aliases": ["base"],
     },
     ObjectTypes.base_applications: {
         "file_name": "base_application.py",
@@ -157,6 +160,7 @@ type_definitions = {
         "config_section": "base_package_manager_repos",
         "accepted_configs": ["base_package_manager_repo.yaml", unified_config],
         "singular": "base package manager",
+        "aliases": ["base_pkg"],
     },
     ObjectTypes.base_workflow_managers: {
         "file_name": "base_workflow_manager.py",
@@ -165,6 +169,7 @@ type_definitions = {
         "config_section": "base_workflow_manager_repos",
         "accepted_configs": ["base_workflow_manager_repo.yaml", unified_config],
         "singular": "base workflow manager",
+        "aliases": ["base_workflow"],
     },
     ObjectTypes.base_systems: {
         "file_name": "base_system.py",
@@ -209,19 +214,18 @@ def _normalize_type_key(key):
     return str(key).lower().replace("-", "_").replace(" ", "_")
 
 
-_TYPE_ALIASES = {
-    "pkg": ObjectTypes.package_managers,
-    "package": ObjectTypes.package_managers,
-    "packages": ObjectTypes.package_managers,
-    "base_pkg": ObjectTypes.base_package_managers,
-    "workflow": ObjectTypes.workflow_managers,
-    "workflows": ObjectTypes.workflow_managers,
-    "base": ObjectTypes.base_classes,
-}
+_TYPE_ALIASES = {}
 
 for _obj in ObjectTypes:
     _tdef = type_definitions.get(_obj, {})
-    for _val in (_obj.name, _tdef.get("singular"), _tdef.get("abbrev"), _tdef.get("dir_name")):
+    _candidates = [
+        _obj.name,
+        _tdef.get("singular"),
+        _tdef.get("abbrev"),
+        _tdef.get("dir_name"),
+        *_tdef.get("aliases", []),
+    ]
+    for _val in _candidates:
         if isinstance(_val, str):
             for _v in (_val, f"{_val}s"):
                 _norm = _normalize_type_key(_v)

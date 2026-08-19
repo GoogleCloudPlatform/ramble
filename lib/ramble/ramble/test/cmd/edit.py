@@ -8,6 +8,7 @@
 
 import pytest
 
+import ramble.repository
 from ramble.main import RambleCommand
 
 edit = RambleCommand("edit")
@@ -118,7 +119,7 @@ def test_edit_singular_type_with_spaces_hyphens(mock_editor):
 
 
 def test_edit_unknown_type():
-    with pytest.raises(KeyError):
+    with pytest.raises(ramble.repository.UnknownObjectTypeError):
         edit("-t", "unknown_type", "spack")
 
 
@@ -174,8 +175,8 @@ def test_normalize_type_name():
     assert normalize_type_name("TEST") == "test"
     assert normalize_type_name("Command") == "command"
     assert normalize_type_name("APP") == "applications"
-    assert normalize_type_name("MODIFIER") == "modifiers"
-    assert normalize_type_name("unknown_type") == "unknown_type"
+    with pytest.raises(ramble.repository.UnknownObjectTypeError):
+        normalize_type_name("unknown_type")
 
 
 def test_edit_abbreviated_type(mock_modifiers, mock_editor):

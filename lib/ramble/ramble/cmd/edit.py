@@ -41,10 +41,7 @@ def normalize_type_name(type_name):
     if norm_type in extra_type_aliases:
         return extra_type_aliases[norm_type]
 
-    try:
-        return ramble.repository.simplify_object_type(type_name).name
-    except ramble.repository.UnknownObjectTypeError:
-        return type_name
+    return ramble.repository.simplify_object_type(type_name).name
 
 
 def find_all_matches(name, repo_path=None, namespace=None, obj_type=None):
@@ -160,11 +157,6 @@ def edit(parser, args):
     # Normalize input type if specified
     if args.type:
         args.type = normalize_type_name(args.type)
-        extra_types = ["test", "command", "docs", "module"]
-        allowed_types = ramble.repository.OBJECT_NAMES + extra_types
-        if args.type not in allowed_types:
-            # Trigger KeyError like the original code did
-            _ = ramble.repository.ObjectTypes[args.type]
 
     if name:
         matches = find_all_matches(name, args.repo, args.namespace, args.type)
