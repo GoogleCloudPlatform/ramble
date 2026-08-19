@@ -199,7 +199,14 @@ def test_edit_object_is_directory(mock_applications, monkeypatch):
 def test_edit_object_insufficient_permissions(mock_applications, monkeypatch):
     import os
 
-    monkeypatch.setattr(os, "access", lambda path, mode: False)
+    real_access = os.access
+
+    def mock_access(path, mode, real_access=real_access, **kwargs):
+        if "application.py" in str(path):
+            return False
+        return real_access(path, mode, **kwargs)
+
+    monkeypatch.setattr(os, "access", mock_access)
     output = edit("basic", fail_on_error=False)
     assert "Insufficient permissions" in output
 
