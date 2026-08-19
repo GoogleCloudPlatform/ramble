@@ -380,3 +380,40 @@ def test_expander_copy_preserves_no_expand_vars():
 
     copied = expander.copy()
     assert copied.expand_var("{var1}") == "{var2}"
+
+
+def test_expander_short_circuit_plain_and_escaped_strings():
+    expansion_vars = {
+        "var1": "value1",
+        "var2": "value2",
+        "nested": "{var1}",
+    }
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    # Plain strings without delimiters
+    assert expander.expand_var("plain_string") == "plain_string"
+    assert expander.expand_var("/workspace/inputs/dir") == "/workspace/inputs/dir"
+    assert expander.expand_var("gcc@14.2.0") == "gcc@14.2.0"
+
+    # Plain math strings without delimiters
+    assert expander.expand_var("2 + 3") == "5"
+    assert expander.expand_var("4 * 5") == "20"
+
+    # Template strings
+    assert expander.expand_var("{var1}") == "value1"
+    assert expander.expand_var("prefix_{var2}_suffix") == "prefix_value2_suffix"
+    assert expander.expand_var("{nested}") == "value1"
+
+    # Escaped curly braces
+    assert expander.expand_var(r"\{escaped\}") == "{escaped}"
+    assert expander.expand_var(r"\{var1\}") == "{var1}"
+    assert expander.expand_var(r"prefix_\{var1\}_suffix") == "prefix_{var1}_suffix"
+
+    # Enum expansion within templates
+    from enum import Enum
+
+    class StatusEnum(str, Enum):
+        SETUP = "SETUP"
+
+    enum_expander = ramble.expander.Expander({"status": StatusEnum.SETUP}, None)
+    assert enum_expander.expand_var("{status}") == "SETUP"
