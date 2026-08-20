@@ -63,7 +63,8 @@ def __getattr__(name: str):
     import importlib
 
     try:
-        mod = importlib.import_module(f"ramble.schema.{name}")
-        return mod
+        return importlib.import_module(f"ramble.schema.{name}")
     except ModuleNotFoundError as err:
-        raise AttributeError(f"module 'ramble.schema' has no attribute '{name}'") from err
+        if err.name == f"ramble.schema.{name}":
+            raise AttributeError(f"module 'ramble.schema' has no attribute '{name}'") from err
+        raise
