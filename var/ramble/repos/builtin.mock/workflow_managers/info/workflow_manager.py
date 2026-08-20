@@ -20,7 +20,7 @@ class Info(WorkflowManagerBase):
     tags("tag1", "tag2")
 
     version("1.0", description="Version 1.0 of info", preferred=True)
-    version("2.0", description="Version 2.0 of info", preferred=False)
+    version("2.0", description="Version 2.0 of info")
 
     variant(
         "variant_name",

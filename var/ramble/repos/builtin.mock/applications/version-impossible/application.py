@@ -15,7 +15,7 @@ class VersionImpossible(ExecutableApplication):
     executable("base_exec", "echo 'base'", use_mpi=False)
 
     version("1.0", description="version-impossible 1.0", preferred=True)
-    version("2.0", description="version-impossible 2.0", preferred=False)
+    version("2.0", description="version-impossible 2.0")
 
     workload("wl1", executable="base_exec", when="@1.0")
     workload("wl1", executable="base_exec", when="@2.0")

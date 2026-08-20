@@ -11,7 +11,7 @@ from ramble.appkit import *
 
 class Versions(ExecutableApplication):
     name = "versions"
-    version("0.8", description="Versions 0.8", preferred=False)
+    version("0.8", description="Versions 0.8")
 
     executable("test_exec_base", "echo 'all your base are belong to us'")
     workload("test_wl_base", executable="test_exec_base")
