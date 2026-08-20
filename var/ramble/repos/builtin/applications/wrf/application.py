@@ -33,7 +33,6 @@ class Wrf(ExecutableApplication):
         software_spec(
             "intel-mpi",
             pkg_spec="intel-oneapi-mpi@2021.17.2",
-            compiler="gcc14",
         )
 
         with when("application_version@4.0:"):

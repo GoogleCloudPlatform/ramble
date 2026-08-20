@@ -29,7 +29,6 @@ class Ngspice(ExecutableApplication):
         software_spec(
             "intel-mpi",
             pkg_spec="intel-oneapi-mpi@2021.17.2",
-            compiler="gcc14",
         )
 
         software_spec(
