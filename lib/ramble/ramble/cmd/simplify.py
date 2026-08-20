@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 import ramble.keywords
+import ramble.paths
 import ramble.repository
 import ramble.util.colors as color
 from ramble.expander import (
@@ -106,22 +107,44 @@ def _extract_ast_names(node, parent=None):
     return r
 
 
-def extract_referenced_names(template_str):
+_WORKFLOW_BASE_VARIABLES = frozenset(
+    {
+        "hostfile",
+        "hostlist",
+        "workflow_banner",
+        "workflow_pragmas",
+        "workflow_hostfile_cmd",
+        "workflow_nodes",
+        "workflow_cores_per_node",
+        "workflow_node_id",
+    }
+)
+
+
+def extract_referenced_names(
+    template_str,
+    all_defined_variables=None,
+    defined_inputs=None,
+    defined_software_specs=None,
+    python_refs=None,
+    fom_captures=None,
+):
     if not isinstance(template_str, str):
         return set()
 
     referenced = set()
-    brace_contents = []
+    brace_items = []
     stack = []
     escaped = False
     for i, char in enumerate(template_str):
         if char == "{":
             if not escaped:
-                stack.append(i)
+                is_bash = i > 0 and template_str[i - 1] == "$"
+                stack.append((i, is_bash))
         elif char == "}":
             if not escaped and stack:
-                start = stack.pop()
-                brace_contents.append(template_str[start + 1 : i])
+                start, is_bash = stack.pop()
+                brace_items.append((template_str[start + 1 : i], is_bash))
         elif char == "\n":
             stack = []
 
@@ -130,24 +153,45 @@ def extract_referenced_names(template_str):
         else:
             escaped = False
 
-    for content in brace_contents:
+    for content, is_bash in brace_items:
         match = format_spec_regex.search(content)
-        if match:
-            content = match.group("kw")
+        kw = match.group("kw") if match else content
+
+        raw_name = kw.split("::")[-1] if "::" in kw else kw
+        if all_defined_variables is not None:
+            if is_valid_reference(
+                kw,
+                all_defined_variables,
+                defined_inputs or set(),
+                defined_software_specs or set(),
+                python_refs=python_refs,
+                fom_captures=fom_captures,
+            ):
+                referenced.add(kw)
+                continue
+            if raw_name != kw and is_valid_reference(
+                raw_name,
+                all_defined_variables,
+                defined_inputs or set(),
+                defined_software_specs or set(),
+                python_refs=python_refs,
+                fom_captures=fom_captures,
+            ):
+                referenced.add(raw_name)
+                continue
+
+        # If it was written as a shell variable ${VAR} and does not match a defined
+        # Ramble variable, it is a bash/shell variable meant for runtime shell evaluation
+        if is_bash:
+            continue
 
         # Replace '::' with '.' to make namespace references valid Python attributes
-        ast_content = content.replace("::", ".")
+        ast_content = kw.replace("::", ".")
         try:
             tree = ast.parse(ast_content, mode="eval")
             referenced.update(_extract_ast_names(tree.body))
         except SyntaxError:
-            # Fallback to regex-based extraction if syntax is not valid Python
-            words = re.findall(r"[a-zA-Z0-9_:-]+", content)
-            for word in words:
-                if "::" in word:
-                    referenced.add(word.split("::")[-1])
-                else:
-                    referenced.add(word)
+            pass
     return referenced
 
 
@@ -647,8 +691,11 @@ def is_valid_reference(
     if (
         var_name in all_defined_variables
         or var_name in defined_inputs
+        or var_name in defined_software_specs
         or (var_name.endswith("_path") and var_name[:-5] in defined_software_specs)
+        or (var_name.endswith("_prefix") and var_name[:-7] in defined_software_specs)
         or var_name in ramble.keywords.default_keys
+        or var_name in _WORKFLOW_BASE_VARIABLES
         or (fom_captures and var_name in fom_captures)
         or var_name in _ALLOWED_MATH_NAMES
         or (python_refs and var_name in python_refs)
@@ -728,19 +775,19 @@ def analyze_object(name, obj_type):
     defined_inputs = get_nested_dict_keys(cls, "inputs")
     defined_executables = get_nested_dict_keys(cls, "executables")
     defined_variables = {var.name for var in iter_defined_variables(cls)}
+    all_referenced_compilers = set()
+    defined_software_specs = set(getattr(cls, "required_packages", {}) or ())
 
     if tree:
-        for _node, _call, _func_name, category, val in iter_class_directive_calls(tree):
+        for _node, _call, func_name, category, val in iter_class_directive_calls(tree):
             if category == "variables" and val:
                 defined_variables.add(val)
             elif category == "inputs" and val:
                 defined_inputs.add(val)
             elif category == "executables" and val:
                 defined_executables.add(val)
-
-    # Collect compilers and software specs
-    all_referenced_compilers = set()
-    defined_software_specs = set(getattr(cls, "required_packages", {}) or ())
+            elif func_name in ("software_spec", "required_package") and val:
+                defined_software_specs.add(val)
 
     if hasattr(cls, "software_specs") and cls.software_specs:
         for specs_list in cls.software_specs.values():
@@ -765,7 +812,14 @@ def analyze_object(name, obj_type):
     broken_template_refs = set()
 
     for tpl_str, fom_captures, ignore_names in iter_object_template_strings(cls, obj_path):
-        refs = extract_referenced_names(tpl_str)
+        refs = extract_referenced_names(
+            tpl_str,
+            all_defined_variables=defined_variables,
+            defined_inputs=defined_inputs,
+            defined_software_specs=defined_software_specs,
+            python_refs=python_refs,
+            fom_captures=fom_captures,
+        )
         all_referenced_names.update(refs)
         for r in refs:
             if ignore_names and r in ignore_names:
@@ -932,6 +986,19 @@ def setup_parser(subparser):
     )
 
 
+def is_mock_repo(repo):
+    """Check whether a repository is a mock/test repository."""
+    if repo.namespace == "builtin.mock" or repo.namespace.endswith(".mock"):
+        return True
+    if hasattr(repo, "root") and repo.root:
+        if (
+            hasattr(ramble.paths, "mock_builtin_path")
+            and repo.root == ramble.paths.mock_builtin_path
+        ) or repo.root.rstrip("/\\").endswith("builtin.mock"):
+            return True
+    return False
+
+
 def simplify(parser, args):
     obj_type = ramble.repository.ObjectTypes[args.type]
     obj_path = ramble.repository.paths[obj_type]
@@ -943,18 +1010,25 @@ def simplify(parser, args):
             if args.names:
                 names = [n for n in args.names if n in names_in_repo]
             else:
-                names = list(names_in_repo)
+                names = sorted(names_in_repo)
+            all_candidate_names = list(names_in_repo)
         except Exception:
             logger.error(f"Repository namespace '{args.repo}' is not configured.")
             return 1
     else:
         if args.names:
             names = args.names
+            all_candidate_names = obj_path.all_object_names()
         else:
-            names = obj_path.all_object_names()
+            non_mock_repos = [repo for repo in obj_path.repos if not is_mock_repo(repo)]
+            candidate_repos = non_mock_repos if non_mock_repos else obj_path.repos
+            candidate_names = set()
+            for repo in candidate_repos:
+                candidate_names.update(repo.all_object_names())
+            names = sorted(candidate_names)
+            all_candidate_names = list(candidate_names)
 
     # Lazy analysis helper for objects
-    all_candidate_names = names_in_repo if args.repo else obj_path.all_object_names()
     global_classes = {}
     local_defs = {}
     analysis_results = {}

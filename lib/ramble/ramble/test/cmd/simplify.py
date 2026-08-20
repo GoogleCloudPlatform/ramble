@@ -384,6 +384,32 @@ def test_extract_referenced_names():
     assert extract_referenced_names("foo {application::orca::version}") == {"version"}
     assert extract_referenced_names("foo {simple_var}") == {"simple_var"}
     assert extract_referenced_names(123) == set()
+    assert extract_referenced_names(
+        "foo {inputs-u-of-alberta}",
+        defined_inputs={"inputs-u-of-alberta"},
+        all_defined_variables=set(),
+    ) == {"inputs-u-of-alberta"}
+    assert extract_referenced_names("notes: {u of alberta inputs} awk '{print $NF}'") == set()
+    assert (
+        extract_referenced_names(
+            "echo ${SERVER_NUMBER} ${CLIENT_NUMBER}",
+            all_defined_variables=set(),
+        )
+        == set()
+    )
+    assert extract_referenced_names(
+        "echo ${my_var}",
+        all_defined_variables={"my_var"},
+    ) == {"my_var"}
+    assert extract_referenced_names(
+        "cat {hostfile}",
+        all_defined_variables=set(),
+    ) == {"hostfile"}
+    assert extract_referenced_names(
+        "run {altair-radioss}/bin/optistruct",
+        defined_software_specs={"altair-radioss"},
+        all_defined_variables=set(),
+    ) == {"altair-radioss"}
 
 
 def test_find_template_file_direct(tmpdir):
@@ -1021,3 +1047,161 @@ class Substringapp(ExecutableApplication):
         assert "input_file(" not in content
         assert "workload(" in content
         assert "executable(" in content
+
+
+def test_simplify_hyphenated_entities_and_syntax_error_braces(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("test_repo_hyphen"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testhyphen\n")
+
+    app_dir = os.path.join(repo_path, "applications", "hyphenapp")
+    os.makedirs(app_dir)
+    app_file = os.path.join(app_dir, "application.py")
+
+    code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class Hyphenapp(ExecutableApplication):
+    name = "hyphenapp"
+
+    input_file(
+        "inputs-u-of-alberta",
+        url="https://host.com/vasp-inputs.tgz",
+        description="Input file with hyphens",
+    )
+    workload_variable(
+        "num-objects",
+        default="1000",
+        description="Variable with hyphen",
+        workload="test_wl",
+    )
+    workload_variable(
+        "input_dir",
+        default="{inputs-u-of-alberta}",
+        workload="test_wl",
+    )
+    executable(
+        "foo",
+        "mdtest -n {num-objects} {input_dir} # notes: {u of alberta inputs} awk '{print $NF}'",
+        use_mpi=False,
+    )
+    workload("test_wl", executables=["foo"], input="inputs-u-of-alberta")
+"""
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "applications", "hyphenapp")
+        assert "Unused Variables" not in out
+        assert "Unused Inputs" not in out
+        assert "Broken Variable References in Templates" not in out
+        assert "alberta" not in out
+        assert "print" not in out
+        assert "NF" not in out
+        assert "Found 0 unused variables" in out
+
+
+def test_simplify_excludes_mock_repo_by_default(tmpdir, mutable_config):
+    # Create a real repo and a mock repo
+    real_repo_path = str(tmpdir.join("real_repo"))
+    os.makedirs(os.path.join(real_repo_path, "applications", "real_app"))
+    with open(os.path.join(real_repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: realrepo\n")
+    with open(
+        os.path.join(real_repo_path, "applications", "real_app", "application.py"),
+        "w",
+        encoding="utf-8",
+    ) as f:
+        f.write("""# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+class RealApp(ExecutableApplication):
+    name = "real_app"
+""")
+
+    mock_repo_path = str(tmpdir.join("mock_repo"))
+    os.makedirs(os.path.join(mock_repo_path, "applications", "mock_app"))
+    with open(os.path.join(mock_repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: test.mock\n")
+    with open(
+        os.path.join(mock_repo_path, "applications", "mock_app", "application.py"),
+        "w",
+        encoding="utf-8",
+    ) as f:
+        f.write("""# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+class MockApp(ExecutableApplication):
+    name = "mock_app"
+    workload_variable('unused_mock_var', default='val', workload='wl')
+""")
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    real_repo = ramble.repository.Repo(real_repo_path, object_type=obj_type)
+    mock_repo = ramble.repository.Repo(mock_repo_path, object_type=obj_type)
+
+    with ramble.repository.use_repositories(mock_repo, real_repo, object_type=obj_type):
+        # 1. Default execution without -r should only check real_repo, excluding mock_app
+        out_default = simplify_cmd("-t", "applications")
+        assert "mock_app" not in out_default
+        assert "unused_mock_var" not in out_default
+
+        # 2. Explicit -r test.mock should check mock_app
+        out_explicit = simplify_cmd("-t", "applications", "-r", "test.mock")
+        assert "mock_app" in out_explicit
+        assert "unused_mock_var" in out_explicit
+
+
+def test_simplify_bash_vars_and_workflow_variables(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("test_repo_bash"))
+    os.makedirs(os.path.join(repo_path, "applications", "bashapp"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testbash\n")
+
+    app_file = os.path.join(repo_path, "applications", "bashapp", "application.py")
+    code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class Bashapp(ExecutableApplication):
+    name = "bashapp"
+
+    workload_variable(
+        "log_prefix",
+        default="run",
+        workload="test_wl",
+    )
+    executable(
+        "run_client",
+        "cat {hostfile} >> {log_prefix}.s${SERVER_NUMBER}.c${CLIENT_NUMBER}",
+        use_mpi=False,
+    )
+    workload("test_wl", executables=["run_client"])
+"""
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "applications", "bashapp")
+        assert "Broken Variable References in Templates" not in out
+        assert "SERVER_NUMBER" not in out
+        assert "CLIENT_NUMBER" not in out
+        assert "hostfile" not in out
+        assert "Found 0 unused variables" in out
