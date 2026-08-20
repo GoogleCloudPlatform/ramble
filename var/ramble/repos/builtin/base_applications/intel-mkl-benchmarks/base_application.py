@@ -26,42 +26,34 @@ class IntelMklBenchmarks(ExecutableApplication):
     version(
         "2026.0.0",
         "Version 2026.0.0 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2025.3.1",
         "Version 2025.3.1 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2025.3.0",
         "Version 2025.3.0 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2025.2.0",
         "Version 2025.2.0 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2025.1.1",
         "Version 2025.1.1 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2025.0.0",
         "Version 2025.0.0 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2024.2.2",
         "Version 2024.2.2 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2024.2.1",
         "Version 2024.2.1 of intel-oneapi-mkl",
-        preferred=False,
     )
     version(
         "2024.2.0",
@@ -71,7 +63,6 @@ class IntelMklBenchmarks(ExecutableApplication):
     version(
         "2023.2.0",
         "Version 2023.2.0 of intel-oneapi-mkl",
-        preferred=False,
     )
 
     variable(

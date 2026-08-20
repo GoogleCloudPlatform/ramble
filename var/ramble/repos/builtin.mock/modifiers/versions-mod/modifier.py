@@ -17,7 +17,7 @@ class VersionsMod(BasicModifier):
     default_mode("standard")
 
     version("2.0", "versionsmod 2.0", preferred=True)
-    version("1.0", "versionsmod 1.0", preferred=False)
+    version("1.0", "versionsmod 1.0")
 
     with when("modifier_version@1.0"):
         environment_variable(

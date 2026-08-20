@@ -33,9 +33,9 @@ class Versions(VersionsBase):
             when=["@:0.9"],
         )
 
-    version("2.0a1", description="Versions 2.0 alpha", preferred=False)
+    version("2.0a1", description="Versions 2.0 alpha")
     version("1.0", description="Versions 1.0", preferred=True)
-    version("0.9", description="Versions 0.9", preferred=False)
+    version("0.9", description="Versions 0.9")
     # Version 0.8 imported from base_application.py
 
     with default_args(when=["package_manager_family=spack"]):

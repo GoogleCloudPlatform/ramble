@@ -19,8 +19,8 @@ class Iozone(ExecutableApplication):
     tags("storage-benchmark", "io-benchmark", "filesystem")
 
     version("3_506", "Version 3_506 of Iozone", preferred=True)
-    version("3_491", "Version 3_491 of Iozone", preferred=False)
-    version("3_465", "Version 3_465 of Iozone", preferred=False)
+    version("3_491", "Version 3_491 of Iozone")
+    version("3_465", "Version 3_465 of Iozone")
 
     @staticmethod
     def version_to_pep440(version):

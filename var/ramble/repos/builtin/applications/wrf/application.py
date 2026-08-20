@@ -25,7 +25,7 @@ class Wrf(ExecutableApplication):
     tags("weather", "nwp", "climate-modeling")
 
     version("4.2", description="Version 4.2 of WRF", preferred=True)
-    version("3.9.1.1", description="Version 3.9.1.1 of WRF", preferred=False)
+    version("3.9.1.1", description="Version 3.9.1.1 of WRF")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc14", pkg_spec="gcc@14.2.0")
