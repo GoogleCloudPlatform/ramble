@@ -110,9 +110,14 @@ def test_mock_spack_info_software(mock_applications, app_query):
     "info_query",
     [
         ["--type", "modifiers", "apptainer"],
+        ["--type", "modifier", "apptainer"],
         ["--type", "modifiers", "apptainer", "-vv"],
         ["--type", "package_managers", "spack"],
+        ["--type", "package_manager", "spack"],
+        ["--type", "package-manager", "spack"],
         ["--type", "workflow_managers", "slurm"],
+        ["--type", "workflow_manager", "slurm"],
+        ["--type", "workflow-manager", "slurm"],
     ],
 )
 def test_non_app_object_info_common_fields(info_query):

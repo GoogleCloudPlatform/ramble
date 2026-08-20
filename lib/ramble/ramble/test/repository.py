@@ -115,3 +115,94 @@ def test_list_object_files(
 def test_invalid_namespace(tmpdir, bad_ns):
     with pytest.raises(ramble.repository.InvalidNamespaceError):
         ramble.repository.create_repo(str(tmpdir.join("bad_repo")), namespace=bad_ns)
+
+
+@pytest.mark.parametrize(
+    "input_type,expected_enum",
+    [
+        ("applications", ramble.repository.ObjectTypes.applications),
+        ("application", ramble.repository.ObjectTypes.applications),
+        ("app", ramble.repository.ObjectTypes.applications),
+        ("apps", ramble.repository.ObjectTypes.applications),
+        ("modifiers", ramble.repository.ObjectTypes.modifiers),
+        ("modifier", ramble.repository.ObjectTypes.modifiers),
+        ("mod", ramble.repository.ObjectTypes.modifiers),
+        ("package_managers", ramble.repository.ObjectTypes.package_managers),
+        ("package_manager", ramble.repository.ObjectTypes.package_managers),
+        ("package-manager", ramble.repository.ObjectTypes.package_managers),
+        ("package manager", ramble.repository.ObjectTypes.package_managers),
+        ("pkg_man", ramble.repository.ObjectTypes.package_managers),
+        ("pkg", ramble.repository.ObjectTypes.package_managers),
+        ("package", ramble.repository.ObjectTypes.package_managers),
+        ("workflow_managers", ramble.repository.ObjectTypes.workflow_managers),
+        ("workflow_manager", ramble.repository.ObjectTypes.workflow_managers),
+        ("workflow-manager", ramble.repository.ObjectTypes.workflow_managers),
+        ("workflow manager", ramble.repository.ObjectTypes.workflow_managers),
+        ("wm", ramble.repository.ObjectTypes.workflow_managers),
+        ("workflow", ramble.repository.ObjectTypes.workflow_managers),
+        ("systems", ramble.repository.ObjectTypes.systems),
+        ("system", ramble.repository.ObjectTypes.systems),
+        ("sys", ramble.repository.ObjectTypes.systems),
+        ("platforms", ramble.repository.ObjectTypes.platforms),
+        ("platform", ramble.repository.ObjectTypes.platforms),
+        ("plat", ramble.repository.ObjectTypes.platforms),
+        ("base_classes", ramble.repository.ObjectTypes.base_classes),
+        ("base_class", ramble.repository.ObjectTypes.base_classes),
+        ("base-class", ramble.repository.ObjectTypes.base_classes),
+        ("base class", ramble.repository.ObjectTypes.base_classes),
+        ("base_cls", ramble.repository.ObjectTypes.base_classes),
+        ("base", ramble.repository.ObjectTypes.base_classes),
+        ("base_applications", ramble.repository.ObjectTypes.base_applications),
+        ("base_application", ramble.repository.ObjectTypes.base_applications),
+        ("base-application", ramble.repository.ObjectTypes.base_applications),
+        ("base application", ramble.repository.ObjectTypes.base_applications),
+        ("base_app", ramble.repository.ObjectTypes.base_applications),
+        ("base_modifiers", ramble.repository.ObjectTypes.base_modifiers),
+        ("base_modifier", ramble.repository.ObjectTypes.base_modifiers),
+        ("base-modifier", ramble.repository.ObjectTypes.base_modifiers),
+        ("base modifier", ramble.repository.ObjectTypes.base_modifiers),
+        ("base_mod", ramble.repository.ObjectTypes.base_modifiers),
+        ("base_package_managers", ramble.repository.ObjectTypes.base_package_managers),
+        ("base_package_manager", ramble.repository.ObjectTypes.base_package_managers),
+        ("base-package-manager", ramble.repository.ObjectTypes.base_package_managers),
+        ("base package manager", ramble.repository.ObjectTypes.base_package_managers),
+        ("base_pkg_man", ramble.repository.ObjectTypes.base_package_managers),
+        ("base_pkg", ramble.repository.ObjectTypes.base_package_managers),
+        ("base_workflow_managers", ramble.repository.ObjectTypes.base_workflow_managers),
+        ("base_workflow_manager", ramble.repository.ObjectTypes.base_workflow_managers),
+        ("base-workflow-manager", ramble.repository.ObjectTypes.base_workflow_managers),
+        ("base workflow manager", ramble.repository.ObjectTypes.base_workflow_managers),
+        ("base_wm", ramble.repository.ObjectTypes.base_workflow_managers),
+        ("base_systems", ramble.repository.ObjectTypes.base_systems),
+        ("base_system", ramble.repository.ObjectTypes.base_systems),
+        ("base-system", ramble.repository.ObjectTypes.base_systems),
+        ("base system", ramble.repository.ObjectTypes.base_systems),
+        ("base_sys", ramble.repository.ObjectTypes.base_systems),
+        ("base_platforms", ramble.repository.ObjectTypes.base_platforms),
+        ("base_platform", ramble.repository.ObjectTypes.base_platforms),
+        ("base-platform", ramble.repository.ObjectTypes.base_platforms),
+        ("base platform", ramble.repository.ObjectTypes.base_platforms),
+        ("base_plat", ramble.repository.ObjectTypes.base_platforms),
+        ("utilities", ramble.repository.ObjectTypes.utilities),
+        ("utility", ramble.repository.ObjectTypes.utilities),
+        ("base_utilities", ramble.repository.ObjectTypes.base_utilities),
+        ("base_utility", ramble.repository.ObjectTypes.base_utilities),
+        ("base-utility", ramble.repository.ObjectTypes.base_utilities),
+        ("base utility", ramble.repository.ObjectTypes.base_utilities),
+    ],
+)
+def test_simplify_object_type(input_type, expected_enum):
+    assert ramble.repository.simplify_object_type(input_type) == expected_enum
+    assert ramble.repository.simplify_object_type(input_type.upper()) == expected_enum
+    assert ramble.repository.get_object_type(input_type) == expected_enum
+
+
+def test_simplify_object_type_enum_passthrough():
+    for obj_type in ramble.repository.ObjectTypes:
+        assert ramble.repository.simplify_object_type(obj_type) == obj_type
+
+
+@pytest.mark.parametrize("invalid_type", ["not_a_type", "foo_bar", "123", "", None])
+def test_simplify_object_type_invalid(invalid_type):
+    with pytest.raises(ramble.repository.UnknownObjectTypeError):
+        ramble.repository.simplify_object_type(invalid_type)

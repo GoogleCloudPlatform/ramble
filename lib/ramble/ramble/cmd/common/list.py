@@ -162,7 +162,7 @@ def perform_list(args):
     # retrieve the formatter to use from args
     formatter = formatters[args.format]
 
-    object_type = ramble.repository.ObjectTypes[args.type]
+    object_type = ramble.repository.simplify_object_type(args.type)
 
     sorted_objects = object_utils.filter_by_name(args.filter, args.search_description, object_type)
 

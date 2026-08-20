@@ -75,6 +75,30 @@ def test_list_base_html():
     assert '<div class="section" id="hpl">' in output
 
 
+@pytest.mark.parametrize(
+    "type_arg",
+    [
+        "applications",
+        "application",
+        "app",
+        "base_applications",
+        "base_application",
+        "base-application",
+        "modifiers",
+        "modifier",
+        "package_managers",
+        "package_manager",
+        "package-manager",
+        "workflow_managers",
+        "workflow_manager",
+    ],
+)
+def test_list_types(type_arg):
+    output = list("--type", type_arg)
+    assert output is not None
+    assert len(output) > 0
+
+
 def test_list_update(tmpdir):
     update_file = tmpdir.join("output")
 
