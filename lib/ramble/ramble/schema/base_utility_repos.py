@@ -6,27 +6,18 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Schema for repos.yaml configuration file.
+"""Schema for base_utility_repos.yaml configuration file.
 
-.. literalinclude:: _ramble_root/lib/ramble/ramble/schema/repos.py
+.. literalinclude:: _ramble_root/lib/ramble/ramble/schema/base_utility_repos.py
    :lines: 13-
 """
 
-#: Properties for inclusion in other schemas
-properties = {
-    "base_utility_repos": {
-        "type": "array",
-        "default": [],
-        "items": {"type": "string"},
-    },
-}
+from ramble.schema.repo_schema import make_repo_properties, make_repo_schema
 
+section_name = "base_utility_repos"
+
+#: Properties for inclusion in other schemas
+properties = make_repo_properties(section_name)
 
 #: Full schema with metadata
-schema = {
-    "$schema": "http://json-schema.org/schema#",
-    "title": "Ramble repository configuration file schema",
-    "type": "object",
-    "additionalProperties": False,
-    "properties": properties,
-}
+schema = make_repo_schema(section_name)
