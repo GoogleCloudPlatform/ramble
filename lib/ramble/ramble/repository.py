@@ -973,25 +973,6 @@ class RepoPath:
                 return True
         return False
 
-    # TODO: DWJ - Maybe we don't need this? Are we going to have virtual
-    #             objects
-    # def is_virtual(self, obj_name, use_index=True):
-    #     """True if the object with this name is virtual,
-    #        False otherwise.
-    #
-    #     Set `use_index` False when calling from a code block that could
-    #     be run during the computation of the provider index."""
-    #     have_name = obj_name is not None
-    #     if have_name and not isinstance(obj_name, str):
-    #         raise ValueError(
-    #             "is_virtual(): expected object name, got %s" %
-    #             type(obj_name))
-    #     if use_index:
-    #         return have_name and app_name in self.provider_index
-    #     else:
-    #         return have_name and (not self.exists(app_name) or
-    #                               self.get_app_class(app_name).virtual)
-
     def __contains__(self, obj_name):
         return self.exists(obj_name)
 

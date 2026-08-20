@@ -197,3 +197,13 @@ def test_singular_type_repo_commands(mutable_config, tmpdir, type_arg):
     repo("remove", "-t", type_arg, "--scope=site", repo_path)
     output = repo("list", "-t", type_arg, "--scope=site", output=str)
     assert f"mockrepo_{type_arg}" not in output
+
+
+def test_repo_list_multitype_non_application_scope(mutable_empty_config, tmpdir):
+    """Test that repo list (type 'any') lists modifiers even if no applications are in scope."""
+    mod_repo_path = str(tmpdir.join("mod_repo"))
+    repo("create", mod_repo_path, "mockmodrepo", "-t", "modifiers")
+    repo("add", "-t", "modifiers", mod_repo_path)
+
+    output = repo("list", output=str)
+    assert "mockmodrepo" in output
