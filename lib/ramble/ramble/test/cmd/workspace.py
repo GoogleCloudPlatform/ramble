@@ -262,110 +262,100 @@ def test_workspace_list(mutable_mock_workspace_path):
 
 
 def test_workspace_info(workspace_name):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-        test_wl2:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-  software:
-    packages:
-      zlib:
-        pkg_spec: 'zlib'
-    environments:
-      zlib:
-        packages:
-        - zlib
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-V",
+        "package_manager=spack",
+        "--wf",
+        "ensure_installed",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace("concretize", global_args=global_args)
     ws1._re_read()
 
-    output = workspace("info", "--software", global_args=["-w", workspace_name])
+    output = workspace("info", "--software", global_args=global_args)
 
     check_info_basic(output)
 
 
 def test_workspace_info_namespaced_application(workspace_name, mutable_mock_apps_repo):
-    test_config = """
-ramble:
-  config:
-    enable_strict_versions: false
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    builtin.mock.app.basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-    basic@1.0:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '1'
-    builtin.mock.basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '3'
-    app.basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '4'
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    config("add", "config:enable_strict_versions:false", global_args=global_args)
 
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
+    workspace(
+        "manage",
+        "experiments",
+        "builtin.mock.app.basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "basic@1.0",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=1",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "builtin.mock.basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=3",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "app.basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=4",
+        global_args=global_args,
+    )
     ws1._re_read()
 
-    output = workspace("info", global_args=["-w", workspace_name])
+    output = workspace("info", global_args=global_args)
 
     assert "Application: builtin.mock.app.basic" in output
     assert "Application: basic" in output
@@ -497,51 +487,49 @@ ramble:
 
 
 def test_workspace_info_with_where_filter(workspace_name):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-        test_wl2:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-  software:
-    packages:
-      zlib:
-        pkg_spec: 'zlib'
-    environments:
-      zlib:
-        packages:
-        - zlib
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "test_wl2",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-V",
+        "package_manager=spack",
+        "--wf",
+        "ensure_installed",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace("concretize", global_args=global_args)
     ws1._re_read()
 
     output = workspace(
@@ -549,7 +537,7 @@ ramble:
         "--software",
         "--where",
         '"{experiment_index}" == "1"',
-        global_args=["-w", workspace_name],
+        global_args=global_args,
     )
 
     assert "basic.test_wl.test_experiment" in output
@@ -558,46 +546,35 @@ ramble:
 
 
 def test_workspace_info_phases(workspace_name):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-        test_wl2:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-    zlib:
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "--wf",
+        "ensure_installed",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
     ws1._re_read()
 
-    output = workspace("info", "--phases", global_args=["-w", workspace_name])
+    output = workspace("info", "--phases", global_args=global_args)
 
     assert "basic" in output
     assert "test_wl" in output
@@ -619,8 +596,8 @@ def test_workspace_info_complete(workspace_name):
         "manage",
         "experiments",
         "zlib",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         "--wf",
         "ensure_installed",
         "-v",
@@ -874,54 +851,41 @@ def test_remove_workspace():
 
 
 def test_concretize_command(workspace_name):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-        test_wl2:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-    zlib:
-      variants:
-        package_manager: spack
-      workloads:
-        ensure_installed:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-  software:
-    packages: {}
-    environments: {}
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-V",
+        "package_manager=spack",
+        "--wf",
+        "ensure_installed",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
-    ws1._re_read()
 
     assert search_files_for_string([config_path], "packages: {}")
     assert not search_files_for_string([config_path], "pkg_spec: zlib")
 
-    workspace("concretize", global_args=["-w", workspace_name])
+    workspace("concretize", global_args=global_args)
 
     assert not search_files_for_string([config_path], "packages: {}")
     assert search_files_for_string([config_path], "pkg_spec: zlib")
@@ -1326,37 +1290,24 @@ ramble # Missing colon!
 
 
 def test_dryrun_setup(workspace_name):
-    test_config = """
-ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '5'
-    n_ranks: '{processes_per_node}*{n_nodes}'
-  applications:
-    basic:
-      workloads:
-        test_wl:
-          experiments:
-            test_experiment:
-              variables:
-                n_nodes: '2'
-  software:
-    packages: {}
-    environments: {}
-"""
-
+    global_args = ["-w", workspace_name]
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "test_experiment",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
 
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
-    ws1._re_read()
-
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=global_args)
 
     out_files = glob.glob(os.path.join(ws1.log_dir, "**", "*.out"), recursive=True)
 
@@ -2633,8 +2584,8 @@ def test_workspace_info_software(workspace_name):
         "n_ranks=1",
         "-v",
         "env_name=pip-env",
-        "-p",
-        "pip",
+        "-V",
+        "package_manager=pip",
         "--default-variable-value",
         "1",
         global_args=global_args,
@@ -2654,8 +2605,8 @@ def test_workspace_info_software(workspace_name):
         "n_ranks=1",
         "-v",
         "env_name=spack-env",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         "--default-variable-value",
         "1",
         global_args=global_args,
@@ -3264,8 +3215,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
-            "-p",
-            "spack",
+            "-V",
+            "package_manager=spack",
             "--default-variable-value",
             "1",
             global_args=global_args,
@@ -3281,8 +3232,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
-            "-p",
-            "spack",
+            "-V",
+            "package_manager=spack",
             "--default-variable-value",
             "1",
             global_args=global_args,
@@ -3388,8 +3339,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
-            "-p",
-            "spack",
+            "-V",
+            "package_manager=spack",
             "--default-variable-value",
             "1",
             global_args=global_args,
@@ -3405,8 +3356,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
-            "-p",
-            "spack",
+            "-V",
+            "package_manager=spack",
             "--default-variable-value",
             "1",
             global_args=global_args,
