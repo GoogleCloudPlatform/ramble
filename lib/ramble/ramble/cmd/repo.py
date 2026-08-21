@@ -343,7 +343,7 @@ def repo_list(args):
             logger.msg(msg)
 
         if not repos:
-            return
+            continue
 
         max_ns_len = max(len(r.namespace) for r in repos)
         for repo in repos:
