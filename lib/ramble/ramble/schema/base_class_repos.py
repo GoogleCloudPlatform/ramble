@@ -12,21 +12,12 @@
    :lines: 13-
 """
 
-#: Properties for inclusion in other schemas
-properties = {
-    "base_class_repos": {
-        "type": "array",
-        "default": [],
-        "items": {"type": "string"},
-    },
-}
+from ramble.schema.repo_schema import make_repo_properties, make_repo_schema
 
+section_name = "base_class_repos"
+
+#: Properties for inclusion in other schemas
+properties = make_repo_properties(section_name)
 
 #: Full schema with metadata
-schema = {
-    "$schema": "http://json-schema.org/schema#",
-    "title": "Ramble base class repository configuration file schema",
-    "type": "object",
-    "additionalProperties": False,
-    "properties": properties,
-}
+schema = make_repo_schema(section_name)

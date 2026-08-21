@@ -57,3 +57,14 @@ def _make_validator():
 
 
 Validator = llnl.util.lang.Singleton(_make_validator)
+
+
+def __getattr__(name: str):
+    import importlib
+
+    try:
+        return importlib.import_module(f"ramble.schema.{name}")
+    except ModuleNotFoundError as err:
+        if err.name == f"ramble.schema.{name}":
+            raise AttributeError(f"module 'ramble.schema' has no attribute '{name}'") from err
+        raise
