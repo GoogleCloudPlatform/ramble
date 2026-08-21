@@ -109,18 +109,19 @@ class Maxtext(ExecutableApplication):
     )
 
     # Pyxis/Enroot parameters
-    workload_variable(
-        "maxtext_mount",
-        default="{maxtext_path}:{maxtext_path}",
-        description="Container mount for maxtext root",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "container_mounts",
-        default="{maxtext_mount}",
-        description="All container mounts in a ramble variable",
-        workloads=all_workloads,
-    )
+    with when("+containerized"):
+        workload_variable(
+            "maxtext_mount",
+            default="{maxtext_path}:{maxtext_path}",
+            description="Container mount for maxtext root",
+            workloads=all_workloads,
+        )
+        workload_variable(
+            "container_mounts",
+            default="{maxtext_mount}",
+            description="All container mounts in a ramble variable",
+            workloads=all_workloads,
+        )
 
     log_str = os.path.join("{experiment_run_dir}", "metrics.out")
     float_or_sci_regex = r"[+-]?[0-9]+(?:\.[0-9]*(?:[eE][+-]?[0-9]+)?)?"

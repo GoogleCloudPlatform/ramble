@@ -644,3 +644,145 @@ def test_boolean_variant_output_formatting():
 
     sorted_output = sorted(output_set, key=when_order)
     assert sorted_output == ["str_var=foo", "+bool_var", "~false_var"]
+
+
+def test_containerized_reserved_variant(request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+
+        # Verify it validates correctly without errors
+        workspace("concretize", global_args=global_args)
+
+        # Verify containerized is in reserved_variants and validate_variant raises an error
+        # for custom definitions, but works for the workspace.
+        with pytest.raises(ramble.variants.RambleVariantError):
+            ramble.variants.validate_variant("containerized")
+
+        # Verify that containerized is false by default in workspace config context
+        # (It should load from etc/ramble/defaults/variants.yaml)
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert not app.object_variants.value("containerized")
+
+        # Set it to true in workspace config and verify
+        config("add", "variants:containerized:true", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert app.object_variants.value("containerized")
+
+
+def test_workflow_manager_containerized_propagation(request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        # Define mpi_command variable to satisfy keyword validation
+        config("add", "variables:mpi_command:mpirun -n {n_ranks}", global_args=global_args)
+
+        # Set workflow manager to gke-mpi (containerized)
+        config("add", "variants:workflow_manager:gke-mpi", global_args=global_args)
+        ws._re_read()
+
+        # Verify it defaults to containerized=True
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert app.object_variants.value("containerized")
+
+        # Now set it explicitly to false, and verify it respects the user override
+        config("add", "variants:containerized:false", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert not app.object_variants.value("containerized")
+
+
+def test_containerized_app_variable_guarding(request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        # Define mpi_command variable to satisfy keyword validation
+        config("add", "variables:mpi_command:mpirun -n {n_ranks}", global_args=global_args)
+
+        # By default, workflow manager is user-managed, so containerized=False.
+        # Verify container_only_var is NOT defined as a workload variable.
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" not in app.variables
+
+        # Switch to a containerized workflow manager (gke-mpi)
+        config("add", "variants:workflow_manager:gke-mpi", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" in app.variables
+
+        # Switch back to user-managed workflow manager but explicitly set containerized: true
+        config("add", "variants:workflow_manager:user-managed", global_args=global_args)
+        config("add", "variants:containerized:true", global_args=global_args)
+        ws._re_read()
+        exp_set = ws.build_experiment_set()
+        for _, app, _ in exp_set.all_experiments():
+            assert "container_only_var" in app.variables

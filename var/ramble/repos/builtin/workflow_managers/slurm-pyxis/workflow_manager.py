@@ -19,6 +19,8 @@ class SlurmPyxis(SlurmBase):
 
     tags("workflow", "slurm", "pyxis")
 
+    is_containerized = True
+
     workflow_manager_variable(
         name="container_path",
         default="",

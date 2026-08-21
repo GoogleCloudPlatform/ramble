@@ -24,6 +24,8 @@ class GkeMpi(WorkflowManagerBase):
 
     tags("workflow", "gke", "mpi")
 
+    is_containerized = True
+
     workflow_manager_variable(
         name="job_name",
         default="{application_name}-{workload_name}-{experiment_name}",

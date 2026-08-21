@@ -135,33 +135,34 @@ class PyNemo(BasePyNemo):
         workload_group="pretraining",
     )
 
-    workload_variable(
-        "logs_mount",
-        default="{exp_manager.explicit_log_dir}:{exp_manager.explicit_log_dir}",
-        description="Container mount for results data",
-        workload_group="pretraining",
-    )
+    with when("+containerized"):
+        workload_variable(
+            "logs_mount",
+            default="{exp_manager.explicit_log_dir}:{exp_manager.explicit_log_dir}",
+            description="Container mount for results data",
+            workload_group="pretraining",
+        )
 
-    workload_variable(
-        "results_mount",
-        default="{experiment_run_dir}:{experiment_run_dir}",
-        description="Container mount for results data",
-        workload_group="pretraining",
-    )
+        workload_variable(
+            "results_mount",
+            default="{experiment_run_dir}:{experiment_run_dir}",
+            description="Container mount for results data",
+            workload_group="pretraining",
+        )
 
-    environment_variable(
-        "NEMO_CONTAINER_MOUNTS",
-        value="{logs_mount},{results_mount}",
-        description="All container mounts in an environment variable",
-        workload_group="pretraining",
-    )
+        environment_variable(
+            "NEMO_CONTAINER_MOUNTS",
+            value="{logs_mount},{results_mount}",
+            description="All container mounts in an environment variable",
+            workload_group="pretraining",
+        )
 
-    workload_variable(
-        "container_mounts",
-        default="{logs_mount},{results_mount}",
-        description="All container mounts in a ramble variable",
-        workload_group="pretraining",
-    )
+        workload_variable(
+            "container_mounts",
+            default="{logs_mount},{results_mount}",
+            description="All container mounts in a ramble variable",
+            workload_group="pretraining",
+        )
 
     # Run parameters
     workload_variable(

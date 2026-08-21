@@ -29,6 +29,7 @@ reserved_variants = {
     "is_repeat_child",
     "is_repeat_parent",
     "repeat_index",
+    "containerized",
 }
 
 variant_types = Enum("variant_types", ["default", "experiment", "version"])

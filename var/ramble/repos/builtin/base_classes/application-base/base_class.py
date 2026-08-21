@@ -215,6 +215,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             default=0,
             description="Index of this experiment, in repeat space",
         )
+        self.object_variants.default_variant(
+            name=namespace.containerized,
+            default=False,
+            description="Whether this experiment is run inside a container",
+        )
 
         self._vars_are_expanded = False
         self.expander = None

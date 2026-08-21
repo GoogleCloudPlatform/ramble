@@ -75,6 +75,14 @@ class WhenVariants(ExecutableApplication):
         workloads=["*"],
     )
 
+    with when("+containerized"):
+        workload_variable(
+            "container_only_var",
+            default="container_val",
+            description="Variable only defined in container",
+            workloads=["*"],
+        )
+
     variant(
         "templated_validation",
         default="{templated_validation_var}",
