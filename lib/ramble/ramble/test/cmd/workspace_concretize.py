@@ -24,10 +24,11 @@ def test_workspace_concretize_additive(workspace_name):
     global_args = ["-w", workspace_name]
 
     workspace(
-        "generate-config",
+        "manage",
+        "experiments",
         "gromacs",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         "--wf",
         "water_*",
         global_args=global_args,
@@ -42,10 +43,11 @@ def test_workspace_concretize_additive(workspace_name):
         assert "intel-oneapi-vtune" not in content
 
     workspace(
-        "generate-config",
+        "manage",
+        "experiments",
         "wrf",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         global_args=global_args,
     )
     workspace("concretize", "-q", global_args=global_args)
@@ -81,8 +83,8 @@ def test_workspace_multispec_concretize(workspace_name):
         "manage",
         "experiments",
         "gromacs",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         "-e",
         "spack_test",
         "--wf",
@@ -95,8 +97,8 @@ def test_workspace_multispec_concretize(workspace_name):
         "manage",
         "experiments",
         "gromacs@2024.1",
-        "-p",
-        "eessi",
+        "-V",
+        "package_manager=eessi",
         "-e",
         "eessi_test",
         "--wf",

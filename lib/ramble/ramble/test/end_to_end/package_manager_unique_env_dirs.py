@@ -22,7 +22,8 @@ def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, wo
 
     # Add tests to workspace
     workspace(
-        "generate-config",
+        "manage",
+        "experiments",
         "gromacs",
         "-v",
         "n_nodes=1",
@@ -30,15 +31,16 @@ def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, wo
         "n_ranks=1",
         "-v",
         "env_name=multiple_env",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         "--wf",
         "water_bare",
         global_args=global_args,
     )
 
     workspace(
-        "generate-config",
+        "manage",
+        "experiments",
         "pip-test",
         "-v",
         "n_nodes=1",
@@ -46,8 +48,8 @@ def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, wo
         "n_ranks=1",
         "-v",
         "env_name=multiple_env",
-        "-p",
-        "pip",
+        "-V",
+        "package_manager=pip",
         "--wf",
         "import",
         global_args=global_args,

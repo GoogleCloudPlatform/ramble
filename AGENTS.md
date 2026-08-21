@@ -265,7 +265,8 @@ Ramble uses `pytest` for its unit tests. Tests **must** be run using the `ramble
 Using `-k` is particularly useful for running only newly added tests.
 
 *   **Writing Unit Tests & Using Test Fixtures**:
-    *   **Workspace Creation**: **ALWAYS** use the `make_workspace_from_config` fixture from `conftest.py` when creating and configuring workspaces in unit tests. Avoid manually creating workspace directories via `tmpdir` or writing YAML files manually.
+    *   **Prefer `workspace manage` for Experiment & Workspace Setup**: When configuring workspaces in CLI tests, command workflows, or application `test_cases/`, prefer using `workspace manage` subcommands (e.g., `workspace("manage", "experiments", ...)`, `workspace("manage", "software", ...)`, `workspace("manage", "modifiers", ...)`, `workspace("manage", "filter-groups", ...)`) or `setup.yaml` instead of manually writing raw YAML strings to `ramble.yaml`. Use `-V <variant>=<value>` (e.g., `-V package_manager=spack`) rather than deprecated flags like `-p` or `--wm`.
+    *   **Workspace Creation Fixture**: When a test requires programmatic raw configuration fixtures, **ALWAYS** use the `make_workspace_from_config` fixture from `conftest.py`. Avoid manually creating workspace directories via `tmpdir` or writing YAML files manually.
     *   **`make_workspace_from_config(config_str=None, name=None, activate=False)`**:
         *   Accepts a raw YAML configuration string (`config_str`) defining the `ramble:` dictionary.
         *   Automatically isolates workspace files under `mutable_mock_workspace_path` and mocks configuration scopes (`mutable_config`).

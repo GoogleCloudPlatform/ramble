@@ -27,7 +27,8 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     global_args = ["-w", workspace_name]
 
     workspace(
-        "generate-config",
+        "manage",
+        "experiments",
         "gromacs",
         "--wf",
         "water_bare",
@@ -37,8 +38,8 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
         "n_nodes=1",
         "-v",
         "n_ranks=1",
-        "-p",
-        "spack",
+        "-V",
+        "package_manager=spack",
         global_args=global_args,
     )
 
