@@ -12,6 +12,7 @@ from typing import Callable, Dict
 import llnl.util.filesystem as fs
 
 import ramble.cmd
+import ramble.cmd.common
 import ramble.config
 import ramble.fetch_strategy
 import ramble.filters
@@ -195,39 +196,15 @@ def deployment_run_pipeline(args, pipeline):
 subcommand_functions: Dict[str, Callable] = {}
 
 
-def sanitize_arg_name(base_name):
-    """Allow function names to be remapped (eg `-` to `_`)"""
-    formatted_name = base_name.replace("-", "_")
-    return formatted_name
-
-
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="deployment_command")
-
-    for name in subcommands:
-        if isinstance(name, (list, tuple)):
-            name, aliases = name[0], name[1:]
-        else:
-            aliases = []
-
-        # add commands to subcommands dict
-        function_name = sanitize_arg_name(f"deployment_{name}")
-
-        function = globals()[function_name]
-        for alias in [name] + aliases:
-            subcommand_functions[alias] = function
-
-        # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name(f"deployment_{name}_setup_parser")
-        setup_parser_cmd = globals()[setup_parser_cmd_name]
-
-        subsubparser = sp.add_parser(
-            name,
-            aliases=aliases,
-            help=setup_parser_cmd.__doc__,
-            description=setup_parser_cmd.__doc__,
-        )
-        setup_parser_cmd(subsubparser)
+    ramble.cmd.common.setup_subcommands_from_prefix(
+        subparser=subparser,
+        dest="deployment_command",
+        subcommands=subcommands,
+        prefix="deployment",
+        globals_dict=globals(),
+        subcommand_functions=subcommand_functions,
+    )
 
 
 def deployment(parser, args):

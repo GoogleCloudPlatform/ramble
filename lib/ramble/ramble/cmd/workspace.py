@@ -20,6 +20,7 @@ from llnl.util import tty
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
+import ramble.cmd.common
 import ramble.cmd.filter_groups
 import ramble.config
 import ramble.expander
@@ -1965,43 +1966,7 @@ def workspace_manage_modifiers(args):
 
 def workspace_manage_filter_groups_setup_parser(subparser):
     """manage workspace filter groups"""
-    scopes_metavar = ramble.config.scopes_metavar
-
-    subparser.add_argument(
-        "--scope",
-        choices=ramble.config.scopes_choices(include_workspace=True),
-        metavar=scopes_metavar,
-        default=None,
-        help="configuration scope to modify/list",
-    )
-
-    actions = subparser.add_subparsers(metavar="ACTION", dest="action")
-
-    add_parser = actions.add_parser("add", help="add a filter group")
-    add_parser.add_argument("-n", "--name", required=True, help="name of filter group")
-    add_parser.add_argument(
-        "--where",
-        action="append",
-        help="inclusive filter expression. Can be specified multiple times.",
-    )
-    add_parser.add_argument(
-        "--exclude-where",
-        dest="exclude_where",
-        action="append",
-        help="exclusive filter expression. Can be specified multiple times.",
-    )
-
-    remove_parser = actions.add_parser("remove", aliases=["rm"], help="remove a filter group")
-    remove_parser.add_argument("-n", "--name", required=True, help="name of filter group")
-
-    list_parser = actions.add_parser("list", help="list defined filter groups")
-    list_parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="show the filter group definition for each",
-    )
-    actions.add_parser("blame", help="show defined filter groups with sources")
+    ramble.cmd.filter_groups.setup_parser(subparser)
 
 
 def workspace_manage_filter_groups(args):
@@ -2118,48 +2083,16 @@ def workspace_experiment_logs(args):
 subcommand_functions: Dict[str, Callable] = {}
 
 
-def sanitize_arg_name(base_name):
-    """Allow function names to be remapped (eg `-` to `_`)"""
-    formatted_name = base_name.replace("-", "_")
-    return formatted_name
-
-
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="workspace_command")
-
-    for name in subcommands:
-        if isinstance(name, (list, tuple)):
-            name, aliases = name[0], name[1:]
-        else:
-            aliases = []
-
-        # add commands to subcommands dict
-        function_name = sanitize_arg_name(f"workspace_{name}")
-
-        function = globals()[function_name]
-        for alias in [name] + aliases:
-            subcommand_functions[alias] = function
-
-        # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name(f"workspace_{name}_setup_parser")
-        setup_parser_cmd = globals()[setup_parser_cmd_name]
-
-        subsubparser = sp.add_parser(
-            name,
-            aliases=aliases,
-            help=setup_parser_cmd.__doc__,
-            description=setup_parser_cmd.__doc__,
-        )
-        setup_parser_cmd(subsubparser)
-
-        # inject --dry-run into subcommands
-        if "--dry-run" not in subsubparser._option_string_actions:
-            subsubparser.add_argument(
-                "--dry-run",
-                dest="dry_run",
-                action="store_true",
-                help=f"perform a dry run of the {name} command",
-            )
+    ramble.cmd.common.setup_subcommands_from_prefix(
+        subparser=subparser,
+        dest="workspace_command",
+        subcommands=subcommands,
+        prefix="workspace",
+        globals_dict=globals(),
+        subcommand_functions=subcommand_functions,
+        inject_dry_run=True,
+    )
 
 
 def workspace(parser, args, unknown_args):
@@ -2185,29 +2118,11 @@ def workspace_manage(args):
 
 def workspace_manage_setup_parser(subparser):
     """manage workspace definitions"""
-    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="manage_command")
-
-    for name in manage_commands:
-        if isinstance(name, (list, tuple)):
-            name, aliases = name[0], name[1:]
-        else:
-            aliases = []
-
-        # add commands to subcommands dict
-        function_name = sanitize_arg_name(f"workspace_manage_{name}")
-
-        function = globals()[function_name]
-        for alias in [name] + aliases:
-            manage_subcommand_functions[alias] = function
-
-        # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name(f"workspace_manage_{name}_setup_parser")
-        setup_parser_cmd = globals()[setup_parser_cmd_name]
-
-        subsubparser = sp.add_parser(
-            name,
-            aliases=aliases,
-            help=setup_parser_cmd.__doc__,
-            description=setup_parser_cmd.__doc__,
-        )
-        setup_parser_cmd(subsubparser)
+    ramble.cmd.common.setup_subcommands_from_prefix(
+        subparser=subparser,
+        dest="manage_command",
+        subcommands=manage_commands,
+        prefix="workspace_manage",
+        globals_dict=globals(),
+        subcommand_functions=manage_subcommand_functions,
+    )
