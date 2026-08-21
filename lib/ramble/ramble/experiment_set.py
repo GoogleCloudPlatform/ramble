@@ -808,6 +808,10 @@ class ExperimentSet:
             else:
                 self.add_chained_experiment(app_inst.expander.experiment_name, app_inst)
 
+        for app_inst in rendered_instances:
+            if app_inst.repeats.is_repeat_base:
+                app_inst.read_status()
+
         for wl_name, stats in overall_wl_stats.items():
             if stats["passed_global"] > 0 and stats["processed"] == 0 and stats["dropped_wl"] > 0:
                 logger.warn(
@@ -906,6 +910,10 @@ class ExperimentSet:
         """Return the number of filtered experiments in this set"""
         return len(self.filtered_experiments(filters))
 
+    def clear_filter_cache(self):
+        """Clear the filtered experiments cache"""
+        self._filtered_experiments_cache.clear()
+
     def filtered_experiments(self, filters):
         """Return a filtered set of all experiments based on a logical expression
 
@@ -930,6 +938,9 @@ class ExperimentSet:
         filtered_list = []
         for exp, inst, idx in self.all_experiments():
             active = True
+
+            if inst.repeats.is_repeat_base:
+                inst.read_status()
 
             if filters.include_where:
                 for expression in filters.include_where:

@@ -3825,34 +3825,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # If repeat_success_strict is true, one failed experiment will fail the whole set
         # If repeat_success_strict is false, any passing experiment will pass the whole set
-        repeat_success = False
-        exp_status_list = []
-        for exp in repeat_experiments:
-            if exp in self.experiment_set.experiments:
-                exp_inst = self.experiment_set.experiments[exp]
-            elif exp in self.experiment_set.chained_experiments:
-                exp_inst = self.experiment_set.chained_experiments[exp]
-            else:
-                continue
-
-            exp_status_list.append(exp_inst.get_status())
-
-        if workspace.repeat_success_strict:
-            if ExperimentStatus.FAILED in exp_status_list:
-                repeat_success = False
-            else:
-                repeat_success = True
-        else:
-            if ExperimentStatus.SUCCESS in exp_status_list:
-                repeat_success = True
-            else:
-                repeat_success = False
-
-        if repeat_success:
-            self.set_status(status=ExperimentStatus.SUCCESS)
-        else:
-            self.set_status(status=ExperimentStatus.FAILED)
-
+        status, exp_status_list = self.calculate_repeat_status(
+            workspace, return_status_list=True
+        )
+        self.set_status(status=status)
         self.result.finalize(workspace)
 
         logger.debug(
@@ -3873,6 +3849,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # When strict success is off for repeats (loose success), skip failed exps
             if exp_inst.result.status == ExperimentStatus.FAILED:
                 continue
+
+            if not exp_inst.result.contexts:
+                exp_inst.result.read_cache(workspace, exp_inst)
 
             if exp_inst.result.contexts:
                 for context in exp_inst.result.contexts:
@@ -4287,13 +4266,114 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Add value to an in-memory FOM"""
         self._fom_map[fom_map_key] = value
 
+    def get_repeat_child_namespaces(self):
+        """Return a list of namespaces for all repeat children of this experiment"""
+        if not self.repeats.is_repeat_base or not self.experiment_set:
+            return []
+
+        base_exp_name = self.expander.experiment_name
+        is_chained = (
+            base_exp_name in self.experiment_set.chained_experiments
+            and base_exp_name not in self.experiment_set.experiments
+        )
+
+        if is_chained and ".chain" in base_exp_name:
+            idx = base_exp_name.index(".chain")
+            prefix, suffix = base_exp_name[:idx], base_exp_name[idx:]
+            return [
+                f"{prefix}.{n}{suffix}"
+                for n in range(1, self.repeats.n_repeats + 1)
+            ]
+
+        base = (
+            base_exp_name if is_chained else self.expander.experiment_namespace
+        )
+        return [f"{base}.{n}" for n in range(1, self.repeats.n_repeats + 1)]
+
+    def get_repeat_children(self):
+        """Return a list of ApplicationBase instances for all repeat children"""
+        if not self.experiment_set:
+            return []
+        children = []
+        for exp in self.get_repeat_child_namespaces():
+            child = self.experiment_set.get_experiment(exp)
+            if child is not None:
+                children.append(child)
+        return children
+
+    def calculate_repeat_status(
+        self, workspace=None, return_status_list=False
+    ):
+        """Calculate the status of a repeat base experiment from its children"""
+        if not self.repeats.is_repeat_base:
+            status = self.get_status()
+            return (status, [status]) if return_status_list else status
+
+        children = self.get_repeat_children()
+        if not children:
+            return (
+                (ExperimentStatus.UNKNOWN, [])
+                if return_status_list
+                else ExperimentStatus.UNKNOWN
+            )
+
+        exp_status_list = [c.get_status() for c in children]
+
+        if not exp_status_list or all(
+            s == ExperimentStatus.UNKNOWN for s in exp_status_list
+        ):
+            status = ExperimentStatus.UNKNOWN
+            return (status, exp_status_list) if return_status_list else status
+
+        ws = workspace or self.workspace
+        strict = getattr(ws, "repeat_success_strict", None)
+        if strict is None:
+            strict = ramble.config.get(
+                "config:repeat_success_strict", default=True
+            )
+
+        failed_statuses = {
+            ExperimentStatus.FAILED,
+            ExperimentStatus.CANCELLED,
+            ExperimentStatus.TIMEOUT,
+        }
+        has_failed = any(s in failed_statuses for s in exp_status_list)
+        all_failed = all(s in failed_statuses for s in exp_status_list)
+        has_success = any(
+            s == ExperimentStatus.SUCCESS for s in exp_status_list
+        )
+        all_success = all(
+            s == ExperimentStatus.SUCCESS for s in exp_status_list
+        )
+
+        if strict:
+            if has_failed:
+                status = ExperimentStatus.FAILED
+            elif all_success:
+                status = ExperimentStatus.SUCCESS
+            else:
+                status = ExperimentStatus.UNKNOWN
+        else:
+            if has_success:
+                status = ExperimentStatus.SUCCESS
+            elif all_failed:
+                status = ExperimentStatus.FAILED
+            else:
+                status = ExperimentStatus.UNKNOWN
+
+        return (status, exp_status_list) if return_status_list else status
+
     def read_status(self):
         """Read status from an experiment's status file, if possible.
 
         Set this experiment's status based on the status file in the experiment
         run directory, if it exists. If it doesn't exist, set its status to
-        ExperimentStatus.UNKNOWN
+        ExperimentStatus.UNKNOWN (or calculate from children if repeat base).
         """
+        if self.repeats.is_repeat_base:
+            self.set_status(self.calculate_repeat_status())
+            return
+
         status_path = os.path.join(
             self.expander.expand_var_name(self.keywords.experiment_run_dir),
             self._status_file_name,
@@ -4319,7 +4399,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def get_status(self):
         """Get the status of this experiment"""
-        if self.keywords.experiment_status not in self.variables:
+        if (
+            self.repeats.is_repeat_base
+            or self.keywords.experiment_status not in self.variables
+        ):
             self.read_status()
 
         return self.variables[self.keywords.experiment_status]
