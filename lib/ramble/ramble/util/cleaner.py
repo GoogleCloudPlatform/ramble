@@ -25,5 +25,5 @@ def get_cleaner_exec_path():
 
 def get_cleaner_script():
     """Returns the content of the standalone cleaner script"""
-    with open(get_cleaner_source_path(), "r", encoding="utf-8") as f:
+    with open(get_cleaner_source_path(), encoding="utf-8") as f:
         return f.read()

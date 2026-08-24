@@ -18,7 +18,7 @@ def edit_file(args):
         content = ""
     else:
         # Use newline='' to preserve original line endings across platforms
-        with open(args.file, "r", newline="", encoding="utf-8") as f:
+        with open(args.file, newline="", encoding="utf-8") as f:
             content = f.read()
 
     def unescape(s):

@@ -26,5 +26,5 @@ def get_file_editor_exec_path():
 
 def get_file_editor_script():
     """Returns the content of the standalone file editor script"""
-    with open(get_file_editor_source_path(), "r", encoding="utf-8") as f:
+    with open(get_file_editor_source_path(), encoding="utf-8") as f:
         return f.read()
