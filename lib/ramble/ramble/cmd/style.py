@@ -46,6 +46,7 @@ include_patterns = [
     "bin/**",
     "lib/ramble/ramble/**",
     "var/ramble/repos/**",
+    "share/ramble/scripts/**",
     "conftest.py",
 ]
 
