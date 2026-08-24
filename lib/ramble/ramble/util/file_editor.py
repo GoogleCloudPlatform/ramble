@@ -14,13 +14,17 @@ HELPER_SCRIPT_NAME = "_ramble_file_editor.py"
 CUSTOM_EDIT_FUNCTIONS_NAME = "custom_edit_functions.py"
 
 
+def get_file_editor_source_path():
+    """Returns the source path to the file editor script in Ramble's share directory"""
+    return os.path.join(ramble.paths.share_path, "scripts", HELPER_SCRIPT_NAME)
+
+
 def get_file_editor_exec_path():
-    """Returns the path to the file editor script to use"""
+    """Returns the path to the file editor script to use in a workspace"""
     return f"{{workspace_shared}}/utilities/{HELPER_SCRIPT_NAME}"
 
 
 def get_file_editor_script():
     """Returns the content of the standalone file editor script"""
-    script_path = os.path.join(ramble.paths.share_path, "scripts", HELPER_SCRIPT_NAME)
-    with open(script_path, "r", encoding="utf-8") as f:
+    with open(get_file_editor_source_path(), "r", encoding="utf-8") as f:
         return f.read()

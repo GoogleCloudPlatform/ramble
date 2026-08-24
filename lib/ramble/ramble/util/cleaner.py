@@ -13,13 +13,17 @@ import ramble.paths
 HELPER_SCRIPT_NAME = "_ramble_cleaner.py"
 
 
+def get_cleaner_source_path():
+    """Returns the source path to the cleaner script in Ramble's share directory"""
+    return os.path.join(ramble.paths.share_path, "scripts", HELPER_SCRIPT_NAME)
+
+
 def get_cleaner_exec_path():
-    """Returns the path to the cleaner script to use"""
+    """Returns the path to the cleaner script to use in a workspace"""
     return f"{{workspace_shared}}/utilities/{HELPER_SCRIPT_NAME}"
 
 
 def get_cleaner_script():
     """Returns the content of the standalone cleaner script"""
-    script_path = os.path.join(ramble.paths.share_path, "scripts", HELPER_SCRIPT_NAME)
-    with open(script_path, "r", encoding="utf-8") as f:
+    with open(get_cleaner_source_path(), "r", encoding="utf-8") as f:
         return f.read()
