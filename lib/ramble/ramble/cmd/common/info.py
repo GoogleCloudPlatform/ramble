@@ -73,6 +73,8 @@ obj_attribute_map = {
 
 def _map_attr_name(attr):
     """Given an attribute display name, map to the internal attribute name"""
+    if attr not in obj_attribute_map:
+        logger.die(f"Attribute '{attr}' is not valid.")
     return obj_attribute_map[attr] if obj_attribute_map[attr] is not None else attr
 
 
@@ -494,6 +496,9 @@ def print_info(args):
         print_object_overview(obj)
     elif args.attributes:
         for attr in args.attributes.split(","):
+            attr = attr.strip()
+            if not attr:
+                continue
             print_single_attribute(obj, attr, args.verbose, args.pattern, args.format)
     elif args.all:
         print_all_attributes(obj, args.verbose, args.pattern, args.format)
