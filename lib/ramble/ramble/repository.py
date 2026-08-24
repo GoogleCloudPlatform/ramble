@@ -11,6 +11,7 @@ import collections
 import contextlib
 import errno
 import functools
+import importlib
 import importlib.machinery
 import importlib.util
 import inspect
@@ -425,7 +426,7 @@ def autospec(function):
     return converter
 
 
-class ObjectNamespace(types.ModuleType):
+class RambleNamespace(types.ModuleType):
     """Allow lazy loading of modules."""
 
     def __init__(self, namespace):
@@ -433,13 +434,16 @@ class ObjectNamespace(types.ModuleType):
         self.__file__ = "(ramble namespace)"
         self.__path__ = []
         self.__name__ = namespace
-        self.__application__ = namespace
         self.__modules = {}
 
     def __getattr__(self, name):
         """Getattr lazily loads modules if they're not already loaded."""
-        submodule = self.__application__ + "." + name
-        setattr(self, name, __import__(submodule))
+        submodule = f"{self.__name__}.{name}"
+        try:
+            setattr(self, name, importlib.import_module(submodule))
+        except ImportError:
+            msg = "'{0}' object has no attribute {1}"
+            raise AttributeError(msg.format(type(self), name)) from None
         return getattr(self, name)
 
 
@@ -881,7 +885,7 @@ class RepoPath:
         if not self.by_namespace.is_prefix(fullname):
             raise ImportError(f"No such ramble repo: {fullname}")
 
-        module = ObjectNamespace(fullname)
+        module = RambleNamespace(fullname)
         module.__loader__ = self
         sys.modules[fullname] = module
         return module
@@ -1075,7 +1079,7 @@ class Repo:
             ns = ".".join(self._names[:i])
 
             if ns not in sys.modules:
-                module = ObjectNamespace(ns)
+                module = RambleNamespace(ns)
                 module.__loader__ = self
                 sys.modules[ns] = module
 
@@ -1151,7 +1155,7 @@ class Repo:
         namespace, _, module_name = fullname.rpartition(".")
 
         if self.is_prefix(fullname):
-            module = ObjectNamespace(fullname)
+            module = RambleNamespace(fullname)
 
         elif namespace == self.full_namespace:
             real_name = self.real_name(module_name)
@@ -1498,28 +1502,6 @@ def create(configuration, object_type=default_type):
     return RepoPath(*repo_dirs, object_type=object_type)
 
 
-class RepositoryNamespace(types.ModuleType):
-    """Allow lazy loading of modules."""
-
-    def __init__(self, namespace):
-        super().__init__(namespace)
-        self.__file__ = "(repository namespace)"
-        self.__path__ = []
-        self.__name__ = namespace
-        self.__package__ = namespace
-        self.__modules = {}
-
-    def __getattr__(self, name):
-        """Getattr lazily loads modules if they're not already loaded."""
-        submodule = self.__package__ + "." + name
-        try:
-            setattr(self, name, __import__(submodule))
-        except ImportError:
-            msg = "'{0}' object has no attribute {1}"
-            raise AttributeError(msg.format(type(self), name)) from None
-        return getattr(self, name)
-
-
 class RepoLoader(importlib.machinery.SourceFileLoader):
     """Loads a Python module associated with a object in specific repository"""
 
@@ -1536,9 +1518,9 @@ class RepoLoader(importlib.machinery.SourceFileLoader):
         return True
 
 
-class RepositoryNamespaceLoader:
+class RambleNamespaceLoader:
     def create_module(self, spec):
-        return RepositoryNamespace(spec.name)
+        return RambleNamespace(spec.name)
 
     def exec_module(self, module):
         module.__loader__ = self
@@ -1581,14 +1563,14 @@ class ReposFinder:
                 if object_name:
                     return RepoLoader(fullname, repo, object_name)
 
-            # We are importing a full namespace like 'spack.pkg.builtin'
+            # We are importing a full namespace like 'ramble.app.builtin'
             if fullname == repo.full_namespace:
-                return RepositoryNamespaceLoader()
+                return RambleNamespaceLoader()
 
         # No repo provides the namespace, but it is a valid prefix of
         # something in the RepoPath.
         if paths[self.object_type].by_namespace.is_prefix(fullname):
-            return RepositoryNamespaceLoader()
+            return RambleNamespaceLoader()
 
         return None
 

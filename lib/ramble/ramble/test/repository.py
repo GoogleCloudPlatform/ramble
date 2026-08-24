@@ -218,3 +218,35 @@ def test_use_repositories_exception_cleanup(extra_repo):
             raise RuntimeError("test error inside context")
     assert ramble.repository.paths[ramble.repository.ObjectTypes.applications] is orig_path
     assert sys.meta_path == orig_meta_path
+
+
+def test_namespace_import_and_attribute_access(mutable_mock_apps_repo):
+    import ramble.app.builtin.mock.basic as mock_basic
+
+    assert hasattr(mock_basic, "Basic")
+
+    import ramble.app.builtin.mock as mock_ns
+
+    assert hasattr(mock_ns, "basic")
+    assert mock_ns.basic.Basic.name == "basic"
+
+    import ramble.app as app_ns
+
+    assert hasattr(app_ns.builtin.mock, "basic")
+    assert app_ns.builtin.mock.basic.Basic.name == "basic"
+
+
+def test_namespace_nonexistent_attribute(mutable_mock_apps_repo):
+    import ramble.app.builtin.mock as mock_ns
+
+    assert not hasattr(mock_ns, "nonexistent_object")
+    assert getattr(mock_ns, "nonexistent_object", "default") == "default"
+    with pytest.raises(AttributeError):
+        _ = mock_ns.nonexistent_object
+
+    import ramble.app as app_ns
+
+    assert not hasattr(app_ns, "nonexistent_subnamespace")
+    assert getattr(app_ns, "nonexistent_subnamespace", None) is None
+    with pytest.raises(AttributeError):
+        _ = app_ns.nonexistent_subnamespace
