@@ -14,7 +14,7 @@ import pytest
 
 import ramble.cmd.common.info
 import ramble.repository
-from ramble.main import RambleCommand
+from ramble.main import RambleCommand, RambleCommandError
 
 info = RambleCommand("info")
 repo = RambleCommand("repo")
@@ -477,3 +477,14 @@ def test_info_namespaced_spec(mutable_config, tmpdir):
     finally:
         for t in ramble.repository.ObjectTypes:
             ramble.repository.paths[t]._instance = None
+
+
+def test_info_invalid_attribute():
+    with pytest.raises(RambleCommandError, match="Attribute 'd' is not valid"):
+        info("gromacs", "--attributes", "d")
+
+
+def test_info_attributes_with_spaces():
+    out = info("gromacs", "--attributes", "maintainers, workloads")
+    assert "maintainers" in out
+    assert "workloads" in out
