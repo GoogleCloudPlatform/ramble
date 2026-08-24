@@ -46,11 +46,12 @@ def perform_cleanup(args):
                     paths_to_delete.append(f_path)
     else:
         try:
-            paths_to_delete.extend(
-                entry.path
-                for entry in os.scandir(directory)
-                if matches_whole_path(regex, entry.path)
-            )
+            with os.scandir(directory) as entries:
+                paths_to_delete.extend(
+                    entry.path
+                    for entry in entries
+                    if matches_whole_path(regex, entry.path)
+                )
         except Exception as e:
             print(f"Error scanning directory {directory}: {e}", file=sys.stderr)
             return 1

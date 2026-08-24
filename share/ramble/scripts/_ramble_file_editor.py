@@ -39,6 +39,9 @@ def edit_file(args):
                 spec = importlib.util.spec_from_file_location(
                     "custom_functions", args.import_module
                 )
+                if spec is None or spec.loader is None:
+                    print(f"Error: Could not load spec for module {args.import_module}.")
+                    return 1
                 custom_module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(custom_module)
                 func = getattr(custom_module, args.function, None)
