@@ -24,6 +24,9 @@ import ramble.util.path
         ("gs://my-bucket", "gs://my-bucket"),
         ("gs://my-bucket/", "gs://my-bucket"),
         ("gs://my-bucket///", "gs://my-bucket"),
+        ("/", "/"),
+        ("///", "/"),
+        ("", ""),
     ],
 )
 def test_normalize_path_or_url(path, expect):
