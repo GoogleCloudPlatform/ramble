@@ -158,10 +158,12 @@ class Logger:
     @contextmanager
     def configure_colors(self, **kwargs):
         old_value = color.get_color_when()
-        if "stream" in kwargs:
-            color.set_color_when("never")
-        yield
-        color.set_color_when(old_value)
+        try:
+            if "stream" in kwargs:
+                color.set_color_when("never")
+            yield
+        finally:
+            color.set_color_when(old_value)
 
     def all_msg(self, *args, **kwargs):
         """Print a message to all logs

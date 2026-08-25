@@ -111,3 +111,18 @@ def test_add_log_context_unbalanced_nested(logger, tmpdir):
     # Clean up
     logger.remove_log()
     logger.remove_log()
+
+
+def test_configure_colors_exception_cleanup(logger):
+    import llnl.util.tty.color as color
+
+    old_color_setting = color._force_color
+    try:
+        color.set_color_when(True)
+        with pytest.raises(RuntimeError):
+            with logger.configure_colors(stream=object()):
+                assert color.get_color_when() is False
+                raise RuntimeError("test error")
+        assert color.get_color_when() is True
+    finally:
+        color.set_color_when(old_color_setting)

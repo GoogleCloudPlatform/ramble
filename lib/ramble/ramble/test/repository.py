@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import sys
+
 import pytest
 
 import ramble.repository
@@ -206,3 +208,13 @@ def test_simplify_object_type_enum_passthrough():
 def test_simplify_object_type_invalid(invalid_type):
     with pytest.raises(ramble.repository.UnknownObjectTypeError):
         ramble.repository.simplify_object_type(invalid_type)
+
+
+def test_use_repositories_exception_cleanup(extra_repo):
+    orig_path = ramble.repository.paths[ramble.repository.ObjectTypes.applications]
+    orig_meta_path = list(sys.meta_path)
+    with pytest.raises(RuntimeError):
+        with ramble.repository.use_repositories(extra_repo[0].root):
+            raise RuntimeError("test error inside context")
+    assert ramble.repository.paths[ramble.repository.ObjectTypes.applications] is orig_path
+    assert sys.meta_path == orig_meta_path
