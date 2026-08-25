@@ -870,6 +870,9 @@ ramble:
     def build_experiment_set(self, die_on_validate_error=True, check_environments=True):
         """Create an experiment set representing this workspace"""
 
+        if self.software_environments is None:
+            self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
+
         experiment_set = ramble.experiment_set.ExperimentSet(self)
 
         experiment_set.set_base_var("experiments_file", self.all_experiments_path)
@@ -1644,8 +1647,7 @@ ramble:
             namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
         )
 
-        self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
-        self.build_experiment_set(die_on_validate_error=False, check_environments=True)
+        self.software_environments = None
 
         return
 
