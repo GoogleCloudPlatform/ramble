@@ -284,9 +284,8 @@ class ConfigScope:
         filename = self.get_section_filename(section)
         data = self.get_section(section)
 
-        # We copy data here to avoid adding defaults at write time
-        validate_data = copy.deepcopy(data)
-        validate(validate_data, section_schemas[section])
+        # validate handles copying data to avoid adding defaults at write time
+        validate(data, section_schemas[section])
 
         try:
             mkdirp(self.path)

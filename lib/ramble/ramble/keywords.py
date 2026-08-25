@@ -179,6 +179,9 @@ class Keywords:
 
     def update_keys(self, extra_keys):
         self.keys.update(extra_keys)
+        self._required_keys = frozenset(
+            key for key, key_def in self.keys.items() if key_def["type"] == key_type.required
+        )
         # Define class attributes for all of the keys
         for key in self.keys:
             setattr(self, key, key)
@@ -214,9 +217,7 @@ class Keywords:
         Yields:
             (str): Key name
         """
-        for key in self.keys:
-            if self.is_required(key):
-                yield key
+        return iter(self._required_keys)
 
     def check_reserved_keys(self, definitions):
         """Check a dictionary of variable definitions for reserved keywords"""
@@ -234,10 +235,7 @@ class Keywords:
         if not definitions:
             return
 
-        required_set = set()
-        for key in self.keys:
-            if self.is_required(key):
-                required_set.add(key)
+        required_set = set(self._required_keys)
 
         for definition in definitions:
             if definition in required_set:

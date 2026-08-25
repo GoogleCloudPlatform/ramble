@@ -178,11 +178,15 @@ class ExperimentResult:
         import copy
 
         output = {}
-
         for lookup_key, output_val in _OUTPUT_MAPPING.items():
             if lookup_key == "keys":
-                output.update(copy.deepcopy(self.keys or {}))
+                if self.keys:
+                    output.update(self.keys)
             else:
-                output[output_val] = copy.deepcopy(getattr(self, lookup_key, None))
+                val = getattr(self, lookup_key, None)
+                if isinstance(val, (dict, list)):
+                    output[output_val] = copy.deepcopy(val)
+                else:
+                    output[output_val] = val
 
         return output
