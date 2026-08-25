@@ -1551,15 +1551,19 @@ def command_variable(
 @contextlib.contextmanager
 def when(condition):
     ramble.language.language_base.DirectiveMeta.push_to_context(condition)
-    yield
-    ramble.language.language_base.DirectiveMeta.pop_from_context()
+    try:
+        yield
+    finally:
+        ramble.language.language_base.DirectiveMeta.pop_from_context()
 
 
 @contextlib.contextmanager
 def default_args(**kwargs):
     ramble.language.language_base.DirectiveMeta.push_default_args(kwargs)
-    yield
-    ramble.language.language_base.DirectiveMeta.pop_default_args()
+    try:
+        yield
+    finally:
+        ramble.language.language_base.DirectiveMeta.pop_default_args()
 
 
 @shared_directive("object_modifiers")

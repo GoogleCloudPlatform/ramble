@@ -670,3 +670,27 @@ def test_workload_directive_where(app_class):
     assert wl_name in app_inst.workloads[_FS]
     assert app_inst.workloads[_FS][wl_name].where == ["{n_nodes} <= 4"]
     assert app_inst.workloads[_FS][wl_name].exclude_where == ["{n_gpus} == 0"]
+
+
+def test_when_context_cleanup_on_exception():
+    from ramble.language.language_base import DirectiveMeta
+    from ramble.language.shared_language import when
+
+    initial_len = len(DirectiveMeta._when_constraints_from_context)
+    with pytest.raises(RuntimeError):
+        with when("+foo"):
+            assert len(DirectiveMeta._when_constraints_from_context) == initial_len + 1
+            raise RuntimeError("test error")
+    assert len(DirectiveMeta._when_constraints_from_context) == initial_len
+
+
+def test_default_args_context_cleanup_on_exception():
+    from ramble.language.language_base import DirectiveMeta
+    from ramble.language.shared_language import default_args
+
+    initial_len = len(DirectiveMeta._default_args)
+    with pytest.raises(RuntimeError):
+        with default_args(foo="bar"):
+            assert len(DirectiveMeta._default_args) == initial_len + 1
+            raise RuntimeError("test error")
+    assert len(DirectiveMeta._default_args) == initial_len

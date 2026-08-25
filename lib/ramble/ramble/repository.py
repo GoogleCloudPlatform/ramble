@@ -402,12 +402,13 @@ def use_repositories(*paths_and_repos, object_type=default_type):
     saved = paths[object_type]
     remove_from_meta = set_path(temporary_repositories, object_type=object_type)
 
-    yield temporary_repositories
-
-    # Restore _path and sys.meta_path
-    if remove_from_meta:
-        sys.meta_path.remove(temporary_repositories)
-    paths[object_type] = saved
+    try:
+        yield temporary_repositories
+    finally:
+        # Restore _path and sys.meta_path
+        if remove_from_meta and temporary_repositories in sys.meta_path:
+            sys.meta_path.remove(temporary_repositories)
+        paths[object_type] = saved
 
 
 def autospec(function):
