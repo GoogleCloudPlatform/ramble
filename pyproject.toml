@@ -149,14 +149,19 @@ no_site_packages = true
 # For now, only type-check the util directory
 files = [
   "lib/ramble/ramble/**/*.py",
+  "share/ramble/scripts/**/*.py",
 ]
 ignore_errors = true
 ignore_missing_imports = true
 allow_redefinition = true
 
 [[tool.mypy.overrides]]
-# Only enable ramble modules
-module = "ramble.*"
+# Only enable ramble modules and share helper scripts
+module = [
+    "ramble.*",
+    "_ramble_cleaner",
+    "_ramble_file_editor",
+]
 ignore_errors = false
 
 [[tool.mypy.overrides]]
@@ -171,6 +176,8 @@ module = [
     "ramble.error",
     "ramble.paths",
     "ramble.filters",
+    "_ramble_cleaner",
+    "_ramble_file_editor",
 ]
 check_untyped_defs = true
 
