@@ -17,6 +17,7 @@ import tempfile
 import llnl.util.filesystem as fs
 
 from ramble.pkgmankit import *
+from ramble.util.command_runner import RunnerError
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -764,24 +765,45 @@ class SpackRunner(CommandRunner):
         Ensure spack is found in the path, and setup some default variables.
         """
 
-        super().__init__(
-            name="spack",
-            command="spack",
-            shell=shell,
-            dry_run=dry_run,
-            env=env,
-        )
-        self.spack = self.command
+        try:
+            super().__init__(
+                name="spack",
+                command="spack",
+                shell=shell,
+                dry_run=dry_run,
+                env=env,
+            )
 
-        # Add default arguments to spack command.
-        # This allows us to inject custom config scope dirs
-        # primarily for unit testing.
-        global_args = ramble.config.get(f"{self.global_config_name}:flags")
-        if global_args is not None:
-            for arg in shlex.split(global_args):
-                self.spack.add_default_arg(arg)
+            self.spack = self.command
+            self.installer = self.spack.copy()
+            self.installer.add_default_prefix(
+                ramble.config.get(f"{self.install_config_name}:prefix")
+            )
+            self.installer.add_default_arg("install")
 
-        self.spack_dir = os.path.dirname(os.path.dirname(self.spack.exe[0]))
+            self.concretizer = self.spack.copy()
+            self.concretizer.add_default_prefix(
+                ramble.config.get(f"{self.concretize_config_name}:prefix")
+            )
+            self.concretizer.add_default_arg("concretize")
+
+            # Add default arguments to spack command.
+            # This allows us to inject custom config scope dirs
+            # primarily for unit testing.
+            global_args = ramble.config.get(f"{self.global_config_name}:flags")
+            if global_args is not None:
+                for arg in shlex.split(global_args):
+                    self.spack.add_default_arg(arg)
+
+            self.spack_dir = os.path.dirname(
+                os.path.dirname(self.spack.exe[0])
+            )
+        except RunnerError:
+            self.shell = shell
+            self.spack = None
+            self.installer = None
+            self.concretizer = None
+            self.spack_dir = os.path.join("missing", "path")
 
         if self.shell == "bash":
             script = "setup-env.sh"
@@ -789,6 +811,8 @@ class SpackRunner(CommandRunner):
             script = "setup-env.csh"
         elif self.shell == "fish":
             script = "setup-env.fish"
+        else:
+            script = "setup-env.sh"
         self.source_script = os.path.join(
             self.spack_dir, "share", "spack", script
         )
@@ -808,18 +832,6 @@ class SpackRunner(CommandRunner):
         self.configs_applied = False
         self.env_contents = []
 
-        self.installer = self.spack.copy()
-        self.installer.add_default_prefix(
-            ramble.config.get(f"{self.install_config_name}:prefix")
-        )
-        self.installer.add_default_arg("install")
-
-        self.concretizer = self.spack.copy()
-        self.concretizer.add_default_prefix(
-            ramble.config.get(f"{self.concretize_config_name}:prefix")
-        )
-        self.concretizer.add_default_arg("concretize")
-
     def get_spack_python(self):
         if self.dry_run:
             return self.bs_python
@@ -834,20 +846,22 @@ class SpackRunner(CommandRunner):
 
         from ramble.util.version import get_git_hash
 
-        version_spec = importlib.util.spec_from_file_location(
-            "spack_version",
-            os.path.join(
-                self.spack_dir, "lib", "spack", "spack", "__init__.py"
-            ),
-        )
-        version_mod = importlib.util.module_from_spec(version_spec)
-        version_spec.loader.exec_module(version_mod)
+        spack_version = None
+        if self.spack:
+            version_spec = importlib.util.spec_from_file_location(
+                "spack_version",
+                os.path.join(
+                    self.spack_dir, "lib", "spack", "spack", "__init__.py"
+                ),
+            )
+            version_mod = importlib.util.module_from_spec(version_spec)
+            version_spec.loader.exec_module(version_mod)
 
-        spack_version = version_mod.spack_version
-        spack_hash = get_git_hash(path=self.spack_dir)
+            spack_version = version_mod.spack_version
+            spack_hash = get_git_hash(path=self.spack_dir)
 
-        if spack_hash:
-            spack_version += f" ({spack_hash})"
+            if spack_hash:
+                spack_version += f" ({spack_hash})"
 
         return spack_version
 
@@ -1071,9 +1085,10 @@ class SpackRunner(CommandRunner):
                 "Environment runner has no path configured"
             )
 
-        self.spack.add_default_env(self.env_key, self.env_path)
-        self.installer.add_default_env(self.env_key, self.env_path)
-        self.concretizer.add_default_env(self.env_key, self.env_path)
+        if self.spack:
+            self.spack.add_default_env(self.env_key, self.env_path)
+            self.installer.add_default_env(self.env_key, self.env_path)
+            self.concretizer.add_default_env(self.env_key, self.env_path)
 
         self.active = True
 
@@ -1086,11 +1101,15 @@ class SpackRunner(CommandRunner):
                 "Environment runner has no path configured"
             )
 
-        if self.active and self.env_key in self.spack.default_env:
+        if (
+            self.spack
+            and self.active
+            and self.env_key in self.spack.default_env
+        ):
             del self.spack.default_env[self.env_key]
             del self.installer.default_env[self.env_key]
             del self.concretizer.default_env[self.env_key]
-            self.active = False
+        self.active = False
 
     def _check_active(self):
         if not self.env_path:

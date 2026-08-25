@@ -176,8 +176,6 @@ def test_application_base_bootstrap_utilities_is_available_true(
         f.write("""ramble:
   config:
     bootstrap_utilities: True
-  variables:
-    use_system_spack: True
   applications:
     hostname:
       workloads:
@@ -195,7 +193,9 @@ def test_application_base_bootstrap_utilities_is_available_true(
     with ws:
         setup_pipeline = ramble.pipeline.SetupPipeline(ws, filters)
         app_inst = next(iter(setup_pipeline.experiment_set.experiments.values()))
-        app_inst.required_utilities = {frozenset([]): {"spack": {"git": "mygit"}}}
+        app_inst.required_utilities = {
+            frozenset([]): {"spack": {"git": "mygit", "allow_external": "True"}}
+        }
         monkeypatch.setattr(
             shutil, "which", lambda cmd, **kwargs: "/path/to/spack" if cmd == "spack" else None
         )
@@ -243,6 +243,71 @@ def test_application_base_bootstrap_utilities_is_bootstrappable_false(
         with pytest.raises(SystemExit):
             setup_pipeline.run()
         # Custom Error should have been logged
+
+
+def test_application_base_bootstrap_utilities_allow_external_false(
+    mutable_config, mutable_mock_workspace_path, monkeypatch
+):
+    ws = ramble.workspace.create("test_allow_ext_false")
+    os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
+    with open(ws.config_file_path, "w", encoding="utf-8") as f:
+        f.write("""ramble:
+  config:
+    bootstrap_utilities: True
+  applications:
+    hostname:
+      workloads:
+        serial:
+          experiments:
+            test_exp:
+              variables:
+                n_ranks: '1'
+  utilities:
+    spack:
+      git: mygit
+""")
+    ws._re_read()
+    filters = ramble.filters.Filters()
+    with ws:
+        setup_pipeline = ramble.pipeline.SetupPipeline(ws, filters)
+        app_inst = next(iter(setup_pipeline.experiment_set.experiments.values()))
+        app_inst.required_utilities = {
+            frozenset([]): {"spack": {"git": "mygit", "allow_external": "False"}}
+        }
+        UtilityBase = ramble.repository.get_base_class("utility-base")
+
+        def mock_is_available(*args, **kwargs):
+            raise Exception("is_available should not be called when allow_external=False")
+
+        monkeypatch.setattr(UtilityBase, "is_available", mock_is_available)
+
+        ws.dry_run = False
+
+        class MockStage:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                pass
+
+            def set_subdir(self, subdir):
+                pass
+
+            def fetch(self):
+                pass
+
+            def expand_archive(self):
+                pass
+
+        monkeypatch.setattr(ramble.stage, "InputStage", MockStage)
+        monkeypatch.setattr(UtilityBase, "validate_versions", lambda *a, **k: True)
+
+        setup_pipeline.run()
+    assert hasattr(app_inst, "_bootstrapped_utility_paths")
+    assert "spack" in app_inst._bootstrapped_utility_paths
 
 
 def test_application_base_bootstrap_utilities_success(
@@ -308,13 +373,7 @@ def test_spack_utility_is_available_version_checking(
     mutable_config, mutable_mock_workspace_path, monkeypatch
 ):
     ws = ramble.workspace.create("test_spack_ver")
-    os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
-    with open(ws.config_file_path, "w", encoding="utf-8") as f:
-        f.write("""ramble:
-  variables:
-    use_system_spack: True
-""")
-    ws._re_read()
+
     spack = Spack("/tmp/dummy")
     monkeypatch.setattr(
         shutil, "which", lambda cmd, **kwargs: "/path/to/spack" if cmd == "spack" else None
@@ -326,21 +385,48 @@ def test_spack_utility_is_available_version_checking(
         returncode = 0
 
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: MockResult())
-
-    # When use_system_spack is True, regardless of version, do not bootstrap
-    # a new spack (return True if installed)
-    assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
-    assert spack.is_available(ws, min_version="0.23.0") is True
-    assert spack.is_available(ws, max_version="0.21.0") is True
-
-    # When use_system_spack is False, only return True (avoid bootstrap) if
-    # already-installed spack has right version
-    with open(ws.config_file_path, "w", encoding="utf-8") as f:
-        f.write("""ramble:
-  variables:
-    use_system_spack: False
-""")
-    ws._re_read()
     assert spack.is_available(ws, min_version="0.20.0", max_version="0.25.0") is True
     assert spack.is_available(ws, min_version="0.23.0") is False
     assert spack.is_available(ws, max_version="0.21.0") is False
+
+
+def test_application_base_bootstrap_utilities_allow_external_false_bool(
+    mutable_config, mutable_mock_workspace_path, monkeypatch
+):
+    ws = ramble.workspace.create("test_allow_ext_false_bool")
+    import os
+
+    os.makedirs(os.path.dirname(ws.config_file_path), exist_ok=True)
+    with open(ws.config_file_path, "w", encoding="utf-8") as f:
+        f.write("""ramble:
+  config:
+    bootstrap_utilities: True
+  applications:
+    hostname:
+      workloads:
+        serial:
+          experiments:
+            test_exp:
+              variables:
+                n_ranks: '1'
+  utilities:
+    spack:
+      git: mygit
+""")
+    ws._re_read()
+    filters = ramble.filters.Filters()
+    with ws:
+        setup_pipeline = ramble.pipeline.SetupPipeline(ws, filters)
+        app_inst = next(iter(setup_pipeline.experiment_set.experiments.values()))
+        app_inst.required_utilities = {
+            frozenset([]): {"spack": {"git": "mygit", "allow_external": False}}
+        }
+        UtilityBase = ramble.repository.get_base_class("utility-base")
+
+        def mock_is_available(*args, **kwargs):
+            raise Exception("is_available should not be called when allow_external=False")
+
+        monkeypatch.setattr(UtilityBase, "is_available", mock_is_available)
+
+        ws.dry_run = False
+        app_inst._bootstrap_utilities(ws)

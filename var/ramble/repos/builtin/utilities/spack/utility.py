@@ -35,7 +35,7 @@ class Spack(UtilityBase):
     )
     variable(
         "spack_version",
-        default="v0.22.0",
+        default="v1.2.2",
         description="Version of spack to fetch",
     )
 
@@ -57,18 +57,3 @@ class Spack(UtilityBase):
     def install(self, workspace):
         # E.g., make, configure, etc.
         logger.debug(f"Executing install phase for {self.name}")
-
-    def is_available(self, workspace, min_version=None, max_version=None):
-        """Check if spack is available in the user's environment."""
-        # Only return True if the user explicitly opted into using the system spack
-        # via a workspace variable, otherwise we should bootstrap the requested version.
-        ws_vars = (
-            workspace._get_workspace_dict()
-            .get("ramble", {})
-            .get("variables", {})
-        )
-        if ws_vars.get("use_system_spack", False):
-            return super().is_available(workspace)
-        return super().is_available(
-            workspace, min_version=min_version, max_version=max_version
-        )

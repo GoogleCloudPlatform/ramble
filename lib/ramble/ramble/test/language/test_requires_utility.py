@@ -9,8 +9,13 @@
 import ramble.language.shared_language
 from ramble.language.language_base import DirectiveMeta
 
+# Save and clear the global directives queue to isolate from other tests
+_saved_queue = DirectiveMeta._directives_to_be_executed.copy()
+DirectiveMeta._directives_to_be_executed = []
+
 
 class MockObject(metaclass=DirectiveMeta):
+    name = "mock_obj"
     __module__ = "ramble.app"
     required_utilities: dict = {}
 
@@ -20,6 +25,41 @@ class MockObject(metaclass=DirectiveMeta):
         commit="v1.0",
         when="mock_when=True",
     )
+
+    ramble.language.shared_language.requires_utility(
+        name="my_ext_dep_allow",
+        git="https://github.com/my/ext_dep.git",
+        commit="v1.0",
+        when="mock_when=True",
+        allow_external=True,
+    )
+
+    ramble.language.shared_language.requires_utility(
+        name="my_ext_dep_no_allow",
+        git="https://github.com/my/ext_dep.git",
+        commit="v1.0",
+        when="mock_when=True",
+        allow_external=False,
+    )
+
+    ramble.language.shared_language.requires_utility(
+        name="my_ext_dep_allow_str",
+        git="https://github.com/my/ext_dep.git",
+        commit="v1.0",
+        when="mock_when=True",
+        allow_external="True",
+    )
+
+    ramble.language.shared_language.requires_utility(
+        name="my_ext_dep_no_allow_str",
+        git="https://github.com/my/ext_dep.git",
+        commit="v1.0",
+        when="mock_when=True",
+        allow_external="False",
+    )
+
+
+DirectiveMeta._directives_to_be_executed = _saved_queue
 
 
 def test_requires_utility_directive_parsing():
@@ -33,3 +73,16 @@ def test_requires_utility_directive_parsing():
     assert ext_dep["git"] == "https://github.com/my/ext_dep.git"
     assert ext_dep["commit"] == "v1.0"
     assert ext_dep["when"] == when_list
+    assert ext_dep["allow_external"] is True  # Default is True
+
+    ext_dep_allow = obj.required_utilities[when_key]["my_ext_dep_allow"]
+    assert ext_dep_allow["allow_external"] is True
+
+    ext_dep_no_allow = obj.required_utilities[when_key]["my_ext_dep_no_allow"]
+    assert ext_dep_no_allow["allow_external"] is False
+
+    ext_dep_allow_str = obj.required_utilities[when_key]["my_ext_dep_allow_str"]
+    assert ext_dep_allow_str["allow_external"] is True
+
+    ext_dep_no_allow_str = obj.required_utilities[when_key]["my_ext_dep_no_allow_str"]
+    assert ext_dep_no_allow_str["allow_external"] is False

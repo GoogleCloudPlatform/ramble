@@ -2691,18 +2691,35 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             ext_dep_paths[ext_dep_name] = "system"
                             continue
 
-                        if hasattr(
-                            ext_dep_inst, "is_available"
-                        ) and ext_dep_inst.is_available(
-                            workspace,
-                            min_version=min_version,
-                            max_version=max_version,
-                        ):
-                            logger.debug(
-                                f"External dependency {ext_dep_name} is already available in the environment, skipping fetch."
+                        allow_external = fetch_kwargs.pop(
+                            "allow_external", True
+                        )
+
+                        if isinstance(allow_external, str):
+                            allow_external = allow_external.lower() == "true"
+                        else:
+                            allow_external = bool(allow_external)
+
+                        if allow_external:
+                            if hasattr(
+                                ext_dep_inst, "is_available"
+                            ) and ext_dep_inst.is_available(
+                                workspace,
+                                min_version=min_version,
+                                max_version=max_version,
+                            ):
+                                logger.debug(
+                                    f"External dependency {ext_dep_name} is already available in the environment, skipping fetch."
+                                )
+                                ext_dep_paths[ext_dep_name] = "system"
+                                continue
+                            logger.msg(
+                                f"External dependency {ext_dep_name} is not available in the environment. Bootstrapping a new version."
                             )
-                            ext_dep_paths[ext_dep_name] = "system"
-                            continue
+                        else:
+                            logger.msg(
+                                f"External dependency {ext_dep_name} is not allowed to be provided externally. Bootstrapping a new version."
+                            )
 
                         is_bootstrappable = True
                         if hasattr(ext_dep_inst, "bootstrappable"):
