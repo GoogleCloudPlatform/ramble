@@ -324,3 +324,19 @@ def test_edit_repo_path(mock_applications, mock_editor):
     edit("--repo", repo_dir, "basic")
     assert len(mock_editor) == 1
     assert "repos/builtin.mock/applications/basic/application.py" in mock_editor[0]
+
+
+def test_edit_application_with_tpl_files(mock_applications, monkeypatch):
+    """Test that ramble edit opens .tpl files alongside application.py"""
+    recorded_calls = []
+
+    def mock_editor(*args, **kwargs):
+        recorded_calls.extend(args)
+
+    monkeypatch.setattr("ramble.cmd.edit.editor", mock_editor)
+    edit("template")
+
+    assert len(recorded_calls) == 3
+    assert recorded_calls[0].endswith("application.py")
+    assert recorded_calls[1].endswith("bar.tpl")
+    assert recorded_calls[2].endswith("script.sh.tpl")
