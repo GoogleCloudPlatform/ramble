@@ -359,4 +359,5 @@ ramble:
         f.write(job_id_content)
 
     # Analyze should complete without crashing due to empty or invalid files
-    workspace("analyze", global_args=["-D", ws.root])
+    out = workspace("analyze", "-p", global_args=["-D", ws.root])
+    assert "Status = FAILED" in out
