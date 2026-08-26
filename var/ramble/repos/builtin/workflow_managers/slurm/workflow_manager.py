@@ -13,7 +13,11 @@ from ramble.experiment_result import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
 
-from spack.util.executable import Executable, ProcessError
+from spack.util.executable import (
+    CommandNotFoundError,
+    Executable,
+    ProcessError,
+)
 
 # Mapping from squeue/sacct status to Ramble status
 _STATUS_MAP = {
@@ -240,7 +244,7 @@ class Slurm(WorkflowManagerBase):
                 job_end_time_str, "%Y-%m-%dT%H:%M:%S"
             ).timestamp()
             duration = int(job_end_time - script_end_time)
-        except (ProcessError, ValueError, OSError) as e:
+        except (ProcessError, ValueError, OSError, CommandNotFoundError) as e:
             logger.warn(f"Failed to get job end time with error {e}")
         else:
             fom_key = "slurm-job-termination-overhead"
