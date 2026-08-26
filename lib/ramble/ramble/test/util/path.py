@@ -31,3 +31,24 @@ import ramble.util.path
 )
 def test_normalize_path_or_url(path, expect):
     assert ramble.util.path.normalize_path_or_url(path) == expect
+
+
+def test_substitute_config_variables():
+    # Non-variable strings should return unchanged
+    assert ramble.util.path.substitute_config_variables("simple/path", {}) == "simple/path"
+    assert ramble.util.path.substitute_config_variables("", {}) == ""
+
+    # Test variable substitutions
+    local = {"custom": "/my/custom/path"}
+    assert (
+        ramble.util.path.substitute_config_variables("$custom/file", local)
+        == "/my/custom/path/file"
+    )
+    assert (
+        ramble.util.path.substitute_config_variables("${custom}/file", local)
+        == "/my/custom/path/file"
+    )
+    assert (
+        ramble.util.path.substitute_config_variables("$tempdir/foo", {})
+        == f"{ramble.util.path.replacements['tempdir']}/foo"
+    )

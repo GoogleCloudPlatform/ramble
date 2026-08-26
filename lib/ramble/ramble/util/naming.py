@@ -8,6 +8,7 @@
 
 # Need this because of ramble.util.string
 import fnmatch
+import functools
 import io
 import itertools
 import re
@@ -37,6 +38,7 @@ _LUA_PREFIX_RE = re.compile(r"^(lua)([^-])")
 _BPP_PREFIX_RE = re.compile(r"^(bpp)([^-])")
 
 
+@functools.lru_cache(maxsize=512)
 def mod_to_class(mod_name):
     """Convert a name from module style to class name style.  Ramble mostly
     follows `PEP-8 <http://legacy.python.org/dev/peps/pep-0008/>`_:
@@ -87,6 +89,7 @@ def possible_ramble_module_names(python_mod_name):
     return results
 
 
+@functools.lru_cache(maxsize=1024)
 def simplify_name(name):
     """Simplify package name to only lowercase, digits, and dashes.
 
