@@ -314,3 +314,50 @@ ramble:
             filename,
         )
         assert os.path.isfile(archived_path)
+
+
+@pytest.mark.parametrize(
+    "end_time_content,job_id_content",
+    [
+        ("", ""),
+        ("   \n", "12345"),
+        ("not_a_float", "12345"),
+        ("1700000000", ""),
+    ],
+)
+def test_slurm_analyze_empty_or_invalid_files(
+    make_workspace_from_config, end_time_content, job_id_content
+):
+    test_config = """
+ramble:
+  variants:
+    workflow_manager: slurm
+  variables:
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            test: {}
+"""
+    ws, _ = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+    experiment_dir = os.path.join(
+        ws.experiment_dir, "hostname", "local", "test"
+    )
+
+    end_time_path = os.path.join(experiment_dir, ".slurm_script_end_time")
+    with open(end_time_path, "w", encoding="utf-8") as f:
+        f.write(end_time_content)
+
+    job_id_path = os.path.join(experiment_dir, ".slurm_job")
+    with open(job_id_path, "w", encoding="utf-8") as f:
+        f.write(job_id_content)
+
+    # Analyze should complete without crashing due to empty or invalid files
+    out = workspace("analyze", "-p", global_args=["-D", ws.root])
+    assert "Status = FAILED" in out

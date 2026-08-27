@@ -13,7 +13,11 @@ from ramble.experiment_result import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
 
-from spack.util.executable import Executable, ProcessError
+from spack.util.executable import (
+    CommandNotFoundError,
+    Executable,
+    ProcessError,
+)
 
 # Mapping from squeue/sacct status to Ramble status
 _STATUS_MAP = {
@@ -180,7 +184,6 @@ class Slurm(WorkflowManagerBase):
 
     @property
     def template_render_vars(self):
-        vars = {}
         app_inst = self.app_inst
         expander = app_inst.expander
         # Adding pre-defined and custom headers
@@ -204,15 +207,13 @@ class Slurm(WorkflowManagerBase):
         partition = expander.expand_var_name("slurm_partition")
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
-        extra_headers = (
-            expander.expand_var_name("extra_sbatch_headers")
-            .strip()
-            .split("\n")
-        )
-        pragmas = pragmas + extra_headers
+        extra_headers = expander.expand_var_name(
+            "extra_sbatch_headers"
+        ).strip()
+        if extra_headers:
+            pragmas.extend(extra_headers.splitlines())
         header_str = "\n".join(self.conditional_expand(pragmas))
         return {
-            **vars,
             "workflow_pragmas": header_str,
             "workflow_hostfile_cmd": self.runner.get_hostfile_cmd(),
         }
@@ -222,26 +223,28 @@ class Slurm(WorkflowManagerBase):
         run_dir = self.app_inst.expander.experiment_run_dir
         end_time_file = os.path.join(run_dir, ".slurm_script_end_time")
         job_id_file = os.path.join(run_dir, ".slurm_job")
-        if not os.path.isfile(end_time_file) or not os.path.isfile(
-            job_id_file
-        ):
+        if not (os.path.isfile(end_time_file) and os.path.isfile(job_id_file)):
             return
-        with open(end_time_file, encoding="utf-8") as f:
-            script_end_time = float(f.read().strip())
-        with open(job_id_file, encoding="utf-8") as f:
-            job_id = f.read().strip()
-        sacct_cmd = Executable("sacct")
         try:
+            with open(end_time_file, encoding="utf-8") as f:
+                script_end_time = float(f.read().strip())
+
+            with open(job_id_file, encoding="utf-8") as f:
+                job_id = f.read().strip()
+            if not job_id:
+                logger.warn(f"Job ID file {job_id_file} is empty")
+                return
+
+            sacct_cmd = Executable("sacct")
             job_end_time_str = sacct_cmd(
                 "-j", job_id, "-X", "-n", "--format=End", output=str
             ).strip()
             # sacct by default reports timestamp in local timezone
-            # TODO: can use more convenient method with python 3.7+
             job_end_time = datetime.datetime.strptime(
                 job_end_time_str, "%Y-%m-%dT%H:%M:%S"
             ).timestamp()
             duration = int(job_end_time - script_end_time)
-        except (ProcessError, ValueError) as e:
+        except (ProcessError, ValueError, OSError, CommandNotFoundError) as e:
             logger.warn(f"Failed to get job end time with error {e}")
         else:
             fom_key = "slurm-job-termination-overhead"
@@ -258,7 +261,7 @@ class Slurm(WorkflowManagerBase):
         query_cmd = Executable(query_script)
         try:
             query_cmd(output=os.devnull)
-        except ProcessError as e:
+        except (ProcessError, OSError) as e:
             # Only log a warning as this is not considered a critical step
             logger.warn(f"batch_query returns error {e}")
         self._get_job_termination_overhead()
@@ -267,17 +270,27 @@ class Slurm(WorkflowManagerBase):
         expander = self.app_inst.expander
         run_dir = expander.expand_var_name("experiment_run_dir")
         job_id_file = os.path.join(run_dir, ".slurm_job")
-        status = ExperimentStatus.UNRESOLVED
         if not os.path.isfile(job_id_file):
             logger.warn("job_id file is missing")
-            return status
-        with open(job_id_file, encoding="utf-8") as f:
-            job_id = f.read().strip()
+            return ExperimentStatus.UNRESOLVED
+        try:
+            with open(job_id_file, encoding="utf-8") as f:
+                job_id = f.read().strip()
+        except OSError as e:
+            logger.warn(f"Failed to read job_id file {job_id_file}: {e}")
+            return ExperimentStatus.UNRESOLVED
+        if not job_id:
+            logger.warn(f"job_id file {job_id_file} is empty")
+            return ExperimentStatus.UNRESOLVED
+
         self.runner.set_dry_run(workspace.dry_run)
         wm_status_raw = self.runner.get_status(job_id)
         wm_status = _STATUS_MAP.get(wm_status_raw)
-        if wm_status is not None and hasattr(ExperimentStatus, wm_status):
-            status = getattr(ExperimentStatus, wm_status)
+        status = (
+            getattr(ExperimentStatus, wm_status)
+            if wm_status and hasattr(ExperimentStatus, wm_status)
+            else ExperimentStatus.UNRESOLVED
+        )
         if status == ExperimentStatus.UNRESOLVED:
             logger.warn(
                 f"The slurm workflow manager failed to resolve the status of job {job_id}. "
@@ -368,7 +381,6 @@ class SlurmRunner:
         self.squeue_runner = None
         self.sacct_runner = None
         self.sinfo_runner = None
-        self.run_dir = None
 
     def _ensure_runner(self, runner_name: str):
         attr = f"{runner_name}_runner"
@@ -388,24 +400,23 @@ class SlurmRunner:
     def get_status(self, job_id):
         if self.dry_run:
             return None
-        self._ensure_runner("squeue")
-        squeue_args = ["-h", "-o", "%t", "-j", job_id]
+        status_out = ""
         try:
+            self._ensure_runner("squeue")
+            squeue_args = ["-h", "-o", "%t", "-j", job_id]
             status_out = self.squeue_runner.command(
                 *squeue_args, output=str, error=os.devnull
             )
-        except ProcessError as e:
-            status_out = ""
+        except (ProcessError, RunnerError, OSError) as e:
             logger.debug(
                 f"squeue returns error {e}. This is normal if the job has already been completed."
             )
         if not status_out:
-            self._ensure_runner("sacct")
-            sacct_args = ["-o", "state", "-X", "-n", "-j", job_id]
             try:
+                self._ensure_runner("sacct")
+                sacct_args = ["-o", "state", "-X", "-n", "-j", job_id]
                 status_out = self.sacct_runner.command(*sacct_args, output=str)
-            except ProcessError as e:
-                status_out = ""
+            except (ProcessError, RunnerError, OSError) as e:
                 logger.debug(
                     f"sacct returns error {e}. The status is not resolved correctly."
                 )
@@ -414,13 +425,19 @@ class SlurmRunner:
     def get_partitions(self):
         if self.dry_run:
             return None
-        self._ensure_runner("sinfo")
-        sinfo_args = ["-h"]
-        out = self.sinfo_runner.command(*sinfo_args, output=str).strip()
+        try:
+            self._ensure_runner("sinfo")
+            sinfo_args = ["-h"]
+            out = self.sinfo_runner.command(*sinfo_args, output=str).strip()
+        except (ProcessError, RunnerError, OSError) as e:
+            logger.debug(f"sinfo returns error {e}")
+            return None
         partitions = set()
         default_partition = None
-        for line in out.split("\n"):
+        for line in out.splitlines():
             info = line.split()
+            if not info:
+                continue
             name = info[0].strip()
             if name.endswith("*"):
                 name = name[:-1]
