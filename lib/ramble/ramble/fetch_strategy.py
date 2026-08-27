@@ -455,7 +455,10 @@ class URLFetchStrategy(FetchStrategy):
 
             timeout = self.extra_options.get("timeout")
             if timeout:
-                connect_timeout = max(connect_timeout, int(timeout))
+                try:
+                    connect_timeout = max(connect_timeout, int(timeout))
+                except (ValueError, TypeError) as e:
+                    raise FetchError(f"Invalid timeout value '{timeout}': {e}") from e
 
         if connect_timeout > 0:
             # Timeout if can't establish a connection after n sec.
