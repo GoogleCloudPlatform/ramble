@@ -199,8 +199,16 @@ def edit(parser, args):
             if not os.access(path, os.R_OK):
                 logger.die(f"Insufficient permissions on '{path}'!")
 
+            edit_files = [path]
+            # If editing an application, also include its template files (.tpl) if exists
+            if matches[0]["type"] == ramble.repository.ObjectTypes.applications.name:
+                obj_dir = os.path.dirname(path)
+                tpl_pattern = os.path.join(glob.escape(obj_dir), "*.tpl")
+                tpl_files = sorted(f for f in glob.glob(tpl_pattern) if os.path.isfile(f))
+                edit_files.extend(tpl_files)
+
             try:
-                editor(path)
+                editor(*edit_files)
             except TypeError:
                 logger.die("No valid editor was found.")
             return
