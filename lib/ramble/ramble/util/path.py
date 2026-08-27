@@ -45,6 +45,9 @@ def substitute_config_variables(path, local_replacements):
 
     """
 
+    if "$" not in path:
+        return path
+
     # Look up replacements for re.sub in the replacements dict.
     def repl(match):
         m = match.group(0).strip("${}")
