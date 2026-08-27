@@ -1796,6 +1796,7 @@ def workspace_manage_includes_setup_parser(subparser):
     actions.add_argument(
         "--remove-index",
         dest="remove_index",
+        type=int,
         metavar="IDX",
         help="whether to remove an existing include by index",
     )
@@ -1821,10 +1822,9 @@ def workspace_manage_includes(args):
                         logger.msg(f"{idx}: {include}")
                     return
             logger.msg("Workspace contains no includes.")
-    elif args.remove_index:
-        remove_index = int(args.remove_index)
+    elif args.remove_index is not None:
         with ws.write_transaction():
-            ws.remove_include(index=remove_index)
+            ws.remove_include(index=args.remove_index)
     elif args.remove_pattern:
         with ws.write_transaction():
             ws.remove_include(pattern=args.remove_pattern)

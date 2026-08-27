@@ -6,11 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.error
 import ramble.util.colors as color
 import ramble.util.matrices
 from ramble.namespace import namespace
 
 import spack.util.spack_yaml as syaml
+
+
+class ContextError(ramble.error.RambleError):
+    """Exception raised for errors in context parsing and handling."""
 
 
 class Context:
@@ -117,7 +122,12 @@ class Context:
         if in_context.tags:
             self.tags.extend(in_context.tags)
         if in_context.n_repeats != 0:
-            self.n_repeats = int(in_context.n_repeats)
+            try:
+                self.n_repeats = int(in_context.n_repeats)
+            except (ValueError, TypeError) as e:
+                raise ContextError(
+                    f"Cannot cast n_repeats value '{in_context.n_repeats}' to an integer: {e}"
+                ) from e
         if in_context.formatted_executables:
             self.formatted_executables.update(in_context.formatted_executables)
         if in_context.success_criteria:
@@ -224,7 +234,12 @@ def create_context_from_dict(context_name, in_dict):
     )
 
     if namespace.n_repeats in in_dict:
-        new_context.n_repeats = int(in_dict[namespace.n_repeats])
+        try:
+            new_context.n_repeats = int(in_dict[namespace.n_repeats])
+        except (ValueError, TypeError) as e:
+            raise ContextError(
+                f"Cannot cast n_repeats value '{in_dict[namespace.n_repeats]}' to an integer: {e}"
+            ) from e
 
     if namespace.formatted_executables in in_dict:
         new_context.formatted_executables = in_dict[namespace.formatted_executables].copy()

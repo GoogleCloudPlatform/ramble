@@ -16,7 +16,7 @@ from unittest import mock
 import pytest
 
 from ramble import fetch_strategy
-from ramble.fetch_strategy import FailedDownloadError
+from ramble.fetch_strategy import FailedDownloadError, FetchError
 
 
 @pytest.mark.parametrize(
@@ -202,6 +202,25 @@ class TestURLFetchStrategy:
         mock_curl.assert_called_once()
         args, kwargs = mock_curl.call_args
         assert "-k" in args
+
+    def test_fetch_curl_custom_timeout(self, fetcher, mock_curl, mock_config, mock_tty):
+        """Test that valid custom timeout is passed to curl."""
+        fetcher.extra_options = {"timeout": 45}
+        mock_curl.return_value = "HTTP/1.1 200 OK"
+        mock_curl.returncode = 0
+        fetcher._fetch_curl("http://example.com/foo.tar.gz")
+
+        mock_curl.assert_called_once()
+        args, _ = mock_curl.call_args
+        assert "--connect-timeout" in args
+        idx = args.index("--connect-timeout")
+        assert args[idx + 1] == "45"
+
+    def test_fetch_curl_invalid_timeout(self, fetcher, mock_curl, mock_config, mock_tty):
+        """Test that invalid timeout raises FetchError."""
+        fetcher.extra_options = {"timeout": "invalid"}
+        with pytest.raises(FetchError, match="Invalid timeout value 'invalid'"):
+            fetcher._fetch_curl("http://example.com/foo.tar.gz")
 
 
 class TestGitFetchStrategy:

@@ -84,3 +84,18 @@ class TestContext(unittest.TestCase):
         self.assertEqual(experiment_config["n_repeats"], 1)
         self.assertEqual(experiment_config["formatted_executables"], {"r": "s"})
         self.assertEqual(experiment_config["success_criteria"], "t")
+
+    def test_invalid_n_repeats_create_context_from_dict(self):
+        from ramble.context import ContextError, create_context_from_dict
+
+        with self.assertRaises(ContextError):
+            create_context_from_dict("test_context", {"n_repeats": "not-an-int"})
+
+    def test_invalid_n_repeats_merge_context(self):
+        from ramble.context import ContextError
+
+        c1 = Context()
+        c1.n_repeats = "invalid"
+        c2 = Context()
+        with self.assertRaises(ContextError):
+            c2.merge_context(c1)

@@ -133,3 +133,13 @@ def test_workspace_remove_includes_pattern(workspace_name):
     with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" not in data
+
+
+def test_workspace_remove_includes_invalid_index(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    ws.write()
+
+    with pytest.raises(SystemExit):
+        workspace("manage", "includes", "--remove-index", "invalid", global_args=global_args)
