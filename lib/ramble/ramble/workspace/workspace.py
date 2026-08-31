@@ -867,8 +867,11 @@ ramble:
     def all_experiments_path(self):
         return os.path.join(self.root, WORKSPACE_ALL_EXPERIMENTS_FILE)
 
-    def build_experiment_set(self, die_on_validate_error=True):
+    def build_experiment_set(self, die_on_validate_error=True, check_environments=True):
         """Create an experiment set representing this workspace"""
+
+        if self.software_environments is None:
+            self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
 
         experiment_set = ramble.experiment_set.ExperimentSet(self)
 
@@ -887,7 +890,7 @@ ramble:
 
         experiment_set.build_experiment_chains()
 
-        if self.software_environments is not None:
+        if check_environments and self.software_environments is not None:
             self.software_environments.check_all_environments()
 
         return experiment_set
@@ -1497,7 +1500,9 @@ ramble:
 
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
 
-        experiment_set = self.build_experiment_set(die_on_validate_error=False)
+        experiment_set = self.build_experiment_set(
+            die_on_validate_error=False, check_environments=False
+        )
 
         force_prefix = False
         pkgman_prefixes = set()
@@ -1641,6 +1646,8 @@ ramble:
         ramble.config.config.update_config(
             namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
         )
+
+        self.software_environments = None
 
         return
 

@@ -461,3 +461,32 @@ def test_check_all_environments_warning(request, mutable_mock_workspace_path, ca
         assert (
             "Software environment 'completely-undefined-env' was auto-constructed" in captured.err
         )
+
+
+def test_build_experiment_set_check_environments_flag(
+    request, mutable_mock_workspace_path, capsys
+):
+    ws_name = request.node.name
+    workspace("create", ws_name)
+
+    with ramble.workspace.read(ws_name) as ws:
+        ws.software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+        _ = ws.software_environments.render_environment(
+            "completely-undefined-env", env_expander, _get_package_manager()
+        )
+
+        ws.build_experiment_set(check_environments=False)
+        captured = capsys.readouterr()
+        assert (
+            "Software environment 'completely-undefined-env' was auto-constructed"
+            not in captured.err
+        )
+
+        ws.build_experiment_set(check_environments=True)
+        captured = capsys.readouterr()
+        assert (
+            "Software environment 'completely-undefined-env' was auto-constructed" in captured.err
+        )

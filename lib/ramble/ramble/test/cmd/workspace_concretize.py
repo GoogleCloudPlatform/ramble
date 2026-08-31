@@ -114,3 +114,25 @@ def test_workspace_multispec_concretize(workspace_name):
         assert "gromacs" in content
         assert "spack_pkg_spec" in content
         assert "eessi_pkg_spec" in content
+
+
+def test_workspace_concretize_populated_env_no_warning(workspace_name, capsys):
+    ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    workspace(
+        "manage",
+        "experiments",
+        "gromacs",
+        "-V",
+        "package_manager=spack",
+        "--wf",
+        "water_bare",
+        "-v",
+        "n_nodes=2",
+        global_args=global_args,
+    )
+    _ = capsys.readouterr()
+    workspace("concretize", global_args=global_args)
+    captured = capsys.readouterr()
+    assert "was auto-constructed" not in captured.err
