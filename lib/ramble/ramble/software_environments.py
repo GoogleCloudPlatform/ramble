@@ -9,6 +9,7 @@
 from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set
 
+import ramble.config
 import ramble.error
 import ramble.util.colors as color
 from ramble.expander import Expander
@@ -714,7 +715,7 @@ class SoftwareEnvironments:
         """
 
         self._workspace = workspace
-        self._software_dict = workspace.get_software_dict().copy()
+        self._software_dict = ramble.config.get(namespace.software).copy()
         self._environment_templates = {}
         self._external_env_templates = {}
         self._package_templates = {}

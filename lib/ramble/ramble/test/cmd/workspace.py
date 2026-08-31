@@ -1648,21 +1648,21 @@ ramble:
     with fs.working_dir(config_path):
         write_config(ws_path, test_config)
 
-        with ramble.workspace.Workspace(ws_path) as ws:
-            software_dict = ws.get_software_dict()
+        with ramble.workspace.Workspace(ws_path):
+            software_dict = ramble.config.get(namespace.software)
             print(f"software_dict before = {software_dict}")
 
         workspace("concretize", global_args=workspace_flags)
 
-        with ramble.workspace.Workspace(ws_path) as ws:
-            software_dict = ws.get_software_dict()
+        with ramble.workspace.Workspace(ws_path):
+            software_dict = ramble.config.get(namespace.software)
             assert namespace.environments in software_dict
 
         write_config(ws_path, test_config)
 
         workspace("concretize", global_args=workspace_flags)
-        with ramble.workspace.Workspace(ws_path) as ws:
-            software_dict = ws.get_software_dict()
+        with ramble.workspace.Workspace(ws_path):
+            software_dict = ramble.config.get(namespace.software)
             assert namespace.environments in software_dict
 
 
