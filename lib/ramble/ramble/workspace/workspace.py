@@ -904,7 +904,7 @@ ramble:
         logger.debug(f" With ws dict: {ws_dict}")
 
         # Iterate over applications in ramble.yaml first
-        app_dict = ramble.config.config.get_config(namespace.application)
+        app_dict = copy.deepcopy(ramble.config.get(namespace.application))
 
         for application, contents in app_dict.items():
             app_name, _, maybe_version = application.partition("@")
@@ -1007,7 +1007,7 @@ ramble:
         if package_list and external_path is not None:
             logger.die("Can only manage environments with one of package_list or external_path")
 
-        software_dict = ramble.config.get(namespace.software).copy()
+        software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if namespace.environments in software_dict:
             environments = software_dict[namespace.environments]
@@ -1082,7 +1082,7 @@ ramble:
             overwrite (bool): Whether colliding definitions should be overwritten
         """
 
-        software_dict = ramble.config.get(namespace.software).copy()
+        software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if namespace.packages in software_dict:
             packages = software_dict[namespace.packages]
@@ -1278,7 +1278,7 @@ ramble:
         edited = False
 
         workspace_vars = ramble.config.get(namespace.variables)
-        apps_dict = ramble.config.get(namespace.application).copy()
+        apps_dict = copy.deepcopy(ramble.config.get(namespace.application))
 
         app_inst = ramble.repository.get(application)
 
@@ -1478,7 +1478,7 @@ ramble:
 
 
         """
-        full_software_dict = ramble.config.get(namespace.software)
+        full_software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if (
             namespace.packages not in full_software_dict
@@ -2019,8 +2019,8 @@ ramble:
 
     def simplify_software(self):
         # First drop unused experiment templates from app dict so environments aren't rendered
-        app_dict = ramble.config.config.get_config(
-            namespace.application, scope=self.ws_file_config_scope_name()
+        app_dict = copy.deepcopy(
+            ramble.config.get(namespace.application, scope=self.ws_file_config_scope_name())
         )
 
         # Build experiment sets to determine which templates never get used
@@ -2063,8 +2063,8 @@ ramble:
         package_dict = None
         environments_dict = None
 
-        software_dict = ramble.config.config.get_config(
-            namespace.software, scope=self.ws_file_config_scope_name()
+        software_dict = copy.deepcopy(
+            ramble.config.get(namespace.software, scope=self.ws_file_config_scope_name())
         )
 
         if namespace.packages in software_dict:
