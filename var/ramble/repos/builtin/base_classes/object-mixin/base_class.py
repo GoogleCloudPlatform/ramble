@@ -58,6 +58,15 @@ class ObjectMixin:
     def scoped_name(self):
         return f"{self.origin_type}::{self.name}"
 
+    @property
+    def preferred_version(self) -> Optional[ObjectVersion]:
+        _ = getattr(self, "known_versions", None)
+        return getattr(self, "_preferred_version", None)
+
+    @preferred_version.setter
+    def preferred_version(self, value: Optional[ObjectVersion]):
+        self._preferred_version = value
+
     def copy(self):
         """Generic copy method for Ramble objects."""
         new_copy = type(self)(self._file_path)
