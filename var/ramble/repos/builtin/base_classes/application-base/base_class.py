@@ -7,7 +7,6 @@
 # except according to those terms.
 """Define base classes for application definitions"""
 
-import copy
 import fnmatch
 import importlib.util
 import operator
@@ -303,10 +302,8 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         new_clone = type(self)(self._file_path)
         self.has_generated_experiments = True
 
-        if "known_versions" in self.__dict__:
-            new_clone.known_versions = copy.deepcopy(
-                self.__dict__["known_versions"]
-            )
+        self._copy_evaluated_directives(new_clone)
+
         clone_variables = {} if not self.variables else self.variables
         clone_variants = {} if not self.variants else self.variants
         new_clone.set_variables_and_variants(

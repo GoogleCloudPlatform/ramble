@@ -183,3 +183,29 @@ def test_dynamic_instance_directive_execution():
 
     assert "dynamic_wl" in inst.workloads[frozenset()]
     assert "dynamic_wl" not in DynamicApp.workloads[frozenset()]
+
+
+def test_application_clone_preserves_evaluated_directives(mutable_mock_apps_repo):
+    """Verify application clone preserves evaluated and dynamically added directives."""
+    app = mutable_mock_apps_repo.get("basic")
+    app.set_variables_and_variants({"workload_name": "test_wl"}, {}, None, None)
+    app.workload("dyn_wl", executables=["dyn_exe"])
+
+    assert "dyn_wl" in app.workloads[frozenset()]
+
+    clone = app.clone()
+
+    assert "dyn_wl" in clone.workloads[frozenset()]
+    assert "archive_patterns" not in clone.__dict__
+
+
+def test_generic_object_copy_preserves_evaluated_directives(mutable_mock_mods_repo):
+    """Verify generic Ramble object copy (e.g. modifier) preserves evaluated directives."""
+    mod = mutable_mock_mods_repo.get("spack-mod")
+    _ = mod.modes
+    assert "modes" in mod.__dict__
+
+    mod_copy = mod.copy()
+    assert "modes" in mod_copy.__dict__
+    assert mod_copy.modes == mod.modes
+    assert "env_var_modifications" not in mod_copy.__dict__
