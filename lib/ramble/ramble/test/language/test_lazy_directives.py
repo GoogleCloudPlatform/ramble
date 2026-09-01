@@ -6,9 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import pytest
+
 import ramble.language.application_language
 import ramble.language.shared_language
-from ramble.language.language_base import _UNSET
+from ramble.appkit import ExecutableApplication
+from ramble.language.language_base import _UNSET, DirectiveError
 
 
 def test_lazy_directive_evaluation():
@@ -209,3 +212,54 @@ def test_generic_object_copy_preserves_evaluated_directives(mutable_mock_mods_re
     assert "modes" in mod_copy.__dict__
     assert mod_copy.modes == mod.modes
     assert "env_var_modifications" not in mod_copy.__dict__
+
+
+def test_subclass_directive_evaluation_when_parent_already_evaluated():
+    """Verify that evaluating parent directives first does not prevent subclass evaluation."""
+
+    class ParentApp(metaclass=ramble.language.application_language.ApplicationMeta):
+        name = "parent_eval_app"
+        __module__ = "ramble.app"
+        _language_types = ["application", "shared"]
+        ramble.language.application_language.workload("parent_wl", executables=["p_exe"])
+
+    class ChildApp(ParentApp):
+        name = "child_eval_app"
+        __module__ = "ramble.app"
+        _language_types = ["application", "shared"]
+        ramble.language.application_language.workload("child_wl", executables=["c_exe"])
+
+    parent_wls = ParentApp.workloads
+    assert "parent_wl" in parent_wls[frozenset()]
+    assert "child_wl" not in parent_wls[frozenset()]
+
+    child_wls = ChildApp.workloads
+    assert "parent_wl" in child_wls[frozenset()]
+    assert "child_wl" in child_wls[frozenset()]
+
+
+def test_subclass_preferred_version_override():
+    """Verify that a subclass can override the parent's preferred version."""
+
+    class ParentVerApp(ExecutableApplication):
+        name = "parent_ver_app"
+        __module__ = "ramble.app"
+        ramble.language.shared_language.version("1.0", preferred=True)
+
+    class ChildVerApp(ParentVerApp):
+        name = "child_ver_app"
+        __module__ = "ramble.app"
+        ramble.language.shared_language.version("2.0", preferred=True)
+
+    assert str(ParentVerApp.preferred_version.version) == "1.0"
+    assert str(ChildVerApp.preferred_version.version) == "2.0"
+
+    with pytest.raises(DirectiveError, match="already has a preferred version"):
+
+        class ConflictVerApp(ExecutableApplication):
+            name = "conflict_ver_app"
+            __module__ = "ramble.app"
+            ramble.language.shared_language.version("1.0", preferred=True)
+            ramble.language.shared_language.version("2.0", preferred=True)
+
+        _ = ConflictVerApp.preferred_version

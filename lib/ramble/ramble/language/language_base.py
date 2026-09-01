@@ -15,8 +15,7 @@ import collections
 import copy
 import functools
 import inspect
-from collections.abc import Sequence  # novm
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Type, Union
 
 import llnl.util.lang
 
@@ -81,13 +80,13 @@ class DirectiveDictDescriptor:
 
     def _evaluate_class(self, cls: type) -> Any:
         """Lazily evaluate directives on the class if not already done."""
-        val = getattr(cls, self.private_name, _UNSET)
+        val = cls.__dict__.get(self.private_name, _UNSET)
         if val is not _UNSET:
             return val
 
         dicts_to_init, directives_to_run = DirectiveMeta._get_execution_plan(self.name)
         for dictionary in dicts_to_init:
-            if getattr(cls, f"_{dictionary}", _UNSET) is _UNSET:
+            if cls.__dict__.get(f"_{dictionary}", _UNSET) is _UNSET:
                 init_val = DirectiveMeta._directive_init_values.get(dictionary, {})
                 setattr(cls, f"_{dictionary}", copy.deepcopy(init_val))
 
@@ -96,11 +95,15 @@ class DirectiveDictDescriptor:
         try:
             for directive_name, directive in directives_list:
                 if directive_name in directives_to_run:
-                    directive(cls)
+                    DirectiveMeta._current_directive = directive
+                    try:
+                        directive(cls)
+                    finally:
+                        DirectiveMeta._current_directive = None
         finally:
             DirectiveMeta._executing_directives_depth -= 1
 
-        res = getattr(cls, self.private_name, _UNSET)
+        res = cls.__dict__.get(self.private_name, _UNSET)
         return res if res is not _UNSET else None
 
     def __get__(self, obj: Any, objtype: Optional[type] = None) -> Any:
@@ -141,6 +144,7 @@ class DirectiveMeta(abc.ABCMeta):
     _directive_types: Dict[str, str] = {}
     _when_constraints_from_context: List[str] = []
     _default_args: List[dict] = []
+    _current_directive: Optional[Callable[..., Any]] = None
 
     @staticmethod
     def push_to_context(when_condition: str) -> None:
@@ -176,6 +180,12 @@ class DirectiveMeta(abc.ABCMeta):
         sources = [getattr(b, "_directives_to_be_executed", None) or [] for b in reversed(bases)]
         for source in sources:
             merged.extend(source)
+
+        for _, directive in DirectiveMeta._directives_to_be_executed:
+            try:
+                directive._defining_class = name  # type: ignore[attr-defined]
+            except (AttributeError, TypeError):
+                pass
 
         merged = list(llnl.util.lang.dedupe(merged))
         merged.extend(DirectiveMeta._directives_to_be_executed)

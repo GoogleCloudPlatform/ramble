@@ -1395,9 +1395,18 @@ def version(
 
         # Ensure only one version is marked as preferred
         if new_version.preferred:
-            curr_preferred = getattr(obj, "_preferred_version", None)
-            if curr_preferred is None:
+            curr_preferred = obj.__dict__.get("_preferred_version", None)
+            curr_class = obj.__dict__.get("_preferred_version_class", None)
+            curr_directive = getattr(
+                ramble.language.language_base.DirectiveMeta,
+                "_current_directive",
+                None,
+            )
+            this_class = getattr(curr_directive, "_defining_class", None)
+
+            if curr_preferred is None or (this_class is not None and curr_class != this_class):
                 obj._preferred_version = new_version
+                obj._preferred_version_class = this_class
             elif curr_preferred.version == new_version.version:
                 # Ignore identical preferred versions, which happens when app is subclassed
                 pass
