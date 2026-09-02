@@ -207,3 +207,41 @@ def test_repo_list_multitype_non_application_scope(mutable_empty_config, tmpdir)
 
     output = repo("list", output=str)
     assert "mockmodrepo" in output
+
+
+@pytest.mark.parametrize("flag", ["-c", "--compact", "--format=compact"])
+def test_repo_list_compact(mutable_config, tmpdir, flag):
+    repo_path = str(tmpdir.join("compact_repo"))
+    repo("create", repo_path, "compact_ns")
+    repo("add", "--scope=site", repo_path)
+
+    if flag.startswith("--format="):
+        output = repo("list", flag, output=str)
+    else:
+        output = repo("list", flag, output=str)
+
+    assert "NAMESPACE" in output
+    assert "TYPES" in output
+    assert "PATH" in output
+    assert "compact_ns" in output
+
+    # Ensure the repo appears only once in the compact output
+    assert output.count("compact_ns") == 1
+
+
+def test_repo_list_compact_specific_type(mutable_config, tmpdir):
+    repo_path = str(tmpdir.join("app_only_repo"))
+    repo("create", repo_path, "app_ns", "-t", "applications")
+    repo("add", "-t", "applications", "--scope=site", repo_path)
+
+    output = repo("list", "-t", "applications", "--compact", output=str)
+    assert "NAMESPACE" in output
+    assert "TYPES" in output
+    assert "PATH" in output
+    assert "app_ns" in output
+    assert output.count("app_ns") == 1
+
+
+def test_repo_list_compact_empty(mutable_empty_config):
+    output = repo("list", "--compact", output=str)
+    assert output == "" or "0 repositor" in output
