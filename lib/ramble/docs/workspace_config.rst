@@ -1,4 +1,4 @@
-.. Copyright 2022-2026 The Ramble Authors
+.. Copyright 2022-2026 Ramble a Series of LF projects, LLC
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -1519,7 +1519,7 @@ This involves creating a new Python class that inherits from `WorkflowManagerBas
 
 Workflow managers are written similar to all other object definitions in
 Ramble. For a complete example, the 
-`SLURM workflow manager <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/workflow_managers/slurm/workflow_manager.py>`_
+`SLURM workflow manager <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/workflow_managers/slurm/workflow_manager.py>`_
 can be used to see how workflow managers can function.
 
 Interacting with Batch Systems

@@ -1,4 +1,4 @@
-.. Copyright 2022-2026 The Ramble Authors
+.. Copyright 2022-2026 Ramble a Series of LF projects, LLC
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -67,7 +67,7 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    :maxdepth: 2
    :caption: Contributing
 
-   Contributing Guidelines <https://github.com/GoogleCloudPlatform/ramble#contributing>
+   Contributing Guidelines <https://github.com/Ramble-Project/ramble#contributing>
    dev_guides
 
 .. toctree::

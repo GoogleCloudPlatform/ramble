@@ -83,7 +83,7 @@ steps:
               --dataset-id "$_DATASET_ID" \
               --table-id "$_TABLE_ID" \
               --pr-number "$_PR_NUMBER" \
-              --repo "GoogleCloudPlatform/ramble"
+              --repo "Ramble-Project/ramble"
             
             post_err=$$?
             if [ $$post_err -ne 0 ]; then

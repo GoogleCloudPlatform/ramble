@@ -1,4 +1,4 @@
-.. Copyright 2022-2026 The Ramble Authors
+.. Copyright 2022-2026 Ramble a Series of LF projects, LLC
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -78,7 +78,7 @@ stored within a directory named for the modifier. As an example, Ramble comes
 with a repository named ``builtin``. This repository contains several standard
 modifier definitions that are provided to the community. One of the modifier
 definition files provided is
-`lscpu <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py>`_.
+`lscpu <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py>`_.
 
 The lscpu modifier definition file is named ``modifier.py`` and is stored
 within a directory named ``lscpu``. Within the ``modifier.py`` file, a python
