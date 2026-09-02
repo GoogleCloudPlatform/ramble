@@ -110,7 +110,7 @@ if [[ "$PUSH_CODECOV" ]]; then
   if [[ -n "$MERGE_BASE_SHA" ]]; then
     echo "Picking PR base: $MERGE_BASE_SHA"
     if [[ -n "$PR_NUMBER" ]]; then
-      codecovcli pr-base-picking --base-sha $MERGE_BASE_SHA --pr $PR_NUMBER --slug "GoogleCloudPlatform/ramble"
+      codecovcli pr-base-picking --base-sha $MERGE_BASE_SHA --pr $PR_NUMBER --slug "Ramble-Project/ramble"
     else
       echo "Skipping pr-base-picking: PR_NUMBER not set"
     fi

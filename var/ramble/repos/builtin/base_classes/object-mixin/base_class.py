@@ -283,7 +283,7 @@ class ObjectMixin:
 
     def _github_url(self, obj_def):
         """Link to an object file on github."""
-        base_url = "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin"
+        base_url = "https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin"
         return f'{base_url}/{obj_def["dir_name"]}/{self.name}/{obj_def["file_name"]}'
 
     def to_html_docs(self, out, obj_def):
