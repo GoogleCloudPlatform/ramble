@@ -907,7 +907,7 @@ ramble:
         logger.debug(f" With ws dict: {ws_dict}")
 
         # Iterate over applications in ramble.yaml first
-        app_dict = ramble.config.config.get_config(namespace.application)
+        app_dict = copy.deepcopy(ramble.config.get(namespace.application))
 
         for application, contents in app_dict.items():
             app_name, _, maybe_version = application.partition("@")
@@ -1010,7 +1010,7 @@ ramble:
         if package_list and external_path is not None:
             logger.die("Can only manage environments with one of package_list or external_path")
 
-        software_dict = self.get_software_dict().copy()
+        software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if namespace.environments in software_dict:
             environments = software_dict[namespace.environments]
@@ -1085,7 +1085,7 @@ ramble:
             overwrite (bool): Whether colliding definitions should be overwritten
         """
 
-        software_dict = self.get_software_dict().copy()
+        software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if namespace.packages in software_dict:
             packages = software_dict[namespace.packages]
@@ -1280,8 +1280,8 @@ ramble:
 
         edited = False
 
-        workspace_vars = self.get_workspace_vars()
-        apps_dict = self.get_applications().copy()
+        workspace_vars = ramble.config.get(namespace.variables)
+        apps_dict = copy.deepcopy(ramble.config.get(namespace.application))
 
         app_inst = ramble.repository.get(application)
 
@@ -1481,7 +1481,7 @@ ramble:
 
 
         """
-        full_software_dict = self.get_software_dict()
+        full_software_dict = copy.deepcopy(ramble.config.get(namespace.software))
 
         if (
             namespace.packages not in full_software_dict
@@ -2026,8 +2026,8 @@ ramble:
 
     def simplify_software(self):
         # First drop unused experiment templates from app dict so environments aren't rendered
-        app_dict = ramble.config.config.get_config(
-            namespace.application, scope=self.ws_file_config_scope_name()
+        app_dict = copy.deepcopy(
+            ramble.config.get(namespace.application, scope=self.ws_file_config_scope_name())
         )
 
         # Build experiment sets to determine which templates never get used
@@ -2070,8 +2070,8 @@ ramble:
         package_dict = None
         environments_dict = None
 
-        software_dict = ramble.config.config.get_config(
-            namespace.software, scope=self.ws_file_config_scope_name()
+        software_dict = copy.deepcopy(
+            ramble.config.get(namespace.software, scope=self.ws_file_config_scope_name())
         )
 
         if namespace.packages in software_dict:
@@ -2699,60 +2699,6 @@ ramble:
 
     def _get_application_dict_config(self, key):
         return self.application_configs[key]["yaml"] if key in self.application_configs else None
-
-    def get_workspace_vars(self):
-        """Return a dict of workspace variables"""
-        return ramble.config.config.get_config(namespace.variables)
-
-    def get_workspace_env_vars(self):
-        """Return a dict of workspace environment variables"""
-        return ramble.config.config.get_config(namespace.env_var)
-
-    def get_workspace_formatted_executables(self):
-        """Return a dict of workspace formatted executables"""
-        return ramble.config.config.get_config(namespace.formatted_executables)
-
-    def get_workspace_internals(self):
-        """Return a dict of workspace internals"""
-        return ramble.config.config.get_config(namespace.internals)
-
-    def get_workspace_modifiers(self):
-        """Return a dict of workspace modifiers"""
-        return ramble.config.config.get_config(namespace.modifiers)
-
-    def get_workspace_zips(self):
-        """Return a dict of workspace zips"""
-        return ramble.config.config.get_config(namespace.zips)
-
-    def get_workspace_variants(self):
-        """Return a dict of workspace variants"""
-        return ramble.config.config.get_config(namespace.variants)
-
-    def get_workspace_success_criteria(self):
-        """Return a dict of workspace success_criteria"""
-        return ramble.config.config.get_config(namespace.success)
-
-    def get_software_dict(self):
-        """Return the software dictionary for this workspace"""
-        software_dict = ramble.config.config.get_config(namespace.software)
-        return software_dict
-
-    def get_workspace_tables(self):
-        """Return a dict of workspace tables"""
-        return ramble.config.config.get_config(namespace.tables)
-
-    def get_workspace_utilities(self):
-        """Return a dict of workspace utilities"""
-        return ramble.config.config.get_config(namespace.utilities)
-
-    def get_applications(self):
-        """Get the dictionary of applications"""
-        logger.debug("Getting app dict.")
-        logger.debug(f" {self._get_workspace_dict()}")
-        workspace_dict = self._get_workspace_dict()
-        if namespace.application not in workspace_dict[namespace.ramble]:
-            workspace_dict[namespace.ramble][namespace.application] = syaml.syaml_dict()
-        return workspace_dict[namespace.ramble][namespace.application]
 
     def read_transaction(self):
         """Get a read lock context manager for use in a `with` block."""

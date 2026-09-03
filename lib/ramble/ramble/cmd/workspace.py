@@ -879,7 +879,7 @@ def workspace_info(args):
             color.cprint(f"    {template}")
 
     # Print workspace variables information
-    workspace_vars = ws.get_workspace_vars()
+    workspace_vars = ramble.config.get(namespace.variables)
 
     ws.software_environments = ramble.software_environments.SoftwareEnvironments(ws)
     software_environments = ws.software_environments
@@ -1140,7 +1140,7 @@ def workspace_info(args):
         if not all_utilities:
             color.cprint("    None")
         else:
-            ws_utilities = ws.get_workspace_utilities() or {}
+            ws_utilities = ramble.config.get(namespace.utilities) or {}
             for utility_name, confs in sorted(all_utilities.items()):
                 color.cprint(color.nested_1(f"    {utility_name}:"))
 
