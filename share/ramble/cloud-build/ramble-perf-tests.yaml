@@ -118,7 +118,7 @@ substitutions:
   _UPLOAD_TO_BQ: 'false'
   # client_id is recommended over app id.
   # client_id is not a secret.
-  _GITHUB_CLIENT_ID: 'Iv23limpijbNRXQzHurG'
+  _GITHUB_CLIENT_ID: 'Iv23lijUJezfMNVKLbBM'
   _WORKER_POOL: ''
 
 timeout: 3600s
