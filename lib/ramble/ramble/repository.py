@@ -31,6 +31,7 @@ import llnl.util.lang
 
 import ramble.caches
 import ramble.config
+import ramble.language.language_base
 import ramble.spec
 import ramble.util.imp
 import ramble.util.naming as nm
@@ -1360,7 +1361,11 @@ class Repo:
                 # manually construct the error message in order to give the
                 # user the correct .py where the syntax error is
                 # located
+                ramble.language.language_base.DirectiveMeta._reset_staging()
                 raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}") from None
+            except BaseException:
+                ramble.language.language_base.DirectiveMeta._reset_staging()
+                raise
 
             module.__object__ = self.full_namespace
             module.__loader__ = self
