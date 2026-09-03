@@ -584,7 +584,7 @@ _ramble_repo_create() {
 }
 
 _ramble_repo_list() {
-    RAMBLE_COMPREPLY="-h --help --scope -t --type"
+    RAMBLE_COMPREPLY="-h --help --scope -c --compact --format -t --type"
 }
 
 _ramble_repo_add() {
