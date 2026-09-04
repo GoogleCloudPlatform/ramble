@@ -823,23 +823,19 @@ ramble:
         if ramble.config.get("config:generate_file_editing_scripts", True):
             fs.mkdirp(self.shared_utilities_dir)
 
-            # Write to base shared utilities directory
-            base_script_content = ramble.util.file_editor.get_file_editor_script()
+            # Copy file editor helper script to workspace shared utilities
             base_script_path = os.path.join(
                 self.shared_utilities_dir, ramble.util.file_editor.HELPER_SCRIPT_NAME
             )
-            with open(base_script_path, "w+", encoding="utf-8") as f:
-                f.write(base_script_content)
+            shutil.copyfile(
+                ramble.util.file_editor.get_file_editor_source_path(), base_script_path
+            )
 
-            # Write cleaner utility script
-            # TODO: Currently this is guarded by the generate_file_editing_scripts
-            # config. Should it use its own config setting?
-            cleaner_script_content = ramble.util.cleaner.get_cleaner_script()
+            # Copy cleaner helper script to workspace shared utilities
             cleaner_script_path = os.path.join(
                 self.shared_utilities_dir, ramble.util.cleaner.HELPER_SCRIPT_NAME
             )
-            with open(cleaner_script_path, "w+", encoding="utf-8") as f:
-                f.write(cleaner_script_content)
+            shutil.copyfile(ramble.util.cleaner.get_cleaner_source_path(), cleaner_script_path)
 
     def write_auxiliary_software_files(self):
         """Write all auxiliary software files out to workspace"""

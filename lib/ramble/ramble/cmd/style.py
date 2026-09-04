@@ -46,6 +46,7 @@ include_patterns = [
     "bin/**",
     "lib/ramble/ramble/**",
     "var/ramble/repos/**",
+    "share/ramble/scripts/**",
     "conftest.py",
 ]
 
@@ -592,7 +593,9 @@ def run_mypy(mypy_cmd, file_list, args):
     mypy_args.extend(get_tool_args(args, "mypy"))
 
     if file_list:
-        mypy_files = [f for f in file_list if f.startswith("lib/ramble/ramble/")]
+        mypy_files = [
+            f for f in file_list if f.startswith(("lib/ramble/ramble/", "share/ramble/scripts/"))
+        ]
         if not mypy_files:
             print_tool_result("mypy", 0)
             return 0
