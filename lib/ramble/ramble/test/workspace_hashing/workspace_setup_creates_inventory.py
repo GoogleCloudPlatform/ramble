@@ -10,6 +10,8 @@ import os
 
 import pytest
 
+import ramble.filters
+import ramble.pipeline
 import ramble.repository
 import ramble.workspace
 from ramble.main import RambleCommand
@@ -100,3 +102,37 @@ def test_deterministic_workspace_hash(workspace_name):
             new_hash = f.read().strip()
 
         assert hash == new_hash
+
+
+def test_construct_experiment_hashes_preserves_changes(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+    n_ranks: '1'
+    n_nodes: '1'
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            exp1: {}
+            exp2: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    # Remove only the first experiment's inventory so its hash is recomputed
+    # while the second experiment's inventory remains unchanged.
+    exp1_inventory = os.path.join(
+        ws.experiment_dir,
+        "hostname",
+        "local",
+        "exp1",
+        ApplicationBase._inventory_file_name,
+    )
+    os.remove(exp1_inventory)
+
+    pipe = ramble.pipeline.Pipeline(ws, ramble.filters.Filters())
+    assert pipe._construct_experiment_hashes() is True
