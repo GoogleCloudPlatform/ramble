@@ -127,8 +127,9 @@ class ObjectMixin(metaclass=SharedMeta):
             return self.app_inst
         return self
 
-    def _get_object_type(self):
-        origin_type = getattr(self, "origin_type", None)
+    @classmethod
+    def _get_object_type(cls):
+        origin_type = getattr(cls, "origin_type", None)
         if origin_type:
             try:
                 return ramble.repository.simplify_object_type(origin_type)

@@ -17,20 +17,8 @@ import ramble.util.naming as nm
 
 def get_template(object_type):
     """Load the python template for a given ObjectType from templates directory."""
-
-    # Map ObjectType to template file names
-    mapping = {
-        ramble.repository.ObjectTypes.applications: "application.py.tpl",
-        ramble.repository.ObjectTypes.base_applications: "application.py.tpl",
-        ramble.repository.ObjectTypes.modifiers: "modifier.py.tpl",
-        ramble.repository.ObjectTypes.base_modifiers: "modifier.py.tpl",
-        ramble.repository.ObjectTypes.package_managers: "package_manager.py.tpl",
-        ramble.repository.ObjectTypes.base_package_managers: "package_manager.py.tpl",
-        ramble.repository.ObjectTypes.workflow_managers: "workflow_manager.py.tpl",
-        ramble.repository.ObjectTypes.base_workflow_managers: "workflow_manager.py.tpl",
-    }
-
-    tpl_name = mapping.get(object_type, "generic.py.tpl")
+    type_def = ramble.repository.type_definitions.get(object_type, {})
+    tpl_name = type_def.get("template", "generic.py.tpl")
     tpl_path = os.path.join(ramble.paths.share_path, "templates", tpl_name)
 
     if os.path.exists(tpl_path):
@@ -96,25 +84,7 @@ def create_object(
 
     # Choose template & default base class
     template = get_template(object_type)
-
-    default_bases = {
-        ramble.repository.ObjectTypes.applications: "ExecutableApplication",
-        ramble.repository.ObjectTypes.base_applications: "ExecutableApplication",
-        ramble.repository.ObjectTypes.modifiers: "BasicModifier",
-        ramble.repository.ObjectTypes.base_modifiers: "BasicModifier",
-        ramble.repository.ObjectTypes.package_managers: "PackageManagerBase",
-        ramble.repository.ObjectTypes.base_package_managers: "PackageManagerBase",
-        ramble.repository.ObjectTypes.workflow_managers: "WorkflowManagerBase",
-        ramble.repository.ObjectTypes.base_workflow_managers: "WorkflowManagerBase",
-        ramble.repository.ObjectTypes.systems: "SystemBase",
-        ramble.repository.ObjectTypes.base_systems: "SystemBase",
-        ramble.repository.ObjectTypes.platforms: "PlatformBase",
-        ramble.repository.ObjectTypes.base_platforms: "PlatformBase",
-        ramble.repository.ObjectTypes.utilities: "UtilityBase",
-        ramble.repository.ObjectTypes.base_utilities: "UtilityBase",
-    }
-    default_base = default_bases.get(object_type, "object")
-
+    default_base = type_def.get("default_base", "object")
     resolved_base = base_class or default_base
     kit_name = type_def.get("kit_name") or "appkit"
 
