@@ -45,7 +45,7 @@ steps:
     id: ramble-docs-test
     entrypoint: /bin/bash
 substitutions:
-  _SPACK_REF: v1.0.0
+  _SPACK_REF: v1.2.2
   _PYTHON_VER: 3.13.5
   _BASE_IMG: rockylinux
   _BASE_VER: '8'

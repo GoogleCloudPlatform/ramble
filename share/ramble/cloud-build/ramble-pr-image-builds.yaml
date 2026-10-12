@@ -40,8 +40,8 @@ steps:
 
 # For PR validation, only use one set of versions.
 substitutions:
-  _SPACK_REF: v1.1.1
-  _PYTHON_VER: 3.11.14
+  _SPACK_REF: v1.2.2
+  _PYTHON_VER: 3.13.5
   _PKG_MANAGER: apt
 
 timeout: 3600s
