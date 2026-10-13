@@ -26,8 +26,8 @@ An example of a Ramble workspace workflow might look like the following:
     digraph workspace_workflow {
         fontsize=12;
         rankdir=TB;
-        nodesep=0.4;
-        ranksep=0.4;
+        nodesep=0.6;
+        ranksep=0.45;
 
         node [
             shape=box,
@@ -41,49 +41,58 @@ An example of a Ramble workspace workflow might look like the following:
         step1 [
             label=<<b>1. Workspace Creation</b><br/>(ramble workspace create)>,
             fillcolor="#f8f9fa",
-            color="#495057"
+            color="#495057",
+            group=main
         ];
         step2 [
             label=<<b>2. YAML &amp; Template Configuration</b><br/>(ramble workspace edit)>,
             fillcolor="#e9ecef",
-            color="#495057"
+            color="#495057",
+            group=main
         ];
         step3 [
-            label=<<b>3. Workspace Concretization</b><br/>(ramble workspace concretize)<br/>Optional / One-time>,
+            label=<<b>3. Workspace Concretization</b><br/>(ramble workspace concretize)<br/><i>Optional / One-time</i>>,
             fillcolor="#e2e3e5",
-            color="#495057"
+            color="#495057",
+            style="filled,rounded,dashed",
+            width=3.0
         ];
         step4 [
             label=<<b>4. Setup Pipeline</b><br/>(ramble workspace setup)>,
             fillcolor="#d4edda",
-            color="#28a745"
+            color="#28a745",
+            group=main
         ];
         step5 [
             label=<<b>5. Execute Pipeline</b><br/>(ramble on)>,
             fillcolor="#cce5ff",
-            color="#004085"
+            color="#004085",
+            group=main
         ];
         step6 [
             label=<<b>6. Analyze Pipeline</b><br/>(ramble workspace analyze)>,
             fillcolor="#ffe8cc",
-            color="#d9480f"
+            color="#d9480f",
+            group=main
         ];
         step7 [
             label=<<b>7. Workspace Reporting</b><br/>(ramble results)>,
             fillcolor="#d1ecf1",
-            color="#0c5460"
+            color="#0c5460",
+            group=main
         ];
         step8 [
             label=<<b>8. Archive Pipeline</b><br/>(ramble workspace archive)>,
             fillcolor="#eebefa",
-            color="#862e9c"
+            color="#862e9c",
+            group=main
         ];
 
-        step1 -> step2 -> step4 -> step5 -> step6 -> step7 -> step8;
+        step1 -> step2 -> step4 -> step5 -> step6 -> step7 -> step8 [weight=10];
         step2:w -> step3:n [style=dashed];
-        step3:s -> step4:w;
+        step3:s -> step4:w [style=dashed];
         step6:e -> step2:e [
-            label="Further explorations?",
+            label="  Further explorations?",
             style=dashed
         ];
     }
@@ -103,7 +112,7 @@ An example of a Ramble workspace workflow might look like the following:
    submit jobs to batch schedulers or execute scripts directly on compute nodes.
 6. **Analysis Pipeline**: Extract Figures of Merit (FOMs) and evaluate success criteria using
    :ref:`ramble workspace analyze <ramble-workspace-analyze>`. This may lead to identifying
-   new areas to explore resulting in a cycle back through the configuration step.
+   new areas to explore resulting in a cycle back through the configuration step, #4.
 7. **Reporting**: View summary statistics and result tables using :ref:`ramble results
    <ramble-results>` (see :doc:`results`).
 8. **Archiving Pipeline**: Package logs, rendered templates, and inventory files into an archive

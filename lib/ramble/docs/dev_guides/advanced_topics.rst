@@ -13,7 +13,7 @@ Advanced Topics for Definition Developers
 =========================================
 
 Some application or modifier definition files have more complex requirements
-than those met with the directives that are covered the object specific
+than those met with the directives that are covered in the object specific
 developer guides. This developers guide will teach you several more advanced
 concepts to help write more specialized definition files.
 
@@ -39,7 +39,7 @@ Pipelines
 Ramble has a concept of a ``pipeline`` which represents full actions that can
 be taken on a workspace. Each ``pipeline`` has a corresponding workspace
 command and targets a specific stage of the experiment lifecycle. The most 
-:ref:`common pipelines <standard-pipelines>` are:
+common pipelines are:
 
    * :ref:`ramble workspace setup <ramble-workspace-setup>`
      → :py:class:`~ramble.pipeline.SetupPipeline`
@@ -76,24 +76,40 @@ Phase Registration
 ==================
 
 Phases can be defined in a variety of locations. Some base classes define phases for specific
-pipelines. Additionally, object types (applications, modifiers, etc.) can all define and
-register their own phases to build more complex pipelines for specific use cases. Some
-example include:
+pipelines. For example:
 
-   * :doc:`Applications <../application_list>` define core command generation, input downloading,
-     license inclusion, and analysis hooks.
-   * :doc:`Package Managers <../package_managers>` (e.g., Spack, Pip) inject software environment
-     creation and installation phases.
-   * :doc:`Modifiers <../modifier_list>` (e.g., containers, profilers) inject pre-exec and post-exec
-     hooks.
-   * :doc:`Workflow Managers <../workflow_managers>` (e.g., Slurm, PBS, Google Batch) define batch
-     submission logic and job execution wrappers.
-   * :doc:`Systems <../systems>` and :doc:`Platforms <../platforms>` contribute hardware-specific
-     variables, CPU architecture parameters, and compiler configurations expanded during pipeline
-     setup.
+    * `ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_
+      registers phases such as ``get_inputs``, ``license_includes``, and
+      ``make_experiments`` in the ``setup`` pipeline, ``prepare_analysis`` and
+      ``analyze_experiments`` in the ``analyze`` pipeline, and ``archive_experiments`` in the
+      ``archive`` pipeline.
+    * `PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_
+      registers ``check_auxiliary_software_files`` in the ``setup`` pipeline and
+      ``add_software_to_results`` in the ``analyze`` pipeline.
+
+Additionally, instances of the base classes (e.g., application, modifier, or package manager)
+can define and register their own phases to build more complex pipelines for specific use
+cases. Some examples include:
+
+    * The `HpcgBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_
+      base application registers ``calculate_values`` in the ``setup`` pipeline to compute
+      grid dimensions from memory variables before experiment scripts are rendered.
+    * The `Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_
+      package manager registers ``software_install`` and ``define_package_paths`` in the
+      ``setup`` pipeline (extending the ``software_create_env`` and ``software_configure``
+      phases inherited from
+      `SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_).
+    * Container modifiers such as
+      `Docker <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/modifiers/docker/modifier.py>`_
+      and
+      `Apptainer <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/modifiers/apptainer/modifier.py>`_
+      register phases like ``build_container``, ``pull_container``, and
+      ``format_docker_mounts`` in the ``setup`` pipeline (alongside
+      ``define_container_variables`` from
+      `ContainerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_modifiers/container-base/base_modifier.py>`_).
 
 Each phase is defined in two parts. The first part is to define
-a class method on a object definition. Phase names need to begin with an
+a class method on an object definition. Phase names need to begin with an
 underscore, and they have the following signature:
 
 .. code-block::
@@ -118,350 +134,400 @@ phase. Phase registration can also define a ``run_after`` list of phases to exec
 before the newly registered phase. A phase can also be registered into multiple
 pipelines, by calling the ``register_phase`` directive multiple times.
 
-The diagram below illustrates a :py:class:`~ramble.pipeline.SetupPipeline` example of how
-classes register specific phases via ``register_phase()`` into the pipeline's
-:py:class:`~ramble.graphs.PhaseGraph` as phases:
-
-.. graphviz::
-
-    digraph setup_phase_registration {
-        newrank=true;
-        fontsize=12;
-        rankdir=TB;
-        nodesep=0.8;
-        ranksep=0.4;
-        compound=true;
-
-        node [shape=box, style="filled,rounded", fontsize=11, margin="0.2,0.12"];
-        edge [fontsize=10, color="#0056b3", penwidth=1.5];
-
-        // Classes
-        subgraph cluster_classes {
-            label=<<b>Classes</b>>;
-            labelloc=t;
-            labeljust=c;
-            style="filled,dashed";
-            fillcolor="#f8f9fa";
-            color="#cbd5e1";
-            fontsize=12;
-            margin=20;
-
-            mod [
-                label="Modifier\n(e.g., Docker)",
-                fillcolor="#eef6ff",
-                color="#0056b3",
-                width=2.5
-            ];
-            pm  [
-                label="Package Manager\n(e.g., Spack)",
-                fillcolor="#eef6ff",
-                color="#0056b3",
-                width=2.5
-            ];
-            app [
-                label="Application Definition\n(e.g., Gromacs)",
-                fillcolor="#eef6ff",
-                color="#0056b3",
-                width=2.5
-            ];
-
-            mod -> pm -> app [style=invis];
-        }
-
-        // PhaseGraph Execution Order
-        subgraph cluster_phases {
-            label=<<b>SetupPipeline PhaseGraph</b>>;
-            labelloc=t;
-            labeljust=c;
-            style="filled,dashed";
-            fillcolor="#f8f9fa";
-            color="#cbd5e1";
-            fontsize=12;
-            margin=20;
-
-            p1 [
-                label="Phase 1: pull_container",
-                fillcolor="#e6f4ea",
-                color="#28a745",
-                width=2.5
-            ];
-            p2 [
-                label="Phase 2: software_create_env",
-                fillcolor="#e6f4ea",
-                color="#28a745",
-                width=2.5
-            ];
-            p3 [
-                label="Phase 3: get_inputs",
-                fillcolor="#e6f4ea",
-                color="#28a745",
-                width=2.5
-            ];
-            p4 [
-                label="Phase 4: license_includes",
-                fillcolor="#e6f4ea",
-                color="#28a745",
-                width=2.5
-            ];
-            p5 [
-                label="Phase 5: make_experiments",
-                fillcolor="#e6f4ea",
-                color="#28a745",
-                width=2.5
-            ];
-
-            p1 -> p2 -> p3 -> p4 -> p5 [color="#28a745", penwidth=2.0, weight=10];
-        }
-
-        // Horizontal rank alignment between Classes and Phases
-        { rank=same; mod; p1; }
-        { rank=same; pm; p2; }
-        { rank=same; app; p3; }
-
-        // Classes --> Phases
-        mod -> p1 [
-            label=<<i>register_phase('pull_container')</i>>,
-            color="#0056b3"
-        ];
-        pm  -> p2 [
-            label=<<i>register_phase('software_create_env')</i>>,
-            color="#0056b3"
-        ];
-        app -> p3 [
-            label=<<i>register_phase('get_inputs')</i>>,
-            color="#0056b3"
-        ];
-        app:se -> p4:w [
-            label=<<i>register_phase('license_includes')</i>>,
-            color="#0056b3"
-        ];
-        app:s -> p5:w [
-            label=<<i>register_phase('make_experiments')</i>>,
-            color="#0056b3"
-        ];
-    }
-
 .. _standard-pipelines:
 
-Standard Pipelines
-==================
+Example Experiment Pipelines
+----------------------------
 
-Setup Pipeline
---------------
+The following sections illustrate the pipeline phase graphs constructed
+for a common experiment workflow of ``ramble workspace setup`` → ``ramble on`` →
+``ramble workspace analyze`` using the
+`Hpcg <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/applications/hpcg/application.py>`_
+application and the
+`Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_
+package manager. In this scenario, no phases are added
+to the :py:class:`ramble.pipeline.ExecutePipeline` by any of the objects, so we'll only
+be examining the :py:class:`ramble.pipeline.SetupPipeline` and
+:py:class:`ramble.pipeline.AnalyzePipeline`.
+
+Example: Setup Pipeline
+************************
 
 * **CLI Command**: :ref:`ramble workspace setup <ramble-workspace-setup>`
 * **Class**: :py:class:`ramble.pipeline.SetupPipeline`
 
-The setup pipeline prepares everything required to execute experiments:
+When :py:class:`~ramble.pipeline.SetupPipeline` initializes, Ramble constructs a
+:py:class:`~ramble.graphs.PhaseGraph` by combining the ``setup`` phases registered across both
+``Hpcg`` and ``Spack`` object inheritance hierarchies. `Hpcg <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_
+inherits from `HpcgBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_
+which, in turn, inherits from `ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_.
+Likewise, `Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_
+inherits from `SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_
+which inherits from `PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_.
+This results in the following phases being registered by the associated objects:
+
+* **Application Hierarchy**:
+
+  * `ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_
+    registers:
+
+    * ``bootstrap_utilities`` (``run_before=["get_inputs"]``)
+    * ``get_inputs`` (unconstrained)
+    * ``license_includes`` (unconstrained)
+    * ``make_experiments`` (``run_after=["get_inputs"]``)
+    * ``write_status`` (``run_after=["make_experiments"]``)
+
+  * `HpcgBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_
+    registers:
+    
+    * ``calculate_values`` (``run_before=["make_experiments"]``)
+
+  * `Hpcg <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_
+    doesn't register any additional phases.
+
+* **Package Manager Hierarchy**:
+
+  * `PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_
+    registers:
+    
+    * ``check_auxiliary_software_files`` (``run_after=["make_experiments"]``)
+
+  * `SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_
+    registers:
+
+    * ``software_create_env`` (unconstrained)
+    * ``software_install_requested_compilers``
+      (``run_after=["software_create_env"]`` when ``+spack_install_compilers`` is enabled)
+    * ``software_configure``
+      (``run_after=["software_create_env", "software_install_requested_compilers"]``)
+    * ``evaluate_requirements`` (``run_before=["make_experiments"]``)
+
+  * `Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_
+    registers:
+
+    * ``software_install`` (``run_after=["software_configure"]``,
+      ``run_before=["evaluate_requirements"]``)
+    * ``define_package_paths`` (``run_after=["software_install", "evaluate_requirements"]``,
+      ``run_before=["make_experiments"]``)
+
+The diagram below shows the resulting :py:class:`~ramble.graphs.PhaseGraph` directed acyclic graph
+(DAG), where directed connecting lines express the ``run_before`` / ``run_after`` dependencies and
+nodes are colored to indicate the object hierarchy that registered them (green for the application
+hierarchy, blue for the package manager hierarchy):
 
 .. graphviz::
 
-    digraph setup_pipeline {
+    digraph hpcg_spack_setup_dag {
         fontsize=12;
         rankdir=TB;
-        nodesep=0.3;
-        ranksep=0.4;
+        nodesep=0.35;
+        ranksep=0.45;
 
-        node [
-            shape=box,
-            style="filled,rounded",
-            fontsize=11,
-            margin="0.25,0.12",
-            fillcolor="#d4edda",
+        node [shape=box, style="filled,rounded", fontsize=10, margin="0.18,0.1"];
+        edge [fontsize=9, color="#475569", penwidth=1.3];
+
+        // ApplicationBase phases (green)
+        bootstrap_utilities [
+            label=<<b>bootstrap_utilities</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
             color="#28a745",
-            width=3.5
+            penwidth=2.0,
+            group="left_col"
         ];
-        edge [fontsize=10, color="#28a745", penwidth=1.3];
+        get_inputs [
+            label=<<b>get_inputs</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="left_col"
+        ];
+        license_includes [
+            label=<<b>license_includes</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="left_col"
+        ];
+        make_experiments [
+            label=<<b>make_experiments</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="mid_col"
+        ];
+        write_status [
+            label=<<b>write_status</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0
+        ];
 
-        s1 [label="pull_container\n(Pull the Docker container)"];
-        s2 [label="software_create_env / software_install\n(Concretize & install via Package Manager)"];
-        s3 [label="get_inputs\n(Download workload datasets)"];
-        s4 [label="license_includes\n(Inject license variables)"];
-        s5 [label="make_experiments\n(Render execute_experiment scripts)"];
+        // HpcgBase base application phase (green)
+        calculate_values [
+            label=<<b>calculate_values</b><br/><i>(HpcgBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="calc_col"
+        ];
 
-        s1 -> s2 -> s3 -> s4 -> s5;
+        // PackageManagerBase / SpackLightweight / Spack phases (blue)
+        software_create_env [
+            label=<<b>software_create_env</b><br/><i>(SpackLightweight)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0,
+            group="right_col"
+        ];
+        software_install_requested_compilers [
+            label=<<b>software_install_requested_compilers</b><br/><i>(SpackLightweight)</i>>,
+            fillcolor="#eef6ff",
+            penwidth=2.0,
+            color="#0056b3"
+        ];
+        software_configure [
+            label=<<b>software_configure</b><br/><i>(SpackLightweight)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0,
+            group="right_col"
+        ];
+        software_install [
+            label=<<b>software_install</b><br/><i>(Spack)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0,
+            group="right_col"
+        ];
+        evaluate_requirements [
+            label=<<b>evaluate_requirements</b><br/><i>(SpackLightweight)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0,
+            group="mid_col"
+        ];
+        define_package_paths [
+            label=<<b>define_package_paths</b><br/><i>(Spack)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0,
+            group="right_col"
+        ];
+        check_auxiliary_software_files [
+            label=<<b>check_auxiliary_software_files</b><br/><i>(PackageManagerBase)</i>>,
+            fillcolor="#eef6ff",
+            penwidth=2.0,
+            color="#0056b3"
+        ];
+
+        // Invisible spacers to align license_includes vertically with bootstrap_utilities on the far left
+        _pad1 [style=invis, shape=point, width=0, height=0, group="left_col"];
+        _pad2 [style=invis, shape=point, width=0, height=0, group="left_col"];
+        _pad3 [style=invis, shape=point, width=0, height=0, group="left_col"];
+        _calc_pad [style=invis, shape=point, width=0, height=0, group="calc_col"];
+        license_includes -> _pad1 -> _pad2 -> _pad3 -> bootstrap_utilities [style=invis, weight=10];
+        _calc_pad -> calculate_values [style=invis, weight=10];
+
+        { rank=same; license_includes; software_create_env; }
+        license_includes -> software_create_env [style=invis];
+        { rank=same; _pad1; software_install_requested_compilers; }
+        _pad1 -> software_install_requested_compilers [style=invis];
+        { rank=same; bootstrap_utilities; _calc_pad; evaluate_requirements; }
+        bootstrap_utilities -> _calc_pad -> evaluate_requirements [style=invis];
+
+        // Application dependency edges
+        bootstrap_utilities -> get_inputs [weight=10];
+        get_inputs -> make_experiments;
+        calculate_values -> make_experiments;
+        make_experiments -> write_status;
+
+        // Package manager dependency edges
+        software_create_env -> software_install_requested_compilers;
+        software_create_env -> software_configure [weight=10];
+        software_install_requested_compilers -> software_configure;
+        software_configure -> software_install [weight=10];
+        software_install -> evaluate_requirements;
+        software_install -> define_package_paths [weight=10];
+        evaluate_requirements -> define_package_paths;
+        evaluate_requirements -> make_experiments [weight=10];
+        define_package_paths -> make_experiments;
+        make_experiments -> check_auxiliary_software_files;
     }
 
-Execute Pipeline
-----------------
+You'll notice that some phases don't have explicit constraints defined by
+them at registration, but do have constraints applied indirectly on them
+when other phases are registered - e.g.,  ``get_inputs`` has no explicit constraints
+but ``bootstrap_utilities`` has a ``run_before=["get_inputs"]`` constraint and
+``make_experiments`` has a ``run_after=["get_inputs"]`` constraint. Some phases, like
+``license_includes``, have no constraints at all, and their execution order gets
+resolved by the :py:class:`~ramble.graphs.PhaseGraph` topological sort. When
+:py:class:`~ramble.graphs.PhaseGraph` topologically sorts this graph, the phases are
+flattened into the following execution order:
 
-* **CLI Command**: :ref:`ramble on <ramble-on>`
-* **Class**: :py:class:`ramble.pipeline.ExecutePipeline`
+#. ``bootstrap_utilities`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``license_includes`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``calculate_values`` (`HpcgBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpcg/base_application.py>`_)
+#. ``software_create_env`` (`SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_)
+#. ``get_inputs`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``software_install_requested_compilers`` (`SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_)
+#. ``software_configure`` (`SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_)
+#. ``software_install`` (`Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_)
+#. ``evaluate_requirements`` (`SpackLightweight <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py>`_)
+#. ``define_package_paths`` (`Spack <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py>`_)
+#. ``make_experiments`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``write_status`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``check_auxiliary_software_files`` (`PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_)
 
-Unlike setup or analysis, base application definitions do not register built-in default execution
-phases because experiment execution centers on evaluating the ``{batch_submit}`` executor command.
-However, custom execution phases registered via ``register_phase(..., pipeline="execute")``
-(e.g., by modifiers or specialized applications) are processed first by the
-:py:class:`~ramble.graphs.PhaseGraph`:
-
-.. graphviz::
-
-    digraph execute_pipeline {
-        fontsize=12;
-        rankdir=TB;
-        nodesep=0.3;
-        ranksep=0.4;
-
-        node [
-            shape=box,
-            style="filled,rounded",
-            fontsize=11,
-            margin="0.25,0.12",
-            fillcolor="#cce5ff",
-            color="#004085",
-            width=3.5
-        ];
-        edge [fontsize=10, color="#004085", penwidth=1.3];
-
-        e1 [label="Custom Registered Phases\n(Optional register_phase(..., pipeline='execute'))"];
-        e2 [label="Expand Executor Command\n(Evaluate {batch_submit})"];
-        e3 [label="Submit / Launch Experiments\n(Invoke sbatch, mpirun, or local shell)"];
-
-        e1 -> e2 -> e3;
-    }
-
-* **Batch Scheduler Integration**: :doc:`Workflow Managers <../workflow_managers>` (e.g., Slurm, PBS,
-  Google Batch) expand the ``{batch_submit}`` executor command to submit batch scripts to the
-  workload manager or execute scripts locally.
-
-Analyze Pipeline
-----------------
+Example: Analyze Pipeline
+**************************
 
 * **CLI Command**: :ref:`ramble workspace analyze <ramble-workspace-analyze>`
 * **Class**: :py:class:`ramble.pipeline.AnalyzePipeline`
 
-The analyze pipeline evaluates completed experiments, extracts metrics, and writes results using
-registered phases:
+The analyze pipeline evaluates completed experiments, extracts metrics, records software
+provenance, and writes results using phases registered across the application and package
+manager hierarchies. Fewer phases are registered in the
+:py:class:`ramble.pipeline.AnalyzePipeline` by the `Hpcg` and `Spack` object hierarchies:
+
+* **Application Hierarchy**:
+
+  * `ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_
+    registers:
+
+    * ``prepare_analysis`` (unconstrained)
+    * ``analyze_experiments`` (``run_after=["prepare_analysis"]``)
+    * ``write_status`` (``run_after=["analyze_experiments"]``)
+    * ``append_results_to_workspace`` (``run_after=["analyze_experiments"]``)
+    * ``write_results_cache`` (``run_after=["write_status", "append_results_to_workspace"]``)
+
+* **Package Manager Hierarchy**:
+
+  * `PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_
+    registers:
+
+    * ``add_software_to_results`` (``run_after=["analyze_experiments"]``,
+      ``run_before=["append_results_to_workspace"]``)
+
+The diagram below shows the resulting :py:class:`~ramble.graphs.PhaseGraph` DAG.
 
 .. graphviz::
 
     digraph analyze_pipeline {
         fontsize=12;
         rankdir=TB;
-        nodesep=0.3;
-        ranksep=0.4;
+        nodesep=0.35;
+        ranksep=0.45;
 
-        node [
-            shape=box,
-            style="filled,rounded",
-            fontsize=11,
-            margin="0.25,0.12",
-            fillcolor="#ffe8cc",
-            color="#d9480f",
-            width=3.5
+        node [shape=box, style="filled,rounded", fontsize=10, margin="0.18,0.1"];
+        edge [fontsize=9, color="#475569", penwidth=1.3];
+
+        // ApplicationBase phases (green)
+        prepare_analysis [
+            label=<<b>prepare_analysis</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="main_col"
         ];
-        edge [fontsize=10, color="#d9480f", penwidth=1.3];
+        analyze_experiments [
+            label=<<b>analyze_experiments</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="main_col"
+        ];
+        write_status [
+            label=<<b>write_status</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0
+        ];
+        append_results_to_workspace [
+            label=<<b>append_results_to_workspace</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="main_col"
+        ];
+        write_results_cache [
+            label=<<b>write_results_cache</b><br/><i>(ApplicationBase)</i>>,
+            fillcolor="#e6f4ea",
+            color="#28a745",
+            penwidth=2.0,
+            group="main_col"
+        ];
 
-        a1 [label="prepare_analysis\n(Pre-processing hook for output logs)"];
-        a2 [label="analyze_experiments\n(Extract FOMs & evaluate success_criteria)"];
-        a3 [label="write_status & append_results_to_workspace\n(Persist ramble_status.json & workspace results)"];
-        a4 [label="write_results_cache\n(Dump results text/YAML/JSON & upload if requested)"];
+        // PackageManagerBase phase (blue)
+        add_software_to_results [
+            label=<<b>add_software_to_results</b><br/><i>(PackageManagerBase)</i>>,
+            fillcolor="#eef6ff",
+            color="#0056b3",
+            penwidth=2.0
+        ];
 
-        a1 -> a2 -> a3 -> a4;
+        prepare_analysis -> analyze_experiments [weight=10];
+        analyze_experiments -> write_status;
+        analyze_experiments -> append_results_to_workspace [weight=10];
+        analyze_experiments -> add_software_to_results;
+        add_software_to_results -> append_results_to_workspace;
+        write_status -> write_results_cache;
+        append_results_to_workspace -> write_results_cache [weight=10];
     }
 
-Archive Pipeline
-----------------
+When the :py:class:`~ramble.graphs.PhaseGraph` topologically sorts this graph, the phases are
+flattened into the following execution order:
 
-* **CLI Command**: :ref:`ramble workspace archive <ramble-workspace-archive>`
-* **Class**: :py:class:`ramble.pipeline.ArchivePipeline`
+#. ``prepare_analysis`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``analyze_experiments`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``write_status`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``add_software_to_results`` (`PackageManagerBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/package-manager-base/base_class.py>`_)
+#. ``append_results_to_workspace`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
+#. ``write_results_cache`` (`ApplicationBase <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_classes/application-base/base_class.py>`_)
 
-The archive pipeline preserves experiment artifacts using its registered phase followed by
-optional archive creation:
+.. _pipeline-exploration:
 
-.. graphviz::
+Exploring Experiment Pipelines
+===============================
 
-    digraph archive_pipeline {
-        fontsize=12;
-        rankdir=TB;
-        nodesep=0.3;
-        ranksep=0.4;
+Several Ramble commands are useful for understanding what objects register phases in
+what pipelines, how these phased registrations are applied to a given workspace, and
+what the resulting ordered phase execution is for a given pipeline.
 
-        node [
-            shape=box,
-            style="filled,rounded",
-            fontsize=11,
-            margin="0.25,0.12",
-            fillcolor="#eebefa",
-            color="#862e9c",
-            width=3.5
-        ];
-        edge [fontsize=10, color="#862e9c", penwidth=1.3];
+To explore and understand what phases a Ramble object registers, you can use the
+:ref:`ramble info <ramble-info>` command:
 
-        ar1 [label="archive_experiments\n(Registered Phase: collect logs, templates & FOM files)"];
-        ar2 [label="create_tarball / upload_archive\n(Generate archive.latest.tar.gz & upload)"];
+.. code-block:: bash
 
-        ar1 -> ar2;
-    }
+    ramble info --attributes registered_phases hpcg
+    ramble info --type base_classes application-base --attributes registered_phases
+    ramble info --type package_managers --attributes registered_phases spack
 
-Standard Pipeline Phases
--------------------------
+To understand what phases are registered for a given workspace, you can use the
+:ref:`ramble workspace info <ramble-workspace-info>` command:
 
-The following table summarizes the standard built-in phases registered across Ramble's primary
-pipelines:
+.. code-block:: bash
 
-.. list-table::
-   :widths: 22 15 20 43
-   :header-rows: 1
+    ramble workspace info --phases
 
-   * - Phase Name
-     - Pipeline
-     - Owner / Source
-     - Description & Purpose
-   * - ``bootstrap_utilities``
-     - Setup
-     - Application Base
-     - Downloads or builds external tool dependencies required for script rendering and experiment
-       processing.
-   * - ``software_create_env``
-     - Setup
-     - Package Manager
-     - Creates software environment definitions (e.g., Spack environments) and concretizes
-       package specs.
-   * - ``software_install``
-     - Setup
-     - Package Manager
-     - Installs required software packages, compilers, and dependencies into the target software
-       stack.
-   * - ``get_inputs``
-     - Setup
-     - Application Base
-     - Downloads, verifies checksums, and extracts workload input datasets into workspace
-       directories.
-   * - ``license_includes``
-     - Setup
-     - Application Base
-     - Resolves license environment variables and paths for commercial or proprietary software.
-   * - ``make_experiments``
-     - Setup
-     - Application Base
-     - Expands variables, renders templates, creates ``execute_experiment`` scripts, and writes the
-       ``all_experiments`` submission script.
-   * - ``prepare_analysis``
-     - Analyze
-     - Application Base
-     - Application-specific pre-processing hook executed prior to FOM extraction.
-   * - ``analyze_experiments``
-     - Analyze
-     - Application Base
-     - Parses log files using regular expressions defined by Figures of Merit (FOMs) and evaluates
-       ``success_criteria``.
-   * - ``calculate_statistics``
-     - Analyze
-     - Pipeline Engine
-     - Computes summary statistics (mean, stddev, min, max) for repeated experiment runs.
-   * - ``archive_experiments``
-     - Archive
-     - Application Base
-     - Copies logs, rendered templates, FOM output files, and inventory metadata into the workspace
-       archive directory.
+And finally, to understand the phase graph order for a given workspace's pipeline, you can
+use the ``--debug`` and ``-dry-run`` options together along with ``--disable-progress-bar``
+and ``--disable-logger`` and ``grep`` for "Executing phase". The results are returned in
+the topologically sorted order:
+
+.. code-block:: bash
+
+    ramble --debug --disable-progress-bar --disable-logger workspace setup --dry-run 2>&1 | grep "Executing phase"
+    ramble --debug --disable-progress-bar --disable-logger workspace analyze --dry-run 2>&1 | grep "Executing phase"
 
 .. _additional-pipelines:
 
 Additional Pipelines
 ====================
 
-Ramble provides several additional pipelines for specialized workflow operations:
+In addtion to :py:class:`ramble.pipeline.ExecutePipeline`,
+:py:class:`ramble.pipeline.SetupPipeline`,
+:py:class:`ramble.pipeline.AnalyzePipeline`, and 
+:py:class:`ramble.pipeline.ArchivePipeline`, Ramble provides several additional pipelines:
 
 * **Mirror Pipeline** (:py:class:`~ramble.pipeline.MirrorPipeline`):
 
