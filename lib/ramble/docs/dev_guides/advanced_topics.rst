@@ -524,7 +524,7 @@ the topologically sorted order:
 Additional Pipelines
 ====================
 
-In addtion to :py:class:`ramble.pipeline.ExecutePipeline`,
+In addition to :py:class:`ramble.pipeline.ExecutePipeline`,
 :py:class:`ramble.pipeline.SetupPipeline`,
 :py:class:`ramble.pipeline.AnalyzePipeline`, and 
 :py:class:`ramble.pipeline.ArchivePipeline`, Ramble provides several additional pipelines:
