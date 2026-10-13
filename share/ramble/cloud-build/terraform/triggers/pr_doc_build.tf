@@ -1,5 +1,5 @@
 locals {
-  pr_doc_img = local.image_map["rocky8-py3-13-5-spack-v1-0-0"]
+  pr_doc_img = local.image_map["rocky8-py3-13-5-spack-v1-2-2"]
 }
 
 resource "google_cloudbuild_trigger" "pr_doc_build_tests" {

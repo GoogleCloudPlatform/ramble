@@ -1,5 +1,5 @@
 locals {
-  perf_test_img = local.image_map["rocky8-py3-13-5-spack-v1-0-0"]
+  perf_test_img = local.image_map["rocky8-py3-13-5-spack-v1-2-2"]
 }
 
 resource "google_cloudbuild_worker_pool" "perf_test_pool" {

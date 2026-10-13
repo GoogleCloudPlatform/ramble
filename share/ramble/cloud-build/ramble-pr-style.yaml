@@ -115,8 +115,8 @@ steps:
     id: ramble-style-tests
     entrypoint: /bin/bash
 substitutions:
-  _SPACK_REF: v0.21.2
-  _PYTHON_VER: 3.11.6
+  _SPACK_REF: v0.23.1
+  _PYTHON_VER: 3.12.1
   _BASE_IMG: rockylinux 
   _BASE_VER: '8'
 timeout: 600s

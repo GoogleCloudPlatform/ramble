@@ -28,8 +28,8 @@ steps:
     - 'PYTHON_VER=${_PYTHON_VER}'
     - '.'
 substitutions:
-  _SPACK_REF: v0.21.2
-  _PYTHON_VER: 3.11.6
+  _SPACK_REF: v1.2.2
+  _PYTHON_VER: 3.13.5
   _BASE_IMG: rockylinux
   _BASE_VER: '8'
   _PKG_MANAGER: 'yum'
