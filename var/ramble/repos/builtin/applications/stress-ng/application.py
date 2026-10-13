@@ -92,7 +92,7 @@ class StressNg(ExecutableApplication):
     )
 
     metrics_regex = (
-        r"stress-ng: (info|metrc):\s+\[[0-9]+\]\s+(?P<stressor_name>cpu|matrix|cache|[\w\-]+)\s+"
+        r"stress-ng: (info|metric):\s+\[[0-9]+\]\s+(?P<stressor_name>cpu|matrix|cache|[\w\-]+)\s+"
         + r"(?P<bogo_ops>[0-9]+)\s+(?P<real_time>[0-9\.]+)\s+(?P<usr_time>[0-9\.]+)\s+"
         + r"(?P<sys_time>[0-9\.]+)\s+(?P<bogo_ops_per_s_real>[0-9\.]+)\s+"
         + r"(?P<bogo_ops_per_s_usrsys>[0-9\.]+)"
