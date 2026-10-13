@@ -1625,8 +1625,7 @@ def workspace_manage_experiments(args):
         logger.warn("No active workspace found. Defaulting to `--dry-run`")
 
         root = tempfile.TemporaryDirectory()
-        ws = ramble.workspace.Workspace(str(root))
-        ws.dry_run = True
+        ws = ramble.workspace.Workspace(root.name, dry_run=True)
     else:
         ws.dry_run = args.dry_run
 
@@ -1771,13 +1770,10 @@ def workspace_manage_software(args):
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
-        import tempfile
-
         logger.warn("No active workspace found. Defaulting to `--dry-run`")
 
         root = tempfile.TemporaryDirectory()
-        ws = ramble.workspace.Workspace(str(root))
-        ws.dry_run = True
+        ws = ramble.workspace.Workspace(root.name, dry_run=True)
     else:
         ws.dry_run = args.dry_run
 

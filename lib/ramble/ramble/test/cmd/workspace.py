@@ -3579,3 +3579,31 @@ def test_workspace_mirror(workspace_name, tmpdir, monkeypatch, capsys):
         assert "failed_input.tar.gz" in captured.out
         assert "Failed downloads:" in captured.err
         assert "Mirroring has errors." in captured.err
+
+
+def test_workspace_manage_no_active_workspace_dry_run(tmpdir):
+    with fs.working_dir(str(tmpdir)):
+        exp_out = workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "working_wl",
+            global_args=["-W"],
+        )
+        assert "basic:" in exp_out
+        assert "working_wl:" in exp_out
+
+        soft_out = workspace(
+            "manage",
+            "software",
+            "--pkg",
+            "pkg1",
+            "--spec",
+            "pkg1@1.0",
+            global_args=["-W"],
+        )
+        assert "pkg1:" in soft_out
+        assert "pkg1@1.0" in soft_out
+
+        assert os.listdir(str(tmpdir)) == []
