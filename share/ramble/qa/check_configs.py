@@ -32,6 +32,7 @@ ramble_root = ramble.paths.prefix
 SKIPPED_SEMANTIC_FILES = {
     "tutorial_7_base_config.yaml",
     "tutorial_7_matrix_config.yaml",
+    "tutorial_8_mpi_config.yaml",
 }
 
 
