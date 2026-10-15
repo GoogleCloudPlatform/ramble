@@ -1,8 +1,8 @@
+-r ../../../requirements.txt
 sphinx
 docutils
 sphinx_rtd_theme
 sphinxcontrib-programoutput
 sphinxcontrib-jquery
 sphinx-copybutton
-tdqm
-deprecation
+pytest

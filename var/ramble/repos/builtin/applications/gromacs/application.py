@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -18,25 +19,49 @@ class Gromacs(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("molecular-dynamics")
+    tags("molecular-dynamics", "hpc-benchmark")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
-    software_spec(
-        "spack_gromacs",
-        pkg_spec="gromacs@2020.5",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+    version("2026.0", description="Version 2026.0 of Gromacs")
+    version("2025.4", description="Version 2025.4 of Gromacs")
+    version("2025.3", description="Version 2025.3 of Gromacs", preferred=True)
+    version("2025.2", description="Version 2025.2 of Gromacs")
+    version("2025.1", description="Version 2025.1 of Gromacs")
+    version("2025.0", description="Version 2025.0 of Gromacs")
+    version("2024.6", description="Version 2024.6 of Gromacs")
+    version("2024.5", description="Version 2024.5 of Gromacs")
+    version("2024.4", description="Version 2024.4 of Gromacs")
+    version("2024.3", description="Version 2024.3 of Gromacs")
+    version("2024.2", description="Version 2024.2 of Gromacs")
+    version("2024.1", description="Version 2024.1 of Gromacs")
+    version("2024", description="Version 2024 of Gromacs")
+    version("2019.6", description="Version 2019.6 of Gromacs")
+
+    with when("package_manager_family=spack"):
+
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
+
+        with default_args(compiler="gcc14"):
+            software_spec(
+                "gromacs-{application::gromacs::version}",
+                pkg_spec="gromacs@{application::gromacs::version}",
+            )
 
     software_spec(
-        "eessi_gromacs",
+        "gromacs-2024.1",
         pkg_spec="GROMACS/2024.1-foss-2023b",
-        package_manager="eessi",
+        when=["package_manager_family=eessi", "application_version=2024.1"],
     )
 
+    executable(
+        name="print-binary-info",
+        template="{gmx} --version",
+        use_mpi=False,
+    )
     executable(
         "pre-process",
         "{grompp} "
@@ -50,7 +75,7 @@ class Gromacs(ExecutableApplication):
     executable(
         "execute-gen",
         "{mdrun} {notunepme} -dlb {dlb} "
-        + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
+        + "{verbose} -resetstep {resetstep} -nsteps {nsteps} "
         + "-s exp_input.tpr {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -58,7 +83,7 @@ class Gromacs(ExecutableApplication):
     executable(
         "execute",
         "{mdrun} {notunepme} -dlb {dlb} "
-        + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
+        + "{verbose} -resetstep {resetstep} -nsteps {nsteps} "
         + "-s {input_path} {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -122,52 +147,65 @@ class Gromacs(ExecutableApplication):
 
     input_file(
         "JCP_benchmarks",
-        url="https://zenodo.org/record/3893789/files/GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP.tar.gz?download=1",
+        url="https://zenodo.org/record/3893789/files/GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP.tar.gz",
         sha256="82449291f44f4d5b7e5c192d688b57b7c2a2e267fe8b12e7a15b5d68f96c7b20",
         description="GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP",
     )
 
+    input_file(
+        "water_33m",
+        url=f"file://{os.path.join(os.getcwd(), 'water_33m.tar.gz')}",
+        sha256="c38032a728f957cf90dd36f3f42c8018b98ea1f0a26b384b91bcbd6bc7ce410c",
+        description="A cubic box with 33 million water molecules (~100 million atoms). This deck is provided by Dr. Carsten Kutzner.",
+    )
+
+    execs_with_gen = ["print-binary-info", "pre-process", "execute-gen"]
+    execs_no_gen = ["print-binary-info", "execute"]
+
     workload(
         "water_gmx50",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="water_gmx50_bare",
     )
     workload(
         "water_bare",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="water_bare_hbonds",
     )
-    workload("lignocellulose", executables=["execute"], input="lignocellulose")
-    workload("hecbiosim", executables=["execute"], input="HECBioSim")
-    workload("benchpep", executables=["execute"], input="BenchPEP")
-    workload("benchpep_h", executables=["execute"], input="BenchPEP_h")
-    workload("benchmem", executables=["execute"], input="BenchMEM")
-    workload("benchrib", executables=["execute"], input="BenchRIB")
+    workload(
+        "lignocellulose", executables=execs_no_gen, input="lignocellulose"
+    )
+    workload("hecbiosim", executables=execs_no_gen, input="HECBioSim")
+    workload("benchpep", executables=execs_no_gen, input="BenchPEP")
+    workload("benchpep_h", executables=execs_no_gen, input="BenchPEP_h")
+    workload("benchmem", executables=execs_no_gen, input="BenchMEM")
+    workload("benchrib", executables=execs_no_gen, input="BenchRIB")
     workload(
         "stmv_rf",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "stmv_pme",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "rnase_cubic",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "ion_channel",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "adh_dodec",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
+    workload("water_33m", executables=execs_no_gen, input="water_33m")
 
     workload_group(
         "all_workloads",
@@ -185,12 +223,13 @@ class Gromacs(ExecutableApplication):
             "rnase_cubic",
             "ion_channel",
             "adh_dodec",
+            "water_33m",
         ],
     )
 
     workload_variable(
         "additional_args",
-        default="",
+        default="-noconfout",
         description="Additiaonl Exec Args",
         workload_group="all_workloads",
     )
@@ -278,21 +317,23 @@ class Gromacs(ExecutableApplication):
     )
     workload_variable(
         "input_path",
-        default="{water_gmx50_bare}/{size}",
-        description="Input path for water GMX50",
-        workload="water_gmx50",
-    )
-    workload_variable(
-        "input_path",
-        default="{water_bare_hbonds}/{size}",
-        description="Input path for water bare hbonds",
-        workload="water_bare",
-    )
-    workload_variable(
-        "input_path",
-        default="{lignocellulose}/lignocellulose-rf.tpr",
-        description="Input path for lignocellulose",
-        workload="lignocellulose",
+        description="Input path for workload",
+        workload_defaults={
+            "water_gmx50": "{water_gmx50_bare}/{size}",
+            "water_bare": "{water_bare_hbonds}/{size}",
+            "lignocellulose": "{lignocellulose}/lignocellulose-rf.tpr",
+            "water_33m": "{water_33m}/box_with_33M_waters_default.tpr",
+            "hecbiosim": "{HECBioSim}/HECBioSim/{type}/benchmark.tpr",
+            "benchpep": "{BenchPEP}/benchPEP.tpr",
+            "benchmem": "{BenchMEM}/benchMEM.tpr",
+            "benchrib": "{BenchRIB}/benchRIB.tpr",
+            "benchpep_h": "{BenchPEP_h}/benchPEP-h.tpr",
+            "stmv_rf": "{JCP_benchmarks}/stmv",
+            "stmv_pme": "{JCP_benchmarks}/stmv",
+            "ion_channel": "{JCP_benchmarks}/{workload_name}",
+            "rnase_cubic": "{JCP_benchmarks}/{workload_name}",
+            "adh_dodec": "{JCP_benchmarks}/{workload_name}",
+        },
     )
     workload_variable(
         "type",
@@ -311,36 +352,6 @@ class Gromacs(ExecutableApplication):
         "hEGFRtetramerPair"
         "",
         workload="hecbiosim",
-    )
-    workload_variable(
-        "input_path",
-        default="{HECBioSim}/HECBioSim/{type}/benchmark.tpr",
-        description="Input path for hecbiosim",
-        workload="hecbiosim",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchPEP}/benchPEP.tpr",
-        description="Input path for Bench PEP workload",
-        workload="benchpep",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchMEM}/benchMEM.tpr",
-        description="Input path for Bench MEM workload",
-        workload="benchmem",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchRIB}/benchRIB.tpr",
-        description="Input path for Bench RIB workload",
-        workload="benchrib",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchPEP_h}/benchPEP-h.tpr",
-        description="Input path for Bench PEP-h workload",
-        workload="benchpep_h",
     )
     workload_variable(
         "type",
@@ -392,7 +403,7 @@ class Gromacs(ExecutableApplication):
     figure_of_merit(
         "Core Time",
         log_file=log_str,
-        fom_regex=r"\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+)",
         group_name="core_time",
         units="s",
         fom_type=FomType.TIME,
@@ -402,7 +413,7 @@ class Gromacs(ExecutableApplication):
         "Wall Time",
         log_file=log_str,
         fom_regex=r"\s+Time:\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<wall_time>[0-9]+\.[0-9]+).*",
+        + r"(?P<wall_time>[0-9]+\.[0-9]+)",
         group_name="wall_time",
         units="s",
         fom_type=FomType.TIME,
@@ -412,7 +423,7 @@ class Gromacs(ExecutableApplication):
         "Percent Core Time",
         log_file=log_str,
         fom_regex=r"\s+Time:\s+[0-9]+\.[0-9]+\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<perc_core_time>[0-9]+\.[0-9]+).*",
+        + r"(?P<perc_core_time>[0-9]+\.[0-9]+)",
         group_name="perc_core_time",
         units="%",
         fom_type=FomType.MEASURE,
@@ -421,7 +432,7 @@ class Gromacs(ExecutableApplication):
     figure_of_merit(
         "Nanosecs per day",
         log_file=log_str,
-        fom_regex=r"Performance:\s+" + r"(?P<ns_per_day>[0-9]+\.[0-9]+).*",
+        fom_regex=r"Performance:\s+" + r"(?P<ns_per_day>[0-9]+\.[0-9]+)",
         group_name="ns_per_day",
         units="ns/day",
         fom_type=FomType.THROUGHPUT,
@@ -431,8 +442,31 @@ class Gromacs(ExecutableApplication):
         "Hours per nanosec",
         log_file=log_str,
         fom_regex=r"Performance:\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<hours_per_ns>[0-9]+\.[0-9]+).*",
+        + r"(?P<hours_per_ns>[0-9]+\.[0-9]+)",
         group_name="hours_per_ns",
         units="hours/ns",
         fom_type=FomType.INFO,
     )
+
+    # FOMs around the binary information
+    info_foms = (
+        "Precision",
+        "MPI library",
+        "OpenMP support",
+        "GPU support",
+        "SIMD instructions",
+        "CPU FFT library",
+        "GPU FFT library",
+        "Multi-GPU FFT",
+        "Hwloc support",
+        "BLAS library",
+        "LAPACK library",
+    )
+    for fom in info_foms:
+        figure_of_merit(
+            name=fom,
+            fom_regex=rf"\s*{fom}:\s*(?P<fom_value>.*)",
+            group_name="fom_value",
+            units="",
+            fom_type=FomType.INFO,
+        )

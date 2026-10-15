@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,7 +28,7 @@ class InstallRamble(BasicModifier):
 
     modifier_variable(
         "ramble_url",
-        default="https://github.com/GoogleCloudPlatform/ramble",
+        default="https://github.com/Ramble-Project/ramble",
         description="URL to clone ramble from",
         modes=["standard", "quiet"],
     )
@@ -60,7 +60,7 @@ if [ ! -d {ramble_venv_path} ]; then
   . {ramble_venv_path}/bin/activate
   pip install --upgrade pip
   pip install -r {ramble_install_dir}/requirements.txt
-  pip install -r {ramble_install_dir}/requirements-dev.txt
+  pip install -r {ramble_install_dir}/requirements-pinned.txt
 fi
 """
 
@@ -111,7 +111,7 @@ fi
         modes=["standard", "quiet"],
     )
 
-    executable_modifier("source_installed_ramble")
+    executable_modifier("source_installed_ramble", usage_filter="once")
 
     def source_installed_ramble(
         self, executable_name, executable, app_inst=None
@@ -124,15 +124,13 @@ fi
         if self._usage_mode == "quiet":
             return pre_exec, post_exec
 
-        if not hasattr(self, "_already_applied"):
-            pre_exec.append(
-                CommandExecutable(
-                    "source-installed-ramble",
-                    template=[
-                        "{source_ramble}",
-                    ],
-                )
+        pre_exec.append(
+            CommandExecutable(
+                "source-installed-ramble",
+                template=[
+                    "{source_ramble}",
+                ],
             )
+        )
 
-            self._already_applied = True
         return pre_exec, post_exec

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,22 +6,20 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import glob
 import os
 
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
 workspace = RambleCommand("workspace")
 
 
-def test_package_manager_config_zlib(mock_applications):
+def test_package_manager_config_zlib(mock_applications, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -48,23 +46,26 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_package_manager_config_zlib"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-        spack_yaml = os.path.join(ws.software_dir, "spack", "zlib-configs", "spack.yaml")
+        spack_yaml = os.path.join(
+            glob.glob(os.path.join(ws.software_dir, "spack*"))[0],
+            "zlib-configs",
+            "spack.yaml",
+        )
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml) as f:
+        with open(spack_yaml, encoding="utf-8") as f:
             data = f.read()
             assert "config:" in data
             assert "debug: true" in data

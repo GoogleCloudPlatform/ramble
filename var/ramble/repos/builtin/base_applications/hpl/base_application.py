@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,9 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.appkit import *
-
 import math
+
+from ramble.appkit import *
 
 
 class Hpl(ExecutableApplication):
@@ -16,7 +16,7 @@ class Hpl(ExecutableApplication):
 
     name = "hpl"
 
-    tags("benchmark-app", "benchmark", "linpack")
+    tags("hpc-benchmark", "linpack", "dense-linear-algebra")
 
     workload_group("standard", workloads=[])
 
@@ -235,44 +235,46 @@ class Hpl(ExecutableApplication):
     )
 
     workload_variable(
-        "pfact",
-        default="0",
-        description="PFACT for optimized calculator",
+        "NPFACTs",
+        default="1",
+        description="Number of PFACTs",
         workload_group="calculator",
     )
-
     workload_variable(
-        "nbmin",
-        default="2",
-        description="NBMIN for optimized calculator",
+        "PFACTs",
+        default="1",
+        description="PFACT Values",
         workload_group="calculator",
     )
-
     workload_variable(
-        "rfact",
-        default="0",
-        description="RFACT for optimized calculator",
+        "N-NBMINs",
+        default="1",
+        description="Number of NBMINs",
         workload_group="calculator",
     )
-
     workload_variable(
-        "bcast",
-        default="0",
-        description="BCAST for optimized calculator",
+        "NBMINs",
+        default="4",
+        description="NBMIN values",
         workload_group="calculator",
     )
-
     workload_variable(
-        "depth",
-        default="0",
-        description="DEPTH for optimized calculator",
+        "N-RFACTs",
+        default="1",
+        description="Number of RFACTs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "RFACTs",
+        default="1",
+        description="RFACT values",
         workload_group="calculator",
     )
 
     # FOMs:
     figure_of_merit(
         "Time",
-        fom_regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         group_name="time",
         units="s",
         contexts=["problem-name"],
@@ -281,7 +283,7 @@ class Hpl(ExecutableApplication):
 
     figure_of_merit(
         "GFlops",
-        fom_regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         group_name="gflops",
         units="GFLOP/s",
         contexts=["problem-name"],
@@ -290,7 +292,7 @@ class Hpl(ExecutableApplication):
 
     figure_of_merit_context(
         "problem-name",
-        regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         output_format="N-NB-P-Q = {N}-{NB}-{P}-{Q}",
     )
 
@@ -330,7 +332,7 @@ class Hpl(ExecutableApplication):
     # Integer sqrt
     def _isqrt(self, n):
         if n < 0:
-            raise Exception
+            raise ValueError(f"_isqrt requires a non-negative value, got {n}")
         elif n < 2:
             return n
         else:
@@ -398,9 +400,15 @@ class Hpl(ExecutableApplication):
             nBlocks -= nBlocks % lcmPQ
             problemSize = blockSize * nBlocks
 
-            for name, var in self.workloads["standard"].variables.items():
-                if var.name not in self.variables:
-                    self.define_variable(var.name, var.default)
+            for when_key, var_list in self.get_workload(
+                "standard"
+            ).variables.items():
+                if self.expander.satisfies(
+                    when_key, self.experiment_variants()
+                ):
+                    for var in var_list:
+                        if var.name not in self.variables:
+                            self.define_variable(var.name, var.default)
 
             # Key = Variable name
             # Value = Value to override variable with

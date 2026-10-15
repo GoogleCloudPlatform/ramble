@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -69,7 +69,9 @@ class Ethtool(BasicModifier):
         mode="standard",
     )
 
-    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+    software_spec(
+        "pdsh", pkg_spec="pdsh", when=["package_manager_family=spack"]
+    )
 
     register_builtin("run_ethtool")
 
@@ -190,7 +192,7 @@ class Ethtool(BasicModifier):
 
     figure_of_merit(
         "adaptive_tx",
-        fom_regex=r"Adaptive RX:.*TX:\s*(?P<adaptive_tx>off|on)",
+        fom_regex=r"Adaptive RX:.*?TX:\s*(?P<adaptive_tx>off|on)",
         log_file="{experiment_run_dir}/ethtool_out",
         group_name="adaptive_tx",
         units="",

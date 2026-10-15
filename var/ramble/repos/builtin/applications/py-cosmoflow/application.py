@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.appkit import *
 import os
 
-import ruamel.yaml as yaml
-import spack.util.spack_yaml as syaml
-import ramble.util.yaml_generation
+from ruamel import yaml
 
+import ramble.util.yaml_generation
+from ramble.appkit import *
+
+import spack.util.spack_yaml as syaml
 from spack.util.path import canonicalize_path
 
 
@@ -24,7 +25,7 @@ class PyCosmoflow(ExecutableApplication):
 
     name = "py-cosmoflow"
 
-    tags("mlperf-hpc")
+    tags("machine-learning", "hpc-ml", "tensorflow", "cosmology")
 
     default_config_string = "{default_config_value}"
 
@@ -184,63 +185,63 @@ class PyCosmoflow(ExecutableApplication):
 
     figure_of_merit(
         "Best Epoch",
-        fom_regex=r".*INFO\s+epoch: (?P<idx>[0-9]+)",
+        fom_regex=r".*?INFO\s+epoch: (?P<idx>[0-9]+)",
         group_name="idx",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Loss",
-        fom_regex=r".*INFO\s+loss: (?P<loss>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+loss: (?P<loss>[0-9\.]+)",
         group_name="loss",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch LR",
-        fom_regex=r".*INFO\s+lr: (?P<lr>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+lr: (?P<lr>[0-9\.]+)",
         group_name="lr",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Mean Absolute Error",
-        fom_regex=r".*INFO\s+mean_absolute_error: (?P<abs_err>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+mean_absolute_error: (?P<abs_err>[0-9\.]+)",
         group_name="abs_err",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Time",
-        fom_regex=r".*INFO\s+time: (?P<time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+time: (?P<time>[0-9\.]+)",
         group_name="time",
         units="s",
     )
 
     figure_of_merit(
         "Best Epoch Val Loss",
-        fom_regex=r".*INFO\s+val_loss: (?P<val_loss>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+val_loss: (?P<val_loss>[0-9\.]+)",
         group_name="val_loss",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Val Mean Absolute Error",
-        fom_regex=r".*INFO\s+val_mean_absolute_error: (?P<val_error>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+val_mean_absolute_error: (?P<val_error>[0-9\.]+)",
         group_name="val_error",
         units="",
     )
 
     figure_of_merit(
         "Total epoch time",
-        fom_regex=r".*INFO\s+Total epoch time: (?P<total_time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+Total epoch time: (?P<total_time>[0-9\.]+)",
         group_name="total_time",
         units="s",
     )
 
     figure_of_merit(
         "Mean epoch time",
-        fom_regex=r".*INFO\s+Mean epoch time: (?P<mean_time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+Mean epoch time: (?P<mean_time>[0-9\.]+)",
         group_name="mean_time",
         units="s",
     )
@@ -268,10 +269,10 @@ class PyCosmoflow(ExecutableApplication):
         dockerfile_dir = os.path.dirname(new_dockerfile_path)
         mkdirp(dockerfile_dir)
 
-        with open(base_dockerfile) as f:
+        with open(base_dockerfile, encoding="utf-8") as f:
             dockerfile = f.read()
 
-        with open(new_dockerfile_path, "w+") as f:
+        with open(new_dockerfile_path, "w+", encoding="utf-8") as f:
             f.write(self.expander.expand_var(dockerfile))
 
     register_phase(
@@ -340,7 +341,7 @@ class PyCosmoflow(ExecutableApplication):
                         self.expander.expansion_str(var_name)
                     )
                 elif isinstance(var_val, list):
-                    for i in range(0, len(var_val)):
+                    for i in range(len(var_val)):
                         var_val[i] = self.expander.expand_var(
                             var_val[i], typed=True
                         )
@@ -369,5 +370,5 @@ class PyCosmoflow(ExecutableApplication):
             self.expander.expand_var("{cosmoflow_config}"),
         )
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(config_str)

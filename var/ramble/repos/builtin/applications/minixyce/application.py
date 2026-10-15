@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -18,31 +19,26 @@ class Minixyce(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags(
-        "circuitdesign",
-        "miniapp",
-        "mini-app",
-        "minibenchmark",
-        "mini-benchmark",
-    )
+    tags("circuit-simulation", "mini-app")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    version("1.0", description="Version 1.0 of miniXyce", preferred=True)
 
-    software_spec(
-        "ompi415cxx",
-        pkg_spec="openmpi@4.1.5 +legacylaunchers +cxx",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    software_spec(
-        "minixyce",
-        pkg_spec="minixyce@1.0 +mpi",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "ompi415cxx",
+            pkg_spec="openmpi@4.1.5 +legacylaunchers +cxx",
+            compiler="gcc12",
+        )
 
-    required_package("minixyce", package_manager="spack*")
+        software_spec(
+            "minixyce-{application::minixyce::version}",
+            pkg_spec="minixyce@{application::minixyce::version} +mpi",
+            compiler="gcc12",
+        )
+
+        required_package("minixyce")
 
     executable(
         "execute",
@@ -50,12 +46,10 @@ class Minixyce(ExecutableApplication):
         use_mpi=True,
     )
 
-    executable(
-        "get_simple_network",
-        template=[
-            "cp {minixyce_path}/doc/tests/{workload_name}.net {experiment_run_dir}/{workload_name}.net"
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-network-file",
+        src="{minixyce_path}/doc/tests/{workload_name}.net",
+        dst="{experiment_run_dir}/{workload_name}.net",
     )
 
     executable(
@@ -92,7 +86,7 @@ class Minixyce(ExecutableApplication):
 
     cir_workloads = ["cir1", "cir2", "cir3", "cir4", "cir5"]
     for cir_workload in cir_workloads:
-        workload(cir_workload, executables=["get_simple_network", "execute"])
+        workload(cir_workload, executables=["stage-network-file", "execute"])
 
     rc_workloads = ["RC_ladder", "RLC_ladder", "RC_ladder2", "RLC_ladder2"]
     for workload_name in rc_workloads:
@@ -153,7 +147,7 @@ class Minixyce(ExecutableApplication):
     floating_point_regex = r"\d+\.\d+"
     scientific_number_regex = r"[\+\-]*\d+\.\d+[eE][\+\-]*\d+"
 
-    success_regex = r"^\s*TIME.*num_GMRES_iters\s*num_GMRES_restarts"
+    success_regex = r"^\s*TIME.*?num_GMRES_iters\s*num_GMRES_restarts"
     success_criteria("valid", mode="string", match=success_regex, file=log_str)
 
     figure_of_merit(
@@ -238,7 +232,7 @@ class Minixyce(ExecutableApplication):
 
         settings = ["t_start", "t_step", "t_stop", "tol", "k"]
 
-        with open(input_path, "w+") as f:
+        with open(input_path, "w+", encoding="utf-8") as f:
             for setting in settings:
                 f.write(
                     setting
@@ -262,12 +256,12 @@ class Minixyce(ExecutableApplication):
 
         if os.path.isfile(output_file):
             names = []
-            with open(output_file) as f:
+            with open(output_file, encoding="utf-8") as f:
                 names = f.readline().split()
                 for line in f.readlines()[-1:]:
                     values = line.split()
 
-            with open(processed_output_path, "w+") as f:
+            with open(processed_output_path, "w+", encoding="utf-8") as f:
                 for i, (name, value) in enumerate(
                     zip(names[1:-2], values[1:-2])
                 ):

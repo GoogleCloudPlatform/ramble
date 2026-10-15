@@ -1,7 +1,14 @@
 name: ramble spelling
 
+permissions:
+  contents: read
+
 on:
-  pull_request: []
+  pull_request:
+   types:
+   - 'opened'
+   - 'reopened'
+   - 'synchronize'
   push:
     branches-ignore:
     - main

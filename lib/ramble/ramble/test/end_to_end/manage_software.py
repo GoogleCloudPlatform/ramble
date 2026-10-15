@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,10 +9,7 @@
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -20,8 +17,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_manage_software(mutable_config, mutable_mock_workspace_path):
-    workspace_name = "test_manage_software"
+def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_name):
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
@@ -30,49 +26,51 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path):
         workspace(
             "manage",
             "experiments",
-            "wrfv4",
+            "wrf",
             "-v",
             "n_ranks=1",
             "-v",
             "n_nodes=1",
-            "-p",
-            "spack",
+            "-V",
+            "package_manager=spack",
+            "--default-variable-value",
+            "1",
             global_args=["-w", workspace_name],
         )
         workspace("concretize", global_args=["-w", workspace_name])
 
         ws1._re_read()
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
             # Check that wrf has a package, and the package is in an environment
             assert "pkg_spec: wrf" in content
-            assert "- wrfv4" in content
+            assert "- wrfv4-{application::wrf::version}" in content
 
             # Check that intel-mpi was defined
-            assert "intel-mpi" in content
+            assert "pkg_spec: intel-oneapi-mpi" in content
 
             # Check that gcc was defined
-            assert "gcc@9.3.0" in content
+            assert "gcc@14.2.0" in content
 
             # Check that the (soon to be new) definition of gcc is not defined
-            assert "gcc@9.4.0" not in content
+            assert "gcc@14.3.0" not in content
 
         # Change the GCC package definition
         workspace(
             "manage",
             "software",
             "--pkg",
-            "gcc9",
+            "gcc14",
             "--overwrite",
             "--package-spec",
-            "gcc@9.4.0",
+            "gcc@14.3.0",
             global_args=["-w", workspace_name],
         )
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
-            assert "gcc@9.4.0" in content
+            assert "gcc@14.3.0" in content
 
         # Delete configs for wrf
         workspace(
@@ -80,9 +78,9 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path):
             "software",
             "--remove",
             "--env",
-            "wrfv4",
+            "wrf",
             "--pkg",
-            "wrfv4",
+            "wrfv4-{application::wrf::version}",
             global_args=["-w", workspace_name],
         )
         workspace(
@@ -94,7 +92,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path):
             global_args=["-w", workspace_name],
         )
         workspace(
-            "manage", "software", "--remove", "--pkg", "gcc9", global_args=["-w", workspace_name]
+            "manage", "software", "--remove", "--pkg", "gcc14", global_args=["-w", workspace_name]
         )
         workspace(
             "manage",
@@ -106,7 +104,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path):
             global_args=["-w", workspace_name],
         )
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
 
             # Check that new env definitions are found

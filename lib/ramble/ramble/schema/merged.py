@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,38 +11,45 @@
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/merged.py
    :lines: 14-
 """
+
 from llnl.util.lang import union_dicts
 
 import ramble.schema.applications
 import ramble.schema.config
+import ramble.schema.env_vars
+import ramble.schema.filter_groups
 import ramble.schema.formatted_executables
+import ramble.schema.internals
 import ramble.schema.licenses
-import ramble.schema.repos
-import ramble.schema.spack  # DEPRECATED: Remove when spack is removed
+import ramble.schema.mirrors
+import ramble.schema.modifiers
+import ramble.schema.repo_schema
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.tables
+import ramble.schema.utilities
 import ramble.schema.variables
 import ramble.schema.variants
-import ramble.schema.env_vars
-import ramble.schema.internals
-import ramble.schema.modifiers
 import ramble.schema.zips
 
 #: Properties for inclusion in other schemas
 properties = union_dicts(
     ramble.schema.applications.properties,
     ramble.schema.config.properties,
+    ramble.schema.env_vars.properties,
+    ramble.schema.filter_groups.properties,
     ramble.schema.formatted_executables.properties,
+    ramble.schema.internals.properties,
     ramble.schema.licenses.properties,
-    ramble.schema.repos.properties,
-    ramble.schema.spack.properties,  # DEPRECATED: Remove when spack is removed
+    ramble.schema.mirrors.properties,
+    ramble.schema.modifiers.properties,
+    ramble.schema.repo_schema.properties,
     ramble.schema.software.properties,
     ramble.schema.success_criteria.properties,
+    ramble.schema.tables.properties,
+    ramble.schema.utilities.properties,
     ramble.schema.variables.properties,
     ramble.schema.variants.properties,
-    ramble.schema.env_vars.properties,
-    ramble.schema.internals.properties,
-    ramble.schema.modifiers.properties,
     ramble.schema.zips.properties,
 )
 

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,9 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
 from ramble.pkg_man.builtin.environment_modules import EnvironmentModules
+from ramble.pkgmankit import *
 
 
 class Eessi(EnvironmentModules):
@@ -25,12 +24,15 @@ class Eessi(EnvironmentModules):
     """
 
     name = "eessi"
+    _spec_prefix = "eessi"
 
     package_manager_variable(
         "eessi_version",
         default="2023.06",
         description="Version of EESSI to use",
     )
+
+    package_manager_family("eessi")
 
     register_builtin("eessi_init")
 

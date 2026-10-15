@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -24,9 +24,9 @@ types supported in Ramble.
 
 .. _ramble-pipelines-and-phases:
 
-------------------------------
+-------------------------------
 Experiment Pipelines and Phases
-------------------------------
+-------------------------------
 
 Ramble has a concept of ``pipeline``, which represent full actions that can
 be taken on a workspace. Some of the common ``pipelines`` that are used are the
@@ -42,8 +42,7 @@ Examples of phases include ``get_inputs`` (for downloading input files needed
 by a workload) and ``software_install`` (for performing software installation
 using a package manager).
 
-Phases can be defined in a variety of locations. Some base classes (e.g.
-:mod:`ramble.application`) define phases for specific pipelines. Additionally,
+Phases can be defined in a variety of locations. Some base classes define phases for specific pipelines. Additionally,
 instances of application, modifier, or package manager definitions can define
 phases as well. Each phase is defined in two parts. The first part is to define
 a class method on a object definition. Phase names need to begin with an

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,22 +10,21 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/applications.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 from llnl.util.lang import union_dicts
-from ramble.schema.success_criteria import success_list_def
 
-import ramble.schema.formatted_executables
 import ramble.schema.env_vars
+import ramble.schema.formatted_executables
 import ramble.schema.internals
+import ramble.schema.modifiers
+import ramble.schema.success_criteria
+import ramble.schema.tables
 import ramble.schema.types
 import ramble.schema.variables
 import ramble.schema.variants
-import ramble.schema.success_criteria
-import ramble.schema.licenses
-import ramble.schema.modifiers
 import ramble.schema.zips
-
+from ramble.schema.success_criteria import success_list_def
 
 matrix_def = {"type": "array", "default": [], "items": {"type": "string"}}
 
@@ -98,14 +97,15 @@ tags_def = {"type": "array", "default": [], "items": {"type": "string"}}
 repeats_def = union_dicts(ramble.schema.types.string_or_num, {"default": 0})
 
 sub_props = union_dicts(
-    ramble.schema.variables.properties,
-    ramble.schema.variants.properties,
-    ramble.schema.success_criteria.properties,
     ramble.schema.env_vars.properties,
+    ramble.schema.formatted_executables.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
+    ramble.schema.success_criteria.properties,
+    ramble.schema.tables.properties,
+    ramble.schema.variables.properties,
+    ramble.schema.variants.properties,
     ramble.schema.zips.properties,
-    ramble.schema.formatted_executables.properties,
     {
         "chained_experiments": chained_experiment_def,
         "template": {"type": "boolean"},

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -27,22 +27,25 @@ class Hpcc(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("benchmark-app", "mini-app", "benchmark", "DGEMM")
+    tags("hpc-benchmark", "dgemm")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    version("1.5.0", "Version 1.5.0 of HPCC", preferred=True)
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-    software_spec(
-        "hpcc",
-        pkg_spec="hpcc@1.5.0",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
 
-    required_package("hpcc", package_manager="spack*")
+        software_spec(
+            "hpcc-{application::hpcc::version}",
+            pkg_spec="hpcc@{application::hpcc::version}",
+            compiler="gcc14",
+        )
+
+        required_package("hpcc")
 
     input_file(
         "hpccinf",
@@ -52,16 +55,16 @@ class Hpcc(ExecutableApplication):
         description="Input/Config file for HPCC benchmark",
     )
 
-    executable(
-        "copy-config",
-        template="cp -R {workload_input_dir}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-config",
+        src="{workload_input_dir}/*",
+        dst="{experiment_run_dir}/.",
     )
 
     executable("execute", "hpcc", use_mpi=True)
 
     workload(
-        "standard", executables=["copy-config", "execute"], input="hpccinf"
+        "standard", executables=["stage-config", "execute"], input="hpccinf"
     )
 
     workload_variable(

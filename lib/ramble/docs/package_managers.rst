@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,7 @@
    except according to those terms.
 
 
-.. _package_manager_control:
+.. _package-manager-control:
 
 ================
 Package Managers
@@ -34,34 +34,25 @@ example of controlling this
   variants:
     package_manager: <package_manager_name>
 
-The default package manager is `null` which disables the use of any package
-manager in the generated experiments. The value of the package manager used can
-be a reference to a variable, and will be expanded following Ramble's
-:ref:`variable definitions <variable-dictionaries>` logic.
+The default package manager is `user-managed` which tells Ramble the user will
+manage installing their own software, and providing Ramble with paths to the
+installations. The value of the package manager variant used can be a reference
+to a variable, and will be expanded following Ramble's :ref:`variable
+definitions <variable-dictionaries>` logic.
 
 --------------------------
 Supported Package Managers
 --------------------------
 
-Currently supported package managers in Ramble include:
+Some of the currently supported package managers in Ramble include:
 
- * None / null
  * environment-modules
  * eessi
  * pip
  * spack
  * spack-lightweight
-
-^^^^^^^^^^^^^^^^^^^^
-None Package Manager
-^^^^^^^^^^^^^^^^^^^^
-
-Setting the package manager config option to ``None`` or ``null`` disables the
-use of a package manager within the experiments. In this case, experiments are
-expected to define the paths to their own executables, and installation of
-these executables should be provided outside of Ramble (i.e. manual
-installation).
-
+ * spack-pip
+ * user-managed
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Modules Package Manager
@@ -113,7 +104,7 @@ determine what packages to install within the resulting virtual environment.
 The use of this package manager requires ``pip`` to be installed outside of
 Ramble. This happens automatically in several Python installations. For more
 information see
-`pip's documentation<https://pip.pypa.io/en/stable/installation/>`_.
+`pip's documentation <https://pip.pypa.io/en/stable/installation/>`_.
 
 ^^^^^^^^^^^^^^^^^^^^^
 Spack Package Manager
@@ -158,3 +149,21 @@ mirror software source.
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
 `Spack's documentation <https://github.com/spack/spack#-spack>`_.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Spack Pip Package Manager
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Setting the package manager config option to ``spack-pip`` enables a hybrid
+mode where Spack is used to install base software, and ``pip`` is used to
+install additional Python packages into the environment.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+User-Managed Package Manager
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Setting the package manager config option to ``user-managed`` disables Ramble's
+automatic software installation. In this mode, the user is responsible for
+ensuring that the required software is available in the environment before
+running experiments.

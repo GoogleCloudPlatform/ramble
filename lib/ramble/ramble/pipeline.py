@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,45 +6,58 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from enum import Enum
-import stat
-import os
-import shutil
-import py.path
-import shlex
 import glob
+import itertools
+import os
+import shlex
+import shutil
+import stat
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
-from llnl.util.tty.color import cprint
+from llnl.util import tty
+from llnl.util.tty.colify import colify
 
-import ramble.application
 import ramble.config
-import ramble.experiment_set
-import ramble.repository
-import ramble.software_environments
-import ramble.util.hashing
-import ramble.fetch_strategy
-import ramble.stage
-import ramble.workspace
 import ramble.expander
-
-import ramble.experimental.uploader
-
+import ramble.experiment_result
+import ramble.fetch_strategy
+import ramble.filters
+import ramble.software_environments
+import ramble.stage
+import ramble.uploader
+import ramble.util.hashing
 import ramble.util.path
-
+import ramble.workspace
 from ramble.namespace import namespace
-from ramble.util.logger import logger
+from ramble.util import json_util
+from ramble.util.colors import cprint
 from ramble.util.file_util import create_symlink
+from ramble.util.logger import logger
 
-import spack.util.spack_json as sjson
-from spack.util.executable import which, Executable
+from spack.util.executable import Executable, which
 
 if not ramble.config.get("config:disable_progress_bar", False):
     try:
         import tqdm
     except ModuleNotFoundError:
         logger.die("Module `tqdm` is not found. Ensure requirements.txt are installed.")
+
+
+class _PipelinesMeta(type):
+    def __iter__(cls):
+        return (v for k, v in vars(cls).items() if not k.startswith("_") and isinstance(v, str))
+
+
+class pipelines(metaclass=_PipelinesMeta):
+    analyze = "analyze"
+    archive = "archive"
+    bootstrap = "bootstrap"
+    mirror = "mirror"
+    setup = "setup"
+    pushtocache = "pushtocache"
+    execute = "execute"
+    pushdeployment = "pushdeployment"
+    logs = "logs"
 
 
 class Pipeline:
@@ -57,7 +70,6 @@ class Pipeline:
         self.filters = filters
         self.workspace = workspace
         self.force_inventory = False
-        self.require_inventory = False
         self.action_string = "Operating on"
         self.suppress_per_experiment_prints = False
         self.suppress_run_header = False
@@ -72,18 +84,24 @@ class Pipeline:
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
         self._experiment_set = workspace.build_experiment_set()
+        self.updated_experiment_hashes = False
 
-    def _construct_experiment_hashes(self):
+    @property
+    def experiment_set(self):
+        return self._experiment_set
+
+    def _construct_experiment_hashes(self) -> bool:
         """Hash all of the experiments.
 
         Populate the workspace inventory information with experiment hash data.
         """
+        changed = False
         for _, app_inst, _ in self._experiment_set.all_experiments():
-            app_inst.populate_inventory(
+            changed = app_inst.populate_inventory(
                 self.workspace,
                 force_compute=self.force_inventory,
-                require_exist=self.require_inventory,
             )
+        return changed
 
     def _construct_workspace_hash(self):
         """Construct workspace inventory
@@ -97,8 +115,8 @@ class Pipeline:
         files_exist = os.path.exists(workspace_inventory) and os.path.exists(workspace_hash_file)
 
         if not self.force_inventory and files_exist:
-            with open(workspace_inventory) as f:
-                self.workspace.hash_inventory = sjson.load(f)
+            with open(workspace_inventory, encoding="utf-8") as f:
+                self.workspace.hash_inventory = json_util.load(f)
 
             self.workspace.workspace_hash = ramble.util.hashing.hash_json(
                 self.workspace.hash_inventory
@@ -118,19 +136,24 @@ class Pipeline:
                 self.workspace.hash_inventory
             )
             with open(
-                os.path.join(self.workspace.root, self.workspace.inventory_file_name), "w+"
+                os.path.join(self.workspace.root, self.workspace.inventory_file_name),
+                "w+",
+                encoding="utf-8",
             ) as f:
-                sjson.dump(self.workspace.hash_inventory, f)
+                json_util.dump(self.workspace.hash_inventory, f)
 
-            with open(os.path.join(self.workspace.root, self.workspace.hash_file_name), "w+") as f:
+            with open(
+                os.path.join(self.workspace.root, self.workspace.hash_file_name),
+                "w+",
+                encoding="utf-8",
+            ) as f:
                 f.write(self.workspace.workspace_hash + "\n")
 
             self.workspace.update_metadata("workspace_digest", self.workspace.workspace_hash)
-            self.workspace._write_metadata()
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""
-        pass
+        self.updated_experiment_hashes = self._construct_experiment_hashes()
 
     def _execute(self):
         """Hook for executing the pipeline"""
@@ -161,39 +184,43 @@ class Pipeline:
                 logger.all_msg(f"    root experiment_index: {experiment_index_value}")
                 logger.all_msg(f"    log file: {exp_log_path}")
 
-            logger.add_log(exp_log_path)
+            with logger.add_log_context(exp_log_path):
+                inv_str = json_util.dumps(app_inst.hash_inventory)
+                logger.msg(f"Experiment inventory:\n{inv_str}")
+                phase_list = list(
+                    app_inst.get_pipeline_phases(self.name, phase_filters=self.filters.phases)
+                )
 
-            phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
-
-            disable_progress = (
-                ramble.config.get("config:disable_progress_bar", False)
-                or self.suppress_per_experiment_prints
-            )
-            if not disable_progress:
-                try:
-                    progress = tqdm.tqdm(
-                        total=len(phase_list),
-                        leave=True,
-                        ascii=" >=",
-                        bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
-                    )
-                except AttributeError:
-                    logger.die("tdqm.tdqm is not found. Ensure requirements.txt are installed.")
-            for phase_idx, phase in enumerate(phase_list):
+                disable_progress = (
+                    ramble.config.get("config:disable_progress_bar", False)
+                    or self.suppress_per_experiment_prints
+                )
                 if not disable_progress:
-                    progress.set_description(
-                        f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
-                    )
-                app_inst.run_phase(self.name, phase, self.workspace)
-                phase_total += 1
+                    try:
+                        progress = tqdm.tqdm(
+                            total=len(phase_list),
+                            leave=True,
+                            ascii=" >=",
+                            bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
+                        )
+                    except AttributeError:
+                        logger.die(
+                            "tqdm.tqdm is not found. Ensure requirements.txt are installed."
+                        )
+                for phase_idx, phase in enumerate(phase_list):
+                    if not disable_progress:
+                        progress.set_description(
+                            f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
+                        )
+                    app_inst.run_phase(self.name, phase)
+                    phase_total += 1
+                    if not disable_progress:
+                        progress.update()
+                app_inst.print_phase_times(self.name, phase_filters=self.filters.phases)
                 if not disable_progress:
-                    progress.update()
-            app_inst.print_phase_times(self.name, self.filters.phases)
-            if not disable_progress:
-                progress.set_description("Experiment complete")
-                progress.close()
+                    progress.set_description("Experiment complete")
+                    progress.close()
 
-            logger.remove_log()
             if not self.suppress_per_experiment_prints:
                 logger.all_msg(f"  Returning to log file: {logger.active_log()}")
 
@@ -204,7 +231,15 @@ class Pipeline:
 
     def _complete(self):
         """Hook for performing pipeline actions after execution is complete"""
-        pass
+        self.workspace.update_metadata("ramble_version", ramble.util.version.get_version())
+        if self.updated_experiment_hashes:
+            try:
+                self._construct_workspace_hash()
+            except FileNotFoundError as e:
+                tty.warn("Unable to construct workspace hash due to missing file")
+                tty.warn(e)
+
+        self.workspace.write_metadata()
 
     def run(self):
         """Run the full pipeline"""
@@ -221,20 +256,33 @@ class Pipeline:
                 f"{experiment_total} experiments:"
             )
 
-        logger.add_log(self.log_path)
-        if logger.enabled:
-            create_symlink(self.log_path, self.log_path_latest)
+        with logger.add_log_context(self.log_path):
+            if logger.enabled:
+                create_symlink(self.log_path, self.log_path_latest)
 
-        self._prepare()
-        self._execute()
-        self._complete()
-        logger.remove_log()
+            self._prepare()
+            self._execute()
+            self._complete()
+
+    def _copy_workspace_root_files(self, workspace, dest_dir):
+        root_files = [
+            ramble.workspace.Workspace.inventory_file_name,
+            ramble.workspace.Workspace.hash_file_name,
+            self.workspace.inventory_file_name,
+            self.workspace.hash_file_name,
+            ramble.workspace.METADATA_FILE_NAME,
+        ]
+        for filename in root_files:
+            src = os.path.join(workspace.root, filename)
+            if os.path.exists(src):
+                dest = os.path.join(dest_dir, filename)
+                shutil.copyfile(src, dest)
 
 
 class AnalyzePipeline(Pipeline):
     """Class for the analyze pipeline"""
 
-    name = "analyze"
+    name = pipelines.analyze
 
     def __init__(
         self,
@@ -244,18 +292,15 @@ class AnalyzePipeline(Pipeline):
         upload=False,
         print_results=False,
         summary_only=False,
+        fom_origin_types=None,
     ):
-        workspace_success = {namespace.success: ramble.config.config.get_config(namespace.success)}
-
-        workspace.extract_success_criteria("workspace", workspace_success)
-
         super().__init__(workspace, filters)
         self.action_string = "Analyzing"
         self.output_formats = ["text"] if output_formats is None else output_formats
-        self.require_inventory = True
         self.upload_results = upload
         self.print_results = print_results
         self.summary_only = summary_only
+        self.fom_origin_types = fom_origin_types
 
     def _prepare(self):
 
@@ -267,7 +312,7 @@ class AnalyzePipeline(Pipeline):
         no_analyze_cnt = 0
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
-                if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
+                if app_inst.get_status() != ramble.experiment_result.ExperimentStatus.UNKNOWN:
                     found_valid_experiment = True
             else:
                 no_analyze_cnt += 1
@@ -288,11 +333,12 @@ class AnalyzePipeline(Pipeline):
                 " Make sure your workspace is setup with\n"
                 "    ramble workspace setup"
             )
-        super()._construct_experiment_hashes()
-        super()._construct_workspace_hash()
+
         super()._prepare()
 
     def _complete(self):
+        super()._complete()
+        self._experiment_set.clear_filter_cache()
         # Calculate statistics for repeats and inject into base experiment results
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
 
@@ -302,16 +348,19 @@ class AnalyzePipeline(Pipeline):
             output_formats=self.output_formats,
             print_results=self.print_results,
             summary_only=self.summary_only,
+            fom_origin_types=self.fom_origin_types,
         )
 
+        self.workspace.dump_tables(self.experiment_set, self.filters)
+
         if self.upload_results:
-            ramble.experimental.uploader.upload_results(self.workspace.results)
+            ramble.uploader.upload_results(self.workspace.results)
 
 
 class ArchivePipeline(Pipeline):
     """Class for the archive pipeline"""
 
-    name = "archive"
+    name = pipelines.archive
 
     def __init__(
         self,
@@ -321,6 +370,7 @@ class ArchivePipeline(Pipeline):
         archive_prefix=None,
         upload_url=None,
         include_secrets=False,
+        archive_patterns=None,
     ):
         super().__init__(workspace, filters)
         self.action_string = "Archiving"
@@ -329,17 +379,10 @@ class ArchivePipeline(Pipeline):
         self.include_secrets = include_secrets
         self.archive_prefix = archive_prefix
         self.archive_name = None
-
-        if self.upload_url and not self.create_tar:
-            logger.warn("Upload URL is currently only supported when using tar format (-t)")
-            logger.warn("Forcing `-t` on to enable archive upload.\n")
-            self.create_tar = True
+        self.archive_patterns = archive_patterns.copy() if archive_patterns else []
 
     def _prepare(self):
-        super()._construct_experiment_hashes()
-        super()._construct_workspace_hash()
         super()._prepare()
-
         date_str = self.workspace.date_string()
 
         # Use the basename from the path as the name of the workspace.
@@ -353,69 +396,92 @@ class ArchivePipeline(Pipeline):
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
 
-        for filename in [
-            ramble.workspace.Workspace.inventory_file_name,
-            ramble.workspace.Workspace.hash_file_name,
-        ]:
-            src = os.path.join(self.workspace.root, filename)
-            if os.path.exists(src):
-                dest = src.replace(self.workspace.root, archive_path)
-                shutil.copyfile(src, dest)
+        self._copy_workspace_root_files(self.workspace, archive_path)
 
         # Copy current configs
         archive_configs = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_config_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_CONFIG_PATH
         )
         _copy_tree(self.workspace.config_dir, archive_configs)
 
         # Copy shared files
         archive_shared = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_shared_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_SHARED_PATH
         )
 
         excluded_secrets = set()
         if not self.include_secrets:
-            excluded_secrets.add(ramble.application.ApplicationBase.license_inc_name)
+            excluded_secrets.add(ramble.workspace.LICENSE_INC_NAME)
 
         fs.mkdirp(archive_shared)
-        for root, _, files in os.walk(self.workspace.shared_dir):
+        for root, dirs, files in os.walk(self.workspace.shared_dir):
+            if "bootstrapped_utilities" in dirs:
+                dirs.remove("bootstrapped_utilities")
+            rel_dir = os.path.relpath(root, self.workspace.shared_dir)
+            target_dir = os.path.join(archive_shared, rel_dir)
             for name in files:
                 if name not in excluded_secrets:
-                    src_dir = os.path.join(self.workspace.shared_dir, root)
-                    src = os.path.join(src_dir, name)
-                    dest = src.replace(self.workspace.shared_dir, archive_shared)
-                    fs.mkdirp(os.path.dirname(dest))
+                    src = os.path.join(root, name)
+                    dest = os.path.join(target_dir, name)
+                    fs.mkdirp(target_dir)
                     shutil.copy(src, dest)
 
         # Copy logs, but omit all symlinks (i.e. "latest")
         archive_logs = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_log_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_LOG_PATH
         )
         fs.mkdirp(archive_logs)
         for root, _, files in os.walk(self.workspace.log_dir):
+            if os.path.islink(root):
+                continue
+            rel_dir = os.path.relpath(root, self.workspace.log_dir)
+            target_dir = os.path.join(archive_logs, rel_dir)
             for name in files:
-                src_dir = os.path.join(self.workspace.log_dir, root)
-                src = os.path.join(src_dir, name)
-                if not (os.path.islink(src_dir) or os.path.islink(src)) and os.path.isfile(src):
-                    dest = src.replace(self.workspace.log_dir, archive_logs)
-                    fs.mkdirp(os.path.dirname(dest))
+                src = os.path.join(root, name)
+                if not os.path.islink(src) and os.path.isfile(src):
+                    dest = os.path.join(target_dir, name)
+                    fs.mkdirp(target_dir)
                     shutil.copyfile(src, dest)
+
+        # Copy tools directory
+        tools_dir = os.path.join(self.workspace.shared_dir, "bootstrapped_utilities")
+        if os.path.exists(tools_dir):
+            archive_tools = os.path.join(
+                self.workspace.latest_archive_path,
+                ramble.workspace.WORKSPACE_SHARED_PATH,
+                "bootstrapped_utilities",
+            )
+            _copy_tree(tools_dir, archive_tools)
+
+        for pattern in itertools.chain(
+            self.archive_patterns,
+            [os.path.join(ramble.workspace.WORKSPACE_RESULTS_PATH, "results.*")],
+        ):
+            # Escape workspace root incase it contains glob characters.
+            pattern_path = glob.escape(self.workspace.root) + os.sep + pattern
+            for file in glob.glob(pattern_path):
+                dest_dir = os.path.dirname(
+                    file.replace(self.workspace.root, self.workspace.latest_archive_path)
+                )
+                fs.mkdirp(dest_dir)
+                shutil.copy(file, dest_dir)
 
         archive_path_latest = os.path.join(self.workspace.archive_dir, "archive.latest")
         create_symlink(archive_path, archive_path_latest)
 
     def _complete(self):
+        super()._complete()
+        archive_url = (
+            self.upload_url if self.upload_url else ramble.config.get("config:archive_url")
+        )
+        archive_url = archive_url.rstrip("/") if archive_url else None
+
         if self.create_tar:
             tar_extension = ".tar.gz"
             tar = which("tar", required=True)
             tar_path = self.archive_name + tar_extension
-            with py.path.local(self.workspace.archive_dir).as_cwd():
+            with fs.working_dir(self.workspace.archive_dir):
                 tar("-czf", tar_path, self.archive_name)
-
-            archive_url = (
-                self.upload_url if self.upload_url else ramble.config.get("config:archive_url")
-            )
-            archive_url = archive_url.rstrip("/") if archive_url else None
 
             tar_path_latest = os.path.join(
                 self.workspace.archive_dir, "archive.latest" + tar_extension
@@ -434,13 +500,26 @@ class ArchivePipeline(Pipeline):
 
                 # Record upload URL to workspace metadata
                 self.workspace.update_metadata("archive_url", remote_tar_path)
-                self.workspace._write_metadata()
+                self.workspace.write_metadata()
+        else:
+            logger.debug(f"Archive url: {archive_url}")
+
+            if archive_url:
+                import ramble.util.web as web_util
+
+                remote_dir_path = archive_url + "/" + self.workspace.latest_archive
+                web_util.push_dir_to_url(self.workspace.latest_archive_path, remote_dir_path)
+                logger.all_msg(f"Uncompressed Archive Uploaded to {remote_dir_path}")
+
+                # Record upload URL to workspace metadata
+                self.workspace.update_metadata("archive_url", remote_dir_path)
+                self.workspace.write_metadata()
 
 
 class MirrorPipeline(Pipeline):
     """Class for the mirror pipeline"""
 
-    name = "mirror"
+    name = pipelines.mirror
 
     def __init__(self, workspace, filters, mirror_path=None):
         super().__init__(workspace, filters)
@@ -448,7 +527,6 @@ class MirrorPipeline(Pipeline):
         self.mirror_path = mirror_path
 
     def _prepare(self):
-        super()._prepare()
         self.workspace.create_mirror(self.mirror_path)
 
     def _complete(self):
@@ -456,71 +534,107 @@ class MirrorPipeline(Pipeline):
         logger.msg(
             f"Successfully {verb} spack software in {self.workspace.mirror_path}",
             "Archive stats:",
-            "  %-4d already present" % len(self.workspace.software_mirror_stats.present),
-            "  %-4d added" % len(self.workspace.software_mirror_stats.new),
-            "  %-4d failed to fetch." % len(self.workspace.software_mirror_stats.errors),
+            f"  {len(self.workspace.software_mirror_stats.present):<4} already present",
+            f"  {len(self.workspace.software_mirror_stats.new):<4} added",
+            f"  {len(self.workspace.software_mirror_stats.errors):<4} failed to fetch.",
         )
 
         logger.msg(
             f"Successfully {verb} inputs in {self.workspace.mirror_path}",
             "Archive stats:",
-            "  %-4d already present" % len(self.workspace.input_mirror_stats.present),
-            "  %-4d added" % len(self.workspace.input_mirror_stats.new),
-            "  %-4d failed to fetch." % len(self.workspace.input_mirror_stats.errors),
+            f"  {len(self.workspace.input_mirror_stats.present):<4} already present",
+            f"  {len(self.workspace.input_mirror_stats.new):<4} added",
+            f"  {len(self.workspace.input_mirror_stats.errors):<4} failed to fetch.",
         )
 
         if self.workspace.input_mirror_stats.errors:
             logger.error("Failed downloads:")
-            tty.colify(
-                (s.cformat("{name}") for s in list(self.workspace.input_mirror_stats.errors)),
+            colify(
+                list(self.workspace.input_mirror_stats.errors),
                 output=logger.active_stream(),
             )
             logger.die("Mirroring has errors.")
 
 
+class BootstrapPipeline(Pipeline):
+    """Class for the bootstrap pipeline"""
+
+    name = pipelines.bootstrap
+
+    def __init__(self, workspace, filters):
+        super().__init__(workspace, filters)
+        self.action_string = "Bootstrapping"
+
+
 class SetupPipeline(Pipeline):
     """Class for the setup pipeline"""
 
-    name = "setup"
+    name = pipelines.setup
 
     def __init__(self, workspace, filters):
         super().__init__(workspace, filters)
         self.force_inventory = True
-        self.require_inventory = False
         self.action_string = "Setting up"
 
     def _prepare(self):
-        # Check if the selected phases require the inventory is successful
-        if "write_inventory" in self.filters.phases or "*" in self.filters.phases:
-            self.require_inventory = True
-
         super()._prepare()
-        experiment_file = open(self.workspace.all_experiments_path, "w+")
+
+        # Ensure workspace utilities are written before execution scripts are built
+        if hasattr(self.workspace, "write_utilities"):
+            self.workspace.write_utilities()
+
+        # Write custom edit functions to each experiment's run directory
+        import llnl.util.filesystem as fs
+
+        import ramble.util.file_editor
+
+        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+            custom_functions = []
+            if hasattr(app_inst, "custom_edit_functions"):
+                for func_source in app_inst.custom_edit_functions.values():
+                    if func_source not in custom_functions:
+                        custom_functions.append(func_source)
+
+            if custom_functions:
+                exp_run_dir = app_inst.expander.experiment_run_dir
+                fs.mkdirp(os.path.join(exp_run_dir, "utilities"))
+                script_path = os.path.join(
+                    exp_run_dir, "utilities", ramble.util.file_editor.CUSTOM_EDIT_FUNCTIONS_NAME
+                )
+                # Ensure the module has the required imports
+                copyright_header = (
+                    "# Copyright 2022-2026 The Ramble Authors\n"
+                    "#\n"
+                    "# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or\n"
+                    "# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license\n"
+                    "# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your\n"
+                    "# option. This file may not be copied, modified, or distributed\n"
+                    "# except according to those terms.\n\n"
+                )
+                module_content = (
+                    copyright_header + "import re\nimport os\n\n" + "\n\n".join(custom_functions)
+                )
+                with open(script_path, "w+", encoding="utf-8") as f:
+                    f.write(module_content)
+
         shell = ramble.config.get("config:shell")
         shell_path = os.path.join("/bin/", shell)
-        experiment_file.write(f"#!{shell_path}\n")
-        self.workspace.experiments_script = experiment_file
-
-        super()._construct_experiment_hashes()
+        self.workspace.experiments_script = [f"#!{shell_path}\n"]
 
     def _complete(self):
-        try:
-            super()._construct_workspace_hash()
-        except FileNotFoundError as e:
-            tty.warn("Unable to construct workspace hash due to missing file")
-            tty.warn(e)
-
-        self.workspace.experiments_script.close()
+        super()._complete()
         experiment_file_path = os.path.join(
             self.workspace.root, self.workspace.all_experiments_path
         )
+        with open(experiment_file_path, "w+", encoding="utf-8") as f:
+            f.writelines(self.workspace.experiments_script)
         os.chmod(experiment_file_path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IROTH | stat.S_IXOTH)
 
 
 class PushToCachePipeline(Pipeline):
     """Class for the pushtocache pipeline"""
 
-    name = "pushtocache"
+    name = pipelines.pushtocache
 
     def __init__(self, workspace, filters, spack_cache_path=None):
         super().__init__(workspace, filters)
@@ -532,13 +646,14 @@ class PushToCachePipeline(Pipeline):
         self.workspace.spack_cache_path = self.spack_cache_path
 
     def _complete(self):
+        super()._complete()
         logger.msg(f"Pushed envs to spack cache {self.spack_cache_path}")
 
 
 class ExecutePipeline(Pipeline):
     """class for the `execute` (`on`) pipeline"""
 
-    name = "execute"
+    name = pipelines.execute
 
     def __init__(
         self,
@@ -550,13 +665,14 @@ class ExecutePipeline(Pipeline):
     ):
         super().__init__(workspace, filters)
         self.action_string = "Executing"
-        self.require_inventory = True
         self.executor = executor
         self.suppress_per_experiment_prints = suppress_per_experiment_prints
         self.suppress_run_header = suppress_run_header
 
     def _execute(self):
         super()._execute()
+
+        resolve_env_vars = ramble.config.get("config:resolve_variables_in_subprocesses", False)
 
         if not self.suppress_run_header:
             logger.all_msg("Running executors...")
@@ -569,20 +685,34 @@ class ExecutePipeline(Pipeline):
                 logger.debug(f"{app_inst.name} is a repeat base. Skipping execution.")
                 continue
 
-            app_inst.add_expand_vars(self.workspace)
+            app_inst.define_variables_for_template_path()
             exec_str = app_inst.expander.expand_var(self.executor)
+            if resolve_env_vars:
+                exec_str = os.path.expandvars(exec_str)
             exec_parts = shlex.split(exec_str)
             exec_name = exec_parts[0]
             exec_args = exec_parts[1:]
 
-            executor = Executable(exec_name)
+            executor = which(exec_name)
+            if executor is None:
+                # attempt searching inside the run directory
+                if not os.path.isabs(exec_name):
+                    alt_exec_path = os.path.join(app_inst.expander.experiment_run_dir, exec_name)
+                    executor = which(alt_exec_path)
+
+            if executor is None:
+                # Attempt the execution, even though it won't succeed.
+                # The raised os error gives better reason for troubleshooting
+                # (like whether the exec doesn't exist, or due to missing permission.)
+                executor = Executable(exec_name)
+
             executor(*exec_args)
 
 
 class LogsPipeline(Pipeline):
     """class for the `logs` pipeline"""
 
-    name = "logs"
+    name = pipelines.logs
 
     def __init__(
         self,
@@ -594,23 +724,31 @@ class LogsPipeline(Pipeline):
     ):
         super().__init__(workspace, filters)
         self.action_string = "Getting log information for"
-        self.require_inventory = False
         self.first_only = first_only
         self.suppress_per_experiment_prints = suppress_per_experiment_prints
         self.suppress_run_header = suppress_run_header
 
     def _execute(self):
-        def print_archive_files(app_inst, pattern_title, patterns):
+        def print_archive_files(app_inst, pattern_title, archive_patterns):
             print_header = True
-            if len(patterns) > 0:
-                for pattern in patterns:
-                    exp_pattern = app_inst.expander.expand_var(pattern)
-                    for file in glob.glob(exp_pattern):
-                        # Only print the header if a file matched the glob
-                        if print_header:
-                            logger.all_msg(f"    Archive files from {pattern_title}:")
-                            print_header = False
-                        logger.all_msg(f"    - {file}")
+            if archive_patterns:
+                for when_set, patterns in archive_patterns.items():
+                    if not app_inst.expander.satisfies(
+                        reqs=when_set, variant_set=app_inst.experiment_variants()
+                    ):
+                        continue
+                    for pattern in patterns.values():
+                        exp_pattern = app_inst.expander.expand_var(pattern)
+                        if not os.path.isabs(exp_pattern):
+                            exp_pattern = os.path.join(
+                                app_inst.expander.experiment_run_dir, exp_pattern
+                            )
+                        for file in glob.glob(exp_pattern):
+                            # Only print the header if a file matched the glob
+                            if print_header:
+                                logger.all_msg(f"    Archive files from {pattern_title}:")
+                                print_header = False
+                            logger.all_msg(f"    - {file}")
 
         super()._execute()
 
@@ -627,23 +765,23 @@ class LogsPipeline(Pipeline):
             logger.all_msg(f"Experiment: {exp}")
             logger.all_msg(f"    Experiment log file: {log_file}")
 
-            analysis_logs, _, _ = app_inst._analysis_dicts(self.workspace.success_list)
+            analysis_logs, _, _ = app_inst.analysis_dicts(app_inst.success_list)
 
             logger.all_msg("    Auxiliary experiment logs:")
             for log in analysis_logs:
                 logger.all_msg(f"    - {log}")
 
-            print_archive_files(app_inst, "application", app_inst.archive_patterns.keys())
+            print_archive_files(app_inst, "application", app_inst.archive_patterns)
             if app_inst.package_manager:
                 pm_name = app_inst.package_manager.name
                 print_archive_files(
                     app_inst,
                     f"package manager {pm_name}",
-                    app_inst.package_manager.archive_patterns.keys(),
+                    app_inst.package_manager.archive_patterns,
                 )
 
-            for mod in app_inst._modifier_instances:
-                print_archive_files(app_inst, f"modifier {mod.name}", mod.archive_patterns.keys())
+            for mod in app_inst.modifier_instances:
+                print_archive_files(app_inst, f"modifier {mod.name}", mod.archive_patterns)
 
             if self.first_only:
                 break
@@ -652,22 +790,22 @@ class LogsPipeline(Pipeline):
 class PushDeploymentPipeline(Pipeline):
     """class for the `prepare-deployment` pipeline"""
 
-    name = "pushdeployment"
+    name = pipelines.pushdeployment
     index_filename = "index.json"
     index_namespace = "deployment_files"
     tar_extension = ".tar.gz"
-    object_repo_name = "object_repo"
+    legacy_object_repo_name = "object_repo"
 
     def __init__(
         self, workspace, filters, create_tar=False, upload_url=None, deployment_name=None
     ):
         super().__init__(workspace, filters)
 
-        workspace_expander = ramble.expander.Expander(workspace.get_workspace_vars(), None)
+        workspace_expander = ramble.expander.Expander(ramble.config.get(namespace.variables), None)
 
         self.action_string = "Pushing deployment of"
-        self.require_inventory = True
         self.create_tar = create_tar
+        self.force_inventory = True
 
         if upload_url:
             expanded_url = workspace_expander.expand_var(upload_url)
@@ -684,23 +822,23 @@ class PushDeploymentPipeline(Pipeline):
 
     def _execute(self):
         configs_dir = os.path.join(
-            self.workspace.named_deployment, ramble.workspace.workspace_config_path
+            self.workspace.named_deployment, ramble.workspace.WORKSPACE_CONFIG_PATH
         )
         fs.mkdirp(configs_dir)
 
         _copy_tree(self.workspace.config_dir, configs_dir)
 
-        aux_software_dir = os.path.join(configs_dir, ramble.workspace.auxiliary_software_dir_name)
+        aux_software_dir = os.path.join(configs_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
         fs.mkdirp(aux_software_dir)
 
-        repo_path = os.path.join(self.workspace.named_deployment, self.object_repo_name)
-        for object_type_def in ramble.repository.type_definitions.values():
-            fs.mkdirp(os.path.join(repo_path, object_type_def["dir_name"]))
-
-        # Write out only to the unified repo.yaml
-        with open(os.path.join(repo_path, ramble.repository.unified_config), "w+") as f:
-            f.write("repo:\n")
-            f.write(f"  namespace: deployment_{self.deployment_name}\n")
+        tools_dir = os.path.join(self.workspace.shared_dir, "bootstrapped_utilities")
+        if os.path.exists(tools_dir):
+            deployment_tools = os.path.join(
+                self.workspace.named_deployment,
+                ramble.workspace.WORKSPACE_SHARED_PATH,
+                "bootstrapped_utilities",
+            )
+            _copy_tree(tools_dir, deployment_tools)
 
         super()._execute()
 
@@ -708,9 +846,14 @@ class PushDeploymentPipeline(Pipeline):
         """Yield the full path to each file in a deployment"""
         for root, _, files in os.walk(self.workspace.named_deployment):
             for name in files:
-                yield os.path.join(self.workspace.named_deployment, root, name)
+                yield os.path.join(root, name)
 
     def _complete(self):
+        super()._complete()
+
+        # Copy inventory files into deployment
+        self._copy_workspace_root_files(self.workspace, self.workspace.named_deployment)
+
         # Create an index.json of the deployment
         deployment_index = {self.index_namespace: []}
         for file in self._deployment_files():
@@ -718,15 +861,15 @@ class PushDeploymentPipeline(Pipeline):
                 file.replace(self.workspace.named_deployment + os.path.sep, "")
             )
         index_file = os.path.join(self.workspace.named_deployment, self.index_filename)
-        with open(index_file, "w+") as f:
-            f.write(sjson.dump(deployment_index))
+        with open(index_file, "w+", encoding="utf-8") as f:
+            f.write(json_util.dumps(deployment_index))
 
         tar_path = os.path.join(
             self.workspace.deployments_dir, self.deployment_name + self.tar_extension
         )
         if self.create_tar:
             tar = which("tar", required=True)
-            with py.path.local(self.workspace.deployments_dir).as_cwd():
+            with fs.working_dir(self.workspace.deployments_dir):
                 tar("-czf", tar_path, self.deployment_name)
 
         if self.upload_url:
@@ -753,10 +896,12 @@ class PushDeploymentPipeline(Pipeline):
 def _copy_tree(src_dir, dest_dir):
     """Copy all files in src_dir to dest_dir"""
     for root, _, files in os.walk(src_dir):
+        rel_dir = os.path.relpath(root, src_dir)
+        target_dir = os.path.join(dest_dir, rel_dir)
         for name in files:
-            src = os.path.join(src_dir, root, name)
-            dest = src.replace(src_dir, dest_dir)
-            fs.mkdirp(os.path.dirname(dest))
+            src = os.path.join(root, name)
+            dest = os.path.join(target_dir, name)
+            fs.mkdirp(target_dir)
             shutil.copyfile(src, dest)
 
 
@@ -768,23 +913,10 @@ def _upload_file(src_file, dest_file):
     fetcher.archive(dest_file)
 
 
-pipelines = Enum(
-    "pipelines",
-    [
-        AnalyzePipeline.name,
-        ArchivePipeline.name,
-        MirrorPipeline.name,
-        SetupPipeline.name,
-        PushToCachePipeline.name,
-        ExecutePipeline.name,
-        PushDeploymentPipeline.name,
-        LogsPipeline.name,
-    ],
-)
-
 _pipeline_map = {
     pipelines.analyze: AnalyzePipeline,
     pipelines.archive: ArchivePipeline,
+    pipelines.bootstrap: BootstrapPipeline,
     pipelines.mirror: MirrorPipeline,
     pipelines.setup: SetupPipeline,
     pipelines.pushtocache: PushToCachePipeline,
@@ -797,7 +929,7 @@ _pipeline_map = {
 def pipeline_class(name):
     """Factory for determining a pipeline class from its name"""
 
-    if name not in _pipeline_map.keys():
+    if name not in _pipeline_map:
         logger.die(
             f"Pipeline {name} is not valid.\n" f"Valid pipelines are {_pipeline_map.keys()}"
         )

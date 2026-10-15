@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.modkit import *
 
 
@@ -22,6 +23,10 @@ class NcclTcpxo(BasicModifier):
     mode(
         "auto", description="Auto detected shell based on config:shell setting"
     )
+    mode(
+        "ll128",
+        description="Use NCCL LL128, reduces latency for small-medium message sizes",
+    )
     default_mode("auto")
 
     def _cos_paths(self):
@@ -33,8 +38,8 @@ class NcclTcpxo(BasicModifier):
     register_builtin("source_tcpxo", injection_method="prepend")
 
     def source_tcpxo(self):
-        import ramble.util.shell_utils
         import ramble.config
+        import ramble.util.shell_utils
 
         shell = ramble.config.get("config:shell")
         source_str = ramble.util.shell_utils.source_str(shell)
@@ -74,4 +79,22 @@ class NcclTcpxo(BasicModifier):
                     "The nccl-tcpxo modifier is not currently supported for batch shell."
                 )
 
+        return cmds
+
+    register_builtin(
+        "set_ll128_env_vars",
+        injection_method="prepend",
+        depends_on=["source_tcpxo"],
+    )
+
+    def set_ll128_env_vars(self):
+        cmds = []
+        if self._usage_mode == "ll128":
+            cmds.append("NCCL_PROTO=Simple,LL128")
+            cmds.append(
+                "NCCL_TUNER_CONFIG_PATH=/var/lib/tcpxo/lib64/a3plus_tuner_config_ll128.textproto"
+            )
+            cmds.append(
+                "NCCL_SHIMNET_GUEST_CONFIG_CHECKER_CONFIG_FILE=/var/lib/tcpxo/lib64/a3plus_guest_config_ll128.textproto"
+            )
         return cmds

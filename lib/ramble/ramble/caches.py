@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,15 +7,15 @@
 # except according to those terms.
 
 """Caches used by Ramble to store data"""
+
 import os
 
 import llnl.util.lang
-from llnl.util.filesystem import mkdirp
-from llnl.util.symlink import symlink
+from llnl.util.filesystem import mkdirp, symlink
 
-import ramble.error
-import ramble.paths
 import ramble.config
+import ramble.fetch_strategy
+import ramble.paths
 import ramble.util.file_cache
 import ramble.util.path
 

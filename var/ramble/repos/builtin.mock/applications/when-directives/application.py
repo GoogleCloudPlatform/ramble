@@ -1,0 +1,423 @@
+# Copyright 2022-2026 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+import os
+
+from ramble.appkit import *
+
+
+class WhenDirectives(ExecutableApplication):
+    name = "when-directives"
+
+    executable("test_exec", "echo '{test_variable}'", use_mpi=False)
+
+    workload("test_wl", executable="test_exec")
+    workload_group("test_wl_group", workloads=["test_wl"])
+
+    with default_args(workload="test_wl"):
+        workload_variable(
+            "test_variable",
+            default="Test",
+            description="Variable to print for testing",
+        )
+
+    # For register_phase()
+    variant(
+        "register_phase_when",
+        default=False,
+        values=[True, False],
+        description="Register additional phase using when",
+    )
+
+    with when("+register_phase_when"):
+        register_phase(
+            "test_phase",
+            pipeline="setup",
+            run_before=["get_inputs"],
+        )
+
+    def _test_phase(self, workspace, app_inst):
+        print("Test Phase")
+
+    # For figure_of_merit() and figure_of_merit_context()
+    variant(
+        "register_fom_when",
+        default=False,
+        values=[True, False],
+        description="Register figure of merit using when",
+    )
+
+    variant(
+        "register_fom_context_when",
+        default=False,
+        values=[True, False],
+        description="Register figure of merit context using when",
+    )
+
+    variant(
+        "register_duplicate_name_fom_when",
+        default=False,
+        values=[True, False],
+        description="Register figure of merit context using when",
+    )
+
+    log_file = "{experiment_run_dir}/test.out"
+    always_on_fom_regex = (
+        r".*(?P<context>test always)\s+(?P<always_fom>[0-9]+\.[0-9]+)"
+    )
+    fom_context_when_regex = r"(?P<when_context>test when context)\s+(?P<when_context_fom>[0-9]+\.[0-9]+).*"
+    addtl_fom_regex = (
+        r"test when fom\s+(?P<when_fom>[0-9]+\.[0-9]+).*"
+        r"test always\s+(?P<always_when>[0-9]+)"
+    )
+
+    figure_of_merit_context(
+        "always_context", regex=always_on_fom_regex, output_format="{context}"
+    )
+
+    figure_of_merit(
+        "test_always_on_fom",
+        fom_regex=always_on_fom_regex,
+        group_name="always_fom",
+        units="",
+        log_file=log_file,
+        contexts=["always_context"],
+    )
+
+    with when("+register_fom_context_when"):
+        figure_of_merit_context(
+            "test_context_when",
+            regex=fom_context_when_regex,
+            output_format="test when",
+        )
+
+        figure_of_merit(
+            "test_fom",
+            fom_regex=fom_context_when_regex,
+            group_name="when_context_fom",
+            units="",
+            log_file=log_file,
+            contexts=["test_context_when"],
+        )
+
+        figure_of_merit(
+            "test_always_on_fom",
+            fom_regex=addtl_fom_regex,
+            group_name="always_when",
+            units="integer",
+            log_file=log_file,
+            contexts=["test_context_when"],
+        )
+
+    with when("+register_fom_when"):
+        figure_of_merit(
+            "test_fom_when",
+            fom_regex=addtl_fom_regex,
+            group_name="when_fom",
+            units="",
+            log_file=log_file,
+            contexts=["test_context_when"],
+        )
+
+    # For success_criteria()
+    variant(
+        "success_criteria_when",
+        default=False,
+        values=[True, False],
+        description="Register success criteria using when",
+    )
+
+    success_criteria(
+        "test_success_criteria_when",
+        mode="string",
+        match=r".*THIS TEXT NOT IN OUT FILE.*",
+        when=["+success_criteria_when"],
+    )
+
+    # For register_template()
+    variant(
+        "register_template_when",
+        default=False,
+        values=[True, False],
+        description="Register template using when",
+    )
+
+    register_template(
+        "test_template_when",
+        src_path="$workspace_shared/test_template.tpl",
+        dest_path="test_template",
+        when=["+register_template_when"],
+    )
+
+    # For register_builtin()
+    variant(
+        "register_builtin_when",
+        default=False,
+        values=[True, False],
+        description="Register builtin using when",
+    )
+
+    register_builtin(
+        "test_builtin_when", required=True, when=["+register_builtin_when"]
+    )
+
+    def test_builtin_when(self):
+        return ['echo "when-builtin"']
+
+    # For archive_pattern()
+    variant(
+        "archive_pattern_when",
+        default=False,
+        values=[True, False],
+        description="Register archive pattern using when",
+    )
+
+    with when("+archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_true.txt")
+
+    with when("~archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_false.txt")
+
+    # For executable()
+    variant(
+        "executable_when",
+        default=False,
+        values=[True, False],
+        description="Register executable using when",
+    )
+
+    variant(
+        "executable_error_when",
+        default=False,
+        values=[True, False],
+        description="Register executable with overlapping when condition",
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'executable version1'",
+        use_mpi=False,
+        when=["~executable_when"],
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'executable version2'",
+        use_mpi=False,
+        when=["+executable_when"],
+    )
+
+    executable(
+        "test_exec_skipped",
+        "echo 'skipped-executable'",
+        use_mpi=False,
+        when=["+executable_when"],
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'this should error when active",
+        use_mpi=False,
+        when=["+executable_error_when"],
+    )
+
+    workload(
+        "exec_when_wl",
+        executables=["test_exec", "test_exec_skipped", "test_exec_def_when"],
+    )
+
+    # for input_file()
+    cwd = os.getcwd()
+    variant(
+        "input_when",
+        default=False,
+        values=[True, False],
+        description="Add input file using when",
+    )
+
+    input_file(
+        "test-input1",
+        url=f"file://{cwd}/input1_false",
+        description="Test input when false",
+        when=["~input_when"],
+    )
+
+    input_file(
+        "test-input1",
+        url=f"file://{cwd}/input1_true",
+        expand=False,
+        description="Test input when true",
+        when=["+input_when"],
+    )
+
+    input_file(
+        "test-input2",
+        url=f"file://{cwd}/input2",
+        expand=False,
+        description="Test input skipped when false",
+        when=["+input_when"],
+    )
+
+    workload(
+        "test_inputs_wl",
+        executables=["test_exec"],
+        inputs=["test-input1", "test-input2"],
+    )
+
+    # for workload()
+    variant(
+        "workload_enabled_when",
+        default=False,
+        values=[True, False],
+        description="Enable workload using when",
+    )
+
+    workload(
+        "test_workload_enabled_when",
+        executables=["test_exec"],
+        when=["+workload_enabled_when"],
+    )
+
+    variant(
+        "workload_definition_when",
+        default=False,
+        values=[True, False],
+        description="Workload definition changes using when",
+    )
+
+    workload(
+        "test_workload_definition_when",
+        executables=["test_exec"],
+        when=["~workload_definition_when"],
+    )
+
+    workload(
+        "test_workload_definition_when",
+        executables=["test_exec_def_when"],
+        when=["+workload_definition_when"],
+    )
+
+    variant(
+        "workload_defined_twice",
+        default=False,
+        values=[True, False],
+        description="Errors when workload has overlapping when conditions",
+    )
+
+    workload(
+        "test_wl",
+        executables=["test_exec"],
+        when=["+workload_defined_twice"],
+    )
+
+    # for workload_group()
+    variant(
+        "workload_group_options",
+        default="group1",
+        values=["group1", "group2"],
+        description="Workload group options",
+    )
+
+    with when("workload_group_options=group1"):
+        executable("test_exec2", "echo '{test_variable2}'", use_mpi=False)
+
+        workload(
+            "test_wl2",
+            executables=["test_exec2"],
+        )
+        workload_group("all_workloads", workloads=["test_wl", "test_wl2"])
+        workload_group("active_group", workloads=["test_wl"])
+
+        workload_variable(
+            "test_variable2",
+            default="Var2",
+            description="This is variable 2",
+            workload_group="all_workloads",
+        )
+
+        environment_variable(
+            "APP_ENV_VAR2",
+            value="TEST_WL2_ENV_VAR",
+            description="Test app environment variable",
+            workload_group="all_workloads",
+        )
+
+    with when("workload_group_options=group2"):
+        executable("test_exec3", "echo '{test_variable3}'", use_mpi=False)
+
+        workload(
+            "test_wl3",
+            executables=["test_exec3"],
+        )
+        workload_group("all_workloads", workloads=["test_wl", "test_wl3"])
+        workload_group("active_group", workloads=["test_wl2"])
+
+        workload_variable(
+            "test_variable3",
+            default="Var3",
+            description="This is variable 3",
+            workload_group="all_workloads",
+        )
+
+        environment_variable(
+            "APP_ENV_VAR3",
+            value="TEST_WL3_ENV_VAR",
+            description="Test app environment variable",
+            workload_group="all_workloads",
+        )
+
+    variant(
+        "app_env_var_included",
+        default=False,
+        values=[True, False],
+        description="Test app object env variable",
+    )
+
+    with when("+app_env_var_included"):
+        environment_variable(
+            "APP_ENV_VAR",
+            value="APP_ENV_VAR_SET",
+            description="Test app environment variable",
+            workload_group="test_wl_group",
+        )
+
+    with when("workload_group=active_group"):
+        environment_variable(
+            "GROUP_VARIANT_ENV_VAR",
+            value="TEST_WL_GROUP_SET",
+            description="Test app environment variable with workload_group variant",
+            workload="test_wl",
+        )
+
+    variant(
+        "app_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_app_required_variable",
+        results_level="variable",
+        description="Test required variable",
+        when=["+app_required_variable"],
+    )
+
+    variant(
+        "app_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_app_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+app_required_key"],
+    )

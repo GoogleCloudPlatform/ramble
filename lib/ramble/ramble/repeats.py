@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -24,10 +24,10 @@ class Repeats:
         """Set if this instance will use repeats
 
         Args:
-            is_repeat_base (Bool): True if this is the base experiment of a repeat set,
-                                   False for singletons and for repeats
-            n_repeats (Int): 0 for singletons and repeats, positive integer for base
-                             experiment
+            is_repeat_base (bool): True if this is the base experiment of a
+                repeat set, False for singletons and for repeats
+            n_repeats (int): 0 for singletons and repeats, positive integer for
+                base experiment
         """
         if (is_repeat_base and n_repeats > 0) or (not is_repeat_base and n_repeats == 0):
             self.is_repeat_base = is_repeat_base

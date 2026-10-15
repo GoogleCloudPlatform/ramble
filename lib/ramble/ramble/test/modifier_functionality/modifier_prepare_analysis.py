@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,11 +11,10 @@ import re
 
 import pytest
 
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
-
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
+from ramble.test.modifier_functionality import modifier_helpers
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
@@ -33,16 +32,14 @@ on_cmd = RambleCommand("on")
     ],
 )
 def test_basic_dry_run_mock_prepare_analysis_mod(
-    mutable_mock_workspace_path, mock_applications, mock_modifiers, scope
+    mutable_mock_workspace_path, mock_applications, mock_modifiers, scope, workspace_name
 ):
-    workspace_name = "test_basic_dry_run_mock_prepare_analysis_mod"
-
     test_modifiers = [(scope, modifier_helpers.named_modifier("prepare-analysis"))]
 
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config(
             "modifiers", test_modifiers, config_path, "basic", "working_wl", batch_cmd=""
@@ -58,8 +55,8 @@ def test_basic_dry_run_mock_prepare_analysis_mod(
 
         expected_regex = re.compile(".*This test worked")
         found_str = False
-        with open(os.path.join(ws1.root, "results.latest.txt")) as f:
-            for line in f.readlines():
+        with open(os.path.join(ws1.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+            for line in f:
                 if expected_regex.match(line):
                     found_str = True
 

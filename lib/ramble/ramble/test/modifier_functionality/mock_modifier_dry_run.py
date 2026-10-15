@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,12 +10,11 @@ import os
 
 import pytest
 
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
-from ramble.modifier import InvalidModeError
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError, InvalidModeError
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
+from ramble.test.modifier_functionality import modifier_helpers
 
 workspace = RambleCommand("workspace")
 
@@ -38,9 +37,8 @@ def test_gromacs_dry_run_mock_mods(
     mock_modifiers,
     scope,
     modifier_mode,
+    workspace_name,
 ):
-    workspace_name = "test_gromacs_dry_run_mock_mods"
-
     test_modifiers = [
         (scope, modifier_helpers.named_modifier(mock_modifier, modifier_mode)),
     ]
@@ -56,16 +54,18 @@ def test_gromacs_dry_run_mock_mods(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
         ws1._re_read()
 
         if modifier_mode != "disabled" and mock_modifier in expected_failures:
-            with pytest.raises(expected_failures[mock_modifier]["error"]) as err:
+            with pytest.raises(
+                expected_failures[mock_modifier]["error"],
+                match=expected_failures[mock_modifier]["msg"],
+            ):
                 workspace("concretize", global_args=["-D", ws1.root])
-                assert expected_failures[mock_modifier]["msg"] in err
         else:
             workspace("concretize", global_args=["-D", ws1.root])
             workspace("setup", "--dry-run", global_args=["-D", ws1.root])

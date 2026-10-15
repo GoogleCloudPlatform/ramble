@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -107,6 +107,8 @@ Ramble creates workspaces using the following structure by default:
     |   | - ramble.yaml
     |   | - execute_experiment.tpl
     |   | - auxiliary_software_files/
+    | - shared/
+    |   | - utilities/
     | - experiments/
     | - inputs/
     | - logs/
@@ -116,6 +118,7 @@ Ramble creates workspaces using the following structure by default:
 This various parts of this directory structure are defined as:
   * ``configs/``: Contain configuration for the workspace
   * ``configs/auxiliary_software_files``: Contain files used by the package managers
+  * ``shared/utilities``: Contain ramble-generated workspace utilities
   * ``experiments/``: Contain experiments define by the workspace configuration
   * ``inputs``: Contain the inputs experiments in this workspace require
   * ``logs``: Contain some logging output from ramble
@@ -178,6 +181,30 @@ will activate a workspace until it is deactivated, while
 
 will activate a workspace for the specific command.
 
+To indicate the activated workspace, an option ``-p`` can be supplied to the ``activate`` command.
+This updates the shell prompt to display the name of the currently active workspace.
+
+.. code-block:: console
+
+    $ ramble workspace activate -p <name_or_path>
+
+Alternatively, a config ``enable_workspace_prompt`` exists, to allow controlling for this behavior
+at the desired configuration granularity.
+
+.. code-block:: console
+
+    $ ramble config add 'config:enable_workspace_prompt:true'
+
+
+A filter group can also be persistently activated for a workspace session by passing the ``-fg`` / ``--filter-group`` flag to the ``activate`` command:
+
+.. code-block:: console
+
+    $ ramble workspace activate <workspace_name> -fg small-scale
+
+This will export the ``RAMBLE_ACTIVE_FILTER_GROUP`` environment variable to the shell, which will be used by subsequent workspace commands as the default filter group. Deactivating the workspace will unset this variable.
+
+
 ------------------------------
 Printing Workspace Information
 ------------------------------
@@ -219,6 +246,84 @@ as well as unused experiment templates, one can use:
 Note: This command will also remove comments within the edited section
 of the workspace config file.
 
+.. _workspace-manage:
+
+------------------------
+Workspace Manage
+------------------------
+
+In addition to helping you automatically define software for your applications,
+ramble also offers a CLI interface to more finely control various aspects of
+the workspace configuration -- ``ramble workspace manage``.
+
+Specifically, this command can help you populate values in the ramble.yaml for:
+  * Experiment definitions
+  * Software definitions
+  * Workspace includes
+  * Workspace modifiers
+
+These can be combined over multiple invocations to express very powerful
+experiment configurations. The options are extensive, and are thus not covered
+here but users are invited to experiment and pass the ``-h`` for more
+information.
+
+Advanced options like ``--workflow-manager`` and ``--package-manager`` can be
+used to set key variable variants to quickly invoke additional core ramble
+features, and the intended user for this feature is both automation and human
+users alike.
+
+Below are some examples that can be used as starting points:
+
+.. code-block:: console
+
+    $ ramble workspace manage experiments <application_name>
+
+This command populates a workspace with default experiments and workloads for a
+given application, including setting default values for key variables. When
+paired with ``ramble workspace concretize`` it can quickly allow a user to
+generate a functioning workspace.
+
+In cases where a user wants to specify software that is different to the output
+of concretize, the following gives a easy and repeatable way to fine tune the
+selection. If for example you wanted to update a specific package to a
+different version, one may type:
+
+.. code-block:: console
+
+    $ ramble workspace manage software --pkg gcc14 --package-spec gcc@14.2.0 --overwrite
+
+This would update the software package definition names ``gcc14`` to have a new package spec.
+
+Modifiers can be applied to various levels of a workspace configuration. To
+simplify the workflow around adding and removing modifiers from a set of
+experiments, users can use the following commands:
+
+.. code-block:: console
+
+  $ ramble workspace manage modifiers --list
+  $ ramble workspace manage modifiers --add -s workspace -n lscpu
+  $ ramble workspace manage modifiers --remove -s workspace -n lscpu
+
+When performing the ``--remove`` action, the scope argument (``-s``) on these
+commands has a robust syntax that allows users to specify various scopes within
+a workspace (``workspace``, ``application``, ``application:workload``, or
+``application:workload:experiment``).
+
+Finally, ``ramble workspace manage includes`` can be used to quickly and easy
+add includes when using a hierarchical workspace.
+
+Filter groups can also be managed via the CLI using the ``ramble workspace manage filter-groups`` subcommand:
+
+.. code-block:: console
+
+  $ ramble workspace manage filter-groups add -n small-scale --where "{n_nodes} < 4"
+  $ ramble workspace manage filter-groups remove -n small-scale
+  $ ramble workspace manage filter-groups list
+  $ ramble workspace manage filter-groups blame
+
+These commands allow adding, removing, listing, and viewing the sources (blame) of filter groups within the active workspace.
+
+
 ---------------------
 Workspace Deployments
 ---------------------
@@ -226,7 +331,7 @@ Workspace Deployments
 A deployment is one mechanism of transferring a configured workspace from one
 location to another. Ramble provides commands to handle creating (and pushing)
 a deployment from a local workspace to a remote location, or pulling a
-deployment from a remote location into a local workspace. 
+deployment from a remote location into a local workspace.
 
 A deployment is a directory that contains the necessary artifacts required to
 recreate the experiments in the workspace on a separate machine. Deployments
@@ -371,10 +476,12 @@ Filtering Experiments
 Several of the workspace commands support filtering the experiments they should
 act on. This can be performed using the ``--where`` argument for inclusive
 filtering, the ``--exclude-where`` argument for exclusive filtering, or the
-``--filter-tags`` argument to filter based on experiment tags.. These arguments
+``--filter-tags`` argument to filter based on experiment tags. These arguments
 take a string representing a logical expression, which can use variables the
-experiment would define. If the logical expression evaluates to true, the
-experiment will be included or excluded for action (respectively).
+experiment would define. The expression can use any of the logical and mathematical
+operators supported by Ramble variables (see :ref:`ramble-supported-functions`).
+If the logical expression evaluates to true, the experiment will be included or
+excluded for action (respectively).
 
 As an example:
 
@@ -421,7 +528,7 @@ the installation and generate software environments for each experiment.
 
 As an example, if the applications and workspace configuration file provide a
 configuration for Spack, Ramble will generate
-`Spack environments<https://spack.readthedocs.io/en/latest/environments.html>`_.
+`Spack environments <https://spack.readthedocs.io/en/latest/environments.html>`_.
 
 By default, Ramble uses the following format for creating a spack environment file:
 

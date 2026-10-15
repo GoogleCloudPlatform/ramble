@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -19,29 +20,29 @@ class QuantumEspresso(ExecutableApplication):
     maintainers("douglasjacobsen")
 
     tags(
-        "electronic-structure",
-        "materials",
+        "quantum-chemistry",
+        "materials-science",
         "dft",
-        "density-functional-theory",
-        "plane-waves",
-        "pseudopotentials",
+        "plane-wave",
+        "pseudopotential",
     )
 
-    define_compiler("gcc13", pkg_spec="gcc@13.1.0", package_manager="spack*")
+    version("7.1", "Version 7.1 of Quantum-Espresso", preferred=True)
 
-    software_spec(
-        "impi2021p8",
-        pkg_spec="intel-oneapi-mpi@2021.8.0",
-        package_manager="spack*",
-    )
-    software_spec(
-        "quantum-espresso",
-        pkg_spec="quantum-espresso@7.1",
-        compiler="gcc13",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc13", pkg_spec="gcc@13.1.0")
 
-    required_package("quantum-espresso", package_manager="spack*")
+        software_spec(
+            "impi2021p8",
+            pkg_spec="intel-oneapi-mpi@2021.8.0",
+        )
+        software_spec(
+            "quantum-espresso-{application::quantum-espresso::version}",
+            pkg_spec="quantum-espresso@{application::quantum-espresso::version}",
+            compiler="gcc13",
+        )
+
+        required_package("quantum-espresso")
 
     input_file(
         "AUSURF112",
@@ -102,62 +103,28 @@ class QuantumEspresso(ExecutableApplication):
         description="O Pseudopotential for WATER_EXX benchmark",
     )
 
-    executable(
-        "copy_inputs",
-        "cp "
-        + os.path.join(Expander.expansion_str("input_path"), "*")
-        + " "
-        + os.path.join(Expander.expansion_str("experiment_run_dir"), "."),
-        use_mpi=False,
+    stage_files(
+        name="copy_inputs",
+        src=os.path.join(Expander.expansion_str("input_path"), "*"),
+        dst=os.path.join(Expander.expansion_str("experiment_run_dir"), "."),
     )
-    executable(
-        "copy_potential1",
-        template=[
-            "mkdir -p {experiment_run_dir}/pseudo",
-            "cp {potential1} {experiment_run_dir}/pseudo/.",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="copy_potential1",
+        src="{potential1}",
+        dst="{experiment_run_dir}/pseudo/.",
     )
-    executable(
-        "copy_potential2",
-        template=[
-            "mkdir -p {experiment_run_dir}/pseudo",
-            "cp {potential2} {experiment_run_dir}/pseudo/.",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="copy_potential2",
+        src="{potential2}",
+        dst="{experiment_run_dir}/pseudo/.",
     )
 
     executable("execute", "pw.x {flags} < {input_file}", use_mpi=True)
 
     workload_names = ["AUSURF112", "CNT10POR8", "GRIR443", "GRIR686", "PSIWAT"]
-    input_files = [
-        "ausurf.in",
-        "pw.in",
-        "grir443.in",
-        "grir686.in",
-        "psiwat.in",
-    ]
-    for wl_name, input_file in zip(workload_names, input_files):
+    for wl_name in workload_names:
         workload(
             wl_name, executables=["copy_inputs", "execute"], inputs=[wl_name]
-        )
-        workload_variable(
-            "input_path",
-            default=Expander.expansion_str(wl_name),
-            description="Path to inputs for " + wl_name + " workload",
-            workloads=[wl_name],
-        )
-        workload_variable(
-            "input_file",
-            default=input_file,
-            description="Name of input file for " + wl_name + " workload",
-            workloads=[wl_name],
-        )
-        workload_variable(
-            "flags",
-            default="",
-            description="Flags for Quantum Espresso",
-            workloads=[wl_name],
         )
 
     workload(
@@ -165,12 +132,41 @@ class QuantumEspresso(ExecutableApplication):
         executables=["copy_potential1", "copy_potential2", "execute"],
         inputs=["WATER_EXX", "WATER_EXX_H", "WATER_EXX_O"],
     )
+
+    workload_group("all_benchmarks", workloads=workload_names + ["WATER_EXX"])
+
+    workload_variable(
+        "flags",
+        default="",
+        description="Flags for Quantum Espresso",
+        workload_group="all_benchmarks",
+    )
+
+    workload_variable(
+        "input_path",
+        description="Path to inputs for workload",
+        workload_defaults={
+            "AUSURF112": "{AUSURF112}",
+            "CNT10POR8": "{CNT10POR8}",
+            "GRIR443": "{GRIR443}",
+            "GRIR686": "{GRIR686}",
+            "PSIWAT": "{PSIWAT}",
+        },
+    )
+
     workload_variable(
         "input_file",
-        default=Expander.expansion_str("WATER_EXX"),
-        description="Path to WATER_EXX input",
-        workloads=["WATER_EXX"],
+        description="Name of input file for workload",
+        workload_defaults={
+            "AUSURF112": "ausurf.in",
+            "CNT10POR8": "pw.in",
+            "GRIR443": "grir443.in",
+            "GRIR686": "grir686.in",
+            "PSIWAT": "psiwat.in",
+            "WATER_EXX": "{WATER_EXX}",
+        },
     )
+
     workload_variable(
         "potential1",
         default=Expander.expansion_str("WATER_EXX_H"),
@@ -184,17 +180,10 @@ class QuantumEspresso(ExecutableApplication):
         workloads=["WATER_EXX"],
     )
 
-    workload_variable(
-        "flags",
-        default="",
-        description="Flags for Quantum Espresso",
-        workloads=["WATER_EXX"],
-    )
-
     log_str = Expander.expansion_str("log_file")
     figure_of_merit(
         "Total CPU time",
-        fom_regex=r"\s*total cpu time spent up to now is\s+(?P<time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*total cpu time spent up to now is\s+(?P<time>[0-9]+\.[0-9]+)",
         group_name="time",
         log_file=log_str,
         units="s",
@@ -202,7 +191,7 @@ class QuantumEspresso(ExecutableApplication):
 
     figure_of_merit(
         "Estimated SCF accuracy",
-        fom_regex=r"\s*estimated scf accuracy\s+<\s+(?P<energy>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*estimated scf accuracy\s+<\s+(?P<energy>[0-9]+\.[0-9]+)",
         group_name="energy",
         log_file=log_str,
         units="Ry",
@@ -210,7 +199,7 @@ class QuantumEspresso(ExecutableApplication):
 
     profile_regex = (
         r"\s+(?P<section>[\w:]+)\s+:\s+(?P<cpu>[0-9]+\.[0-9]+)s CPU\s+"
-        + r"(?P<wall>[0-9]+\.[0-9]+)s WALL \(\s+(?P<calls>[0-9]+) calls\).*"
+        + r"(?P<wall>[0-9]+\.[0-9]+)s WALL \(\s+(?P<calls>[0-9]+) calls\)"
     )
     figure_of_merit_context(
         "Profile section", regex=profile_regex, output_format="{section}"
@@ -244,5 +233,5 @@ class QuantumEspresso(ExecutableApplication):
     )
 
     success_criteria(
-        "job_done", mode="string", match=r".*JOB DONE\..*", file=log_str
+        "job_done", mode="string", match=r".*?JOB DONE\.", file=log_str
     )

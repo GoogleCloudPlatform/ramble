@@ -1,0 +1,58 @@
+# Workflow for running Ramble unit tests on MacOS
+# This serves as a quick check to ensure Ramble works on the platform
+name: macOS Compatibility Tests
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'lib/ramble/**'
+      - 'bin/**'
+      - 'var/ramble/repos/**'
+      - 'requirements*.txt'
+      - 'pyproject*.toml'
+      - '.github/workflows/macos-tests.yaml'
+permissions:
+  contents: read
+jobs:
+  macos-tests:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'requirements*.txt'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-pinned.txt
+
+      - name: Clone the latest Spack
+        run: |
+          git clone --depth 1 https://github.com/spack/spack.git ../spack
+
+      - name: Verify Environment
+        run: |
+          . share/ramble/setup-env.sh
+          echo "RAMBLE_ROOT=$RAMBLE_ROOT"
+          python --version
+          ramble python --version
+          . ../spack/share/spack/setup-env.sh
+          spack --version
+
+      - name: Run Unit Tests
+        run: |
+          . share/ramble/setup-env.sh
+          . ../spack/share/spack/setup-env.sh
+          # Exclude slow tests
+          ramble unit-test --fast -n auto

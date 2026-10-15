@@ -42,9 +42,8 @@ import traceback
 import types
 
 import llnl.util.tty as tty
-from llnl.util.filesystem import install, install_tree, mkdirp
+from llnl.util.filesystem import install, install_tree, mkdirp, symlink
 from llnl.util.lang import dedupe
-from llnl.util.symlink import symlink
 from llnl.util.tty.color import cescape, colorize
 from llnl.util.tty.log import MultiProcessFd
 
@@ -75,7 +74,6 @@ from spack.util.environment import (
     validate,
 )
 from spack.util.executable import Executable
-from spack.util.log_parse import make_log_context, parse_log_events
 from spack.util.module_cmd import load_module, module, path_from_modules
 from spack.util.string import plural
 
@@ -1388,27 +1386,4 @@ def _make_stop_phase(msg, long_msg):
 
 
 def write_log_summary(out, log_type, log, last=None):
-    errors, warnings = parse_log_events(log)
-    nerr = len(errors)
-    nwar = len(warnings)
-
-    if nerr > 0:
-        if last and nerr > last:
-            errors = errors[-last:]
-            nerr = last
-
-        # If errors are found, only display errors
-        out.write(
-            "\n%s found in %s log:\n" %
-            (plural(nerr, 'error'), log_type))
-        out.write(make_log_context(errors))
-    elif nwar > 0:
-        if last and nwar > last:
-            warnings = warnings[-last:]
-            nwar = last
-
-        # If no errors are found but warnings are, display warnings
-        out.write(
-            "\n%s found in %s log:\n" %
-            (plural(nwar, 'warning'), log_type))
-        out.write(make_log_context(warnings))
+    raise NotImplementedError("Log summary parsing is not supported in Ramble's vendored Spack")

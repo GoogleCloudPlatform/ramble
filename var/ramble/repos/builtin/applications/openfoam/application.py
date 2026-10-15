@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-
 from ramble.base_app.builtin.openfoam import Openfoam as OpenfoamBase
 
 
@@ -18,20 +17,23 @@ class Openfoam(OpenfoamBase):
 
     maintainers("douglasjacobsen")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    version("2312", "Version 2312 of Openfoam", preferred=True)
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-    software_spec(
-        "openfoam",
-        pkg_spec="openfoam@2312",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
 
-    required_package("openfoam", package_manager="spack*")
+        software_spec(
+            "openfoam-{application::openfoam::version}",
+            pkg_spec="openfoam@{application::openfoam::version}",
+            compiler="gcc14",
+        )
+
+        required_package("openfoam")
 
     executable(
         "surfaceFeatures",
@@ -40,18 +42,11 @@ class Openfoam(OpenfoamBase):
         redirect="{experiment_run_dir}/log.surfaceFeatures",
     )
 
-    executable(
-        "get_inputs",
-        template=[
-            "cp -Lr {input_path}/* {experiment_run_dir}/.",
-            "mkdir -p constant/triSurface",
-            "mkdir -p constant/geometry",
-            "cp {geometry_path} constant/triSurface/.",
-            "cp {geometry_path} constant/geometry/.",
-            "cp system/decomposeParDict.* system/decomposeParDict",
-            "ln -sf {experiment_run_dir}/0.orig {experiment_run_dir}/0",
-        ],
-        use_mpi=False,
+    stage_files(name="stage_0", src="0.orig", dst="0")
+    stage_files(
+        name="stage_0",
+        src="system/decomposeParDict.*",
+        dst="system/decomposeParDict",
     )
 
     workload_variable(

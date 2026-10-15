@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,12 +8,13 @@
 
 import os
 
+import llnl.util.filesystem as fs
+
+from ramble.base_mod.builtin.container_base import ContainerBase
 from ramble.modkit import *
 from ramble.util.hashing import hash_file, hash_string
-from spack.util.path import canonicalize_path
-from ramble.base_mod.builtin.container_base import ContainerBase
 
-import llnl.util.filesystem as fs
+from spack.util.path import canonicalize_path
 
 
 class PyxisEnroot(ContainerBase):
@@ -195,13 +196,13 @@ class PyxisEnroot(ContainerBase):
             )
 
             if os.path.exists(hash_file_path):
-                with open(hash_file_path) as f:
+                with open(hash_file_path, encoding="utf-8") as f:
                     container_hash = f.read()
 
             else:
                 container_hash = hash_file(container_path)
 
-                with open(hash_file_path, "w+") as f:
+                with open(hash_file_path, "w+", encoding="utf-8") as f:
                     f.write(container_hash)
 
             inventory.append(

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,32 +6,36 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import datetime
 import os
 
+from ramble.experiment_result import ExperimentStatus
+from ramble.util import shell_utils
 from ramble.wmkit import *
-from ramble.application import experiment_status
 
-from spack.util.executable import ProcessError
+from spack.util.executable import (
+    CommandNotFoundError,
+    Executable,
+    ProcessError,
+)
 
 # Mapping from squeue/sacct status to Ramble status
 _STATUS_MAP = {
-    "PD": "SUBMITTED",
-    "R": "RUNNING",
-    "CF": "SETUP",
-    "CG": "COMPLETE",
-    "COMPLETED": "COMPLETE",
-    "CANCELLED": "CANCELLED",
-    "CANCELLED+": "CANCELLED",
-    "FAILED": "FAILED",
+    "PD": ExperimentStatus.SUBMITTED,
+    "R": ExperimentStatus.RUNNING,
+    "CF": ExperimentStatus.SETUP,
+    # Regard completing as complete
+    "CG": ExperimentStatus.COMPLETE,
+    "COMPLETING": ExperimentStatus.COMPLETE,
+    "CA": ExperimentStatus.COMPLETE,
+    "COMPLETED": ExperimentStatus.COMPLETE,
+    "CANCELLED": ExperimentStatus.CANCELLED,
+    "CANCELLED+": ExperimentStatus.CANCELLED,
+    "F": ExperimentStatus.FAILED,
+    "FAILED": ExperimentStatus.FAILED,
+    "TO": ExperimentStatus.TIMEOUT,
+    "TIMEOUT": ExperimentStatus.TIMEOUT,
 }
-
-
-def _declare_status_map():
-    """A utility to convert the `_STATUS_MAP` into a bash array"""
-    entries = ["declare -A status_map"]
-    for k, v in _STATUS_MAP.items():
-        entries.append(f'status_map["{k}"]="{v}"')
-    return "\n".join(entries)
 
 
 class Slurm(WorkflowManagerBase):
@@ -43,6 +47,8 @@ class Slurm(WorkflowManagerBase):
 
     tags("workflow", "slurm")
 
+    workflow_manager_family("slurm")
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
@@ -53,8 +59,8 @@ class Slurm(WorkflowManagerBase):
         default="""# ****************************************************
 # * Workflow manager: slurm
 # * Execution script is: {slurm_experiment_sbatch}
-# * If this file is not the same as the above path, it is unlikely that this script
-# * is used when `ramble on` executes experiments.
+# * Note: `execute_experiment` is sourced by the execution script.
+# * Do not add `#SBATCH` headers to `execute_experiment`, as they will be ignored.
 # ****************************************************
 """,
         description="Banner to describe the workflow within execution templates",
@@ -110,6 +116,13 @@ class Slurm(WorkflowManagerBase):
         "The path can contain workspace path variables such as $workspace_config.",
     )
 
+    variant(
+        "slurm_include_default_sbatch_headers",
+        default=True,
+        values=[True, False],
+        description="Whether a set of default headers (such as #SBATCH --exclusive) should be included",
+    )
+
     register_template(
         name="batch_submit",
         src_path="batch_submit.tpl",
@@ -137,7 +150,11 @@ class Slurm(WorkflowManagerBase):
         name="batch_query",
         src_path="batch_query.tpl",
         dest_path="batch_query",
-        extra_vars={"declare_status_map": _declare_status_map()},
+        extra_vars={
+            "declare_status_map": shell_utils.gen_dict_definition(
+                var_name="status_map", dict=_STATUS_MAP
+            )
+        },
     )
 
     register_template(
@@ -157,53 +174,198 @@ class Slurm(WorkflowManagerBase):
         src_path="{slurm_execute_template_path}",
     )
 
+    register_template(
+        name="batch_helpers",
+        src_path="batch_helpers.tpl",
+        dest_path="batch_helpers",
+    )
+
+    archive_pattern("{experiment_run_dir}/.slurm_*")
+
+    @property
     def template_render_vars(self):
-        vars = {}
-        expander = self.app_inst.expander
+        app_inst = self.app_inst
+        expander = app_inst.expander
         # Adding pre-defined and custom headers
         pragmas = [
-            ("#SBATCH -N {n_nodes}"),
-            ("#SBATCH --ntasks-per-node {processes_per_node}"),
-            ("#SBATCH -J {job_name}"),
-            ("#SBATCH -o {experiment_run_dir}/slurm-%j.out"),
-            ("#SBATCH -e {experiment_run_dir}/slurm-%j.err"),
-            ("#SBATCH --gpus-per-node {gpus_per_node}"),
+            "#SBATCH -N {n_nodes}",
+            "#SBATCH -J {job_name}",
+            "#SBATCH -o {experiment_run_dir}/slurm-%j.out",
+            "#SBATCH -e {experiment_run_dir}/slurm-%j.err",
         ]
+        if expander.satisfies(
+            "+slurm_include_default_sbatch_headers",
+            variant_set=app_inst.experiment_variants(),
+        ):
+            pragmas.extend(
+                [
+                    "#SBATCH --ntasks-per-node {processes_per_node}",
+                    "#SBATCH --gpus-per-node {gpus_per_node}",
+                    "#SBATCH --exclusive",
+                ]
+            )
         partition = expander.expand_var_name("slurm_partition")
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
-        extra_headers = (
-            self.app_inst.variables["extra_sbatch_headers"].strip().split("\n")
-        )
-        pragmas = pragmas + extra_headers
+        extra_headers = expander.expand_var_name(
+            "extra_sbatch_headers"
+        ).strip()
+        if extra_headers:
+            pragmas.extend(extra_headers.splitlines())
         header_str = "\n".join(self.conditional_expand(pragmas))
         return {
-            **vars,
             "workflow_pragmas": header_str,
             "workflow_hostfile_cmd": self.runner.get_hostfile_cmd(),
         }
+
+    def _get_job_termination_overhead(self):
+        # Get the duration between script end time and job termination time.
+        run_dir = self.app_inst.expander.experiment_run_dir
+        end_time_file = os.path.join(run_dir, ".slurm_script_end_time")
+        job_id_file = os.path.join(run_dir, ".slurm_job")
+        if not (os.path.isfile(end_time_file) and os.path.isfile(job_id_file)):
+            return
+        try:
+            with open(end_time_file, encoding="utf-8") as f:
+                script_end_time = float(f.read().strip())
+
+            with open(job_id_file, encoding="utf-8") as f:
+                job_id = f.read().strip()
+            if not job_id:
+                logger.warn(f"Job ID file {job_id_file} is empty")
+                return
+
+            sacct_cmd = Executable("sacct")
+            job_end_time_str = sacct_cmd(
+                "-j", job_id, "-X", "-n", "--format=End", output=str
+            ).strip()
+            # sacct by default reports timestamp in local timezone
+            job_end_time = datetime.datetime.strptime(
+                job_end_time_str, "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+            duration = int(job_end_time - script_end_time)
+        except (ProcessError, ValueError, OSError, CommandNotFoundError) as e:
+            logger.warn(f"Failed to get job end time with error {e}")
+        else:
+            fom_key = "slurm-job-termination-overhead"
+            self.figure_of_merit(
+                "job-termination-overhead", units="s", fom_map_key=fom_key
+            )
+            self.add_inmem_fom_value(fom_key, duration)
+
+    def _prepare_analysis(self, workspace):
+        if workspace.dry_run:
+            return
+        expander = self.app_inst.expander
+        query_script = expander.expand_var_name("batch_query")
+        query_cmd = Executable(query_script)
+        try:
+            query_cmd(output=os.devnull)
+        except (ProcessError, OSError) as e:
+            # Only log a warning as this is not considered a critical step
+            logger.warn(f"batch_query returns error {e}")
+        self._get_job_termination_overhead()
 
     def get_status(self, workspace):
         expander = self.app_inst.expander
         run_dir = expander.expand_var_name("experiment_run_dir")
         job_id_file = os.path.join(run_dir, ".slurm_job")
-        status = experiment_status.UNRESOLVED
         if not os.path.isfile(job_id_file):
             logger.warn("job_id file is missing")
-            return status
-        with open(job_id_file) as f:
-            job_id = f.read().strip()
+            return ExperimentStatus.UNRESOLVED
+        try:
+            with open(job_id_file, encoding="utf-8") as f:
+                job_id = f.read().strip()
+        except OSError as e:
+            logger.warn(f"Failed to read job_id file {job_id_file}: {e}")
+            return ExperimentStatus.UNRESOLVED
+        if not job_id:
+            logger.warn(f"job_id file {job_id_file} is empty")
+            return ExperimentStatus.UNRESOLVED
+
         self.runner.set_dry_run(workspace.dry_run)
         wm_status_raw = self.runner.get_status(job_id)
-        wm_status = _STATUS_MAP.get(wm_status_raw)
-        if wm_status is not None and hasattr(experiment_status, wm_status):
-            status = getattr(experiment_status, wm_status)
-        if status == experiment_status.UNRESOLVED:
+        status = _STATUS_MAP.get(wm_status_raw, ExperimentStatus.UNRESOLVED)
+        if status == ExperimentStatus.UNRESOLVED:
             logger.warn(
                 f"The slurm workflow manager failed to resolve the status of job {job_id}. "
                 "Enable debug mode (`ramble -d`) for more detailed error messages."
             )
         return status
+
+    # Extract some job-related FOMs
+    for fom in [
+        "id",
+        "status",
+        "nodes",
+        "start",
+        "end",
+        "exit_code",
+    ]:
+        figure_of_merit(
+            f"job-{fom}",
+            fom_regex=rf"\s*job_{fom}:\s*(?P<val>.*)",
+            group_name="val",
+            log_file="{experiment_run_dir}/.slurm_job_info",
+            fom_type=FomType.INFO,
+        )
+
+    figure_of_merit(
+        "job-elapsed-seconds",
+        fom_regex=r"\s*job_elapsed_seconds:\s*(?P<val>\d+)",
+        group_name="val",
+        units="s",
+        log_file="{experiment_run_dir}/.slurm_job_info",
+        fom_type=FomType.TIME,
+    )
+
+    # Capture sbatch script end time, in epoch seconds
+    register_builtin(
+        "capture_sbatch_script_end_time",
+        required=True,
+        injection_method="append",
+    )
+
+    def capture_sbatch_script_end_time(self):
+        return "date +%s > {experiment_run_dir}/.slurm_script_end_time"
+
+    # Capture slurm configs before the workload runs, just so that the configs
+    # match closer when the job is submitted.
+    register_builtin(
+        "capture_slurm_config", required=True, injection_method="prepend"
+    )
+
+    def capture_slurm_config(self):
+        return "scontrol show config > {experiment_run_dir}/.slurm_config"
+
+    for fom in ["TopologyParam", "TopologyPlugin"]:
+        figure_of_merit(
+            f"slurm-config-{fom}",
+            fom_regex=rf"\s*{fom}\s*=\s*(?P<val>\S+)",
+            group_name="val",
+            log_file="{experiment_run_dir}/.slurm_config",
+            fom_type=FomType.INFO,
+        )
+
+    success_criteria(
+        "job-status-check",
+        mode="fom_comparison",
+        fom_name="job-status",
+        formula="'{value}' == 'COMPLETE'",
+    )
+
+    register_validator(
+        name="check_sbatch_in_execute_experiment",
+        predicate="not file_contains('{workspace_configs}/execute_experiment.tpl', '(?m)^[ \\t]*#SBATCH')",
+        message=(
+            "In experiment {experiment_namespace}:\n"
+            "  `execute_experiment` contains `#SBATCH` directives, "
+            "which will be ignored.\n"
+            "  Custom headers should be added to `extra_sbatch_headers` "
+            "in the workspace configuration instead."
+        ),
+        fail_on_invalid=False,
+    )
 
 
 class SlurmRunner:
@@ -214,7 +376,6 @@ class SlurmRunner:
         self.squeue_runner = None
         self.sacct_runner = None
         self.sinfo_runner = None
-        self.run_dir = None
 
     def _ensure_runner(self, runner_name: str):
         attr = f"{runner_name}_runner"
@@ -234,24 +395,23 @@ class SlurmRunner:
     def get_status(self, job_id):
         if self.dry_run:
             return None
-        self._ensure_runner("squeue")
-        squeue_args = ["-h", "-o", "%t", "-j", job_id]
+        status_out = ""
         try:
+            self._ensure_runner("squeue")
+            squeue_args = ["-h", "-o", "%t", "-j", job_id]
             status_out = self.squeue_runner.command(
                 *squeue_args, output=str, error=os.devnull
             )
-        except ProcessError as e:
-            status_out = ""
+        except (ProcessError, RunnerError, OSError) as e:
             logger.debug(
                 f"squeue returns error {e}. This is normal if the job has already been completed."
             )
         if not status_out:
-            self._ensure_runner("sacct")
-            sacct_args = ["-o", "state", "-X", "-n", "-j", job_id]
             try:
+                self._ensure_runner("sacct")
+                sacct_args = ["-o", "state", "-X", "-n", "-j", job_id]
                 status_out = self.sacct_runner.command(*sacct_args, output=str)
-            except ProcessError as e:
-                status_out = ""
+            except (ProcessError, RunnerError, OSError) as e:
                 logger.debug(
                     f"sacct returns error {e}. The status is not resolved correctly."
                 )
@@ -260,13 +420,19 @@ class SlurmRunner:
     def get_partitions(self):
         if self.dry_run:
             return None
-        self._ensure_runner("sinfo")
-        sinfo_args = ["-h"]
-        out = self.sinfo_runner.command(*sinfo_args, output=str).strip()
+        try:
+            self._ensure_runner("sinfo")
+            sinfo_args = ["-h"]
+            out = self.sinfo_runner.command(*sinfo_args, output=str).strip()
+        except (ProcessError, RunnerError, OSError) as e:
+            logger.debug(f"sinfo returns error {e}")
+            return None
         partitions = set()
         default_partition = None
-        for line in out.split("\n"):
+        for line in out.splitlines():
             info = line.split()
+            if not info:
+                continue
             name = info[0].strip()
             if name.endswith("*"):
                 name = name[:-1]

@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -134,7 +134,7 @@ example:
     - platform_config
     - n_nodes
 
-Would result in 6 experiments. Adding this to your workspace configuration, you
+Would result in 4 experiments. Adding this to your workspace configuration, you
 should have the following in your ``ramble.yaml``:
 
 .. literalinclude:: ../../../../examples/tutorial_7_matrix_config.yaml
@@ -150,7 +150,21 @@ should give the following error message:
 
 .. code-block:: console
 
-    ==> Error: Experiment wrfv4.CONUS_12km.scaling_1 is not unique.
+    ==> Warning: Two experiments are defined with the name wrf@4.2.CONUS_12km.scaling_1
+    ==> Warning:   -> Collision Origin: Within the same YAML experiment block: 'scaling_{n_nodes}' (Matrix/Vector Expansion)
+    ==> Warning: Variables unique to previously defined experiment:
+    ==> Warning:   - experiment_index
+    ==> Warning: Variable differences between experiment definitions:
+    ==> Warning:   - processes_per_node: {'previous': 16, 'new': 20}
+    ==> Warning:   - platform: {'previous': 'platform1', 'new': 'platform2'}
+    ==> Warning: 
+    ==> Warning: ==> SUGGESTION: Your experiment name template does not distinguish between parallel expansions.
+    ==> Warning:     To make the namespaces unique, add one or more of these differing matrix variables into your 'scaling_{n_nodes}' template:
+    ==> Warning:     -> {processes_per_node}
+    ==> Warning:     -> {platform}
+    ==> Warning: 
+    ==> Error: Experiment wrf@4.2.CONUS_12km.scaling_1 is not unique.
+
 
 This is because your experiment name template is not unique across the values
 of ``platform_config``. To remedy this issue, you can update the experiment
@@ -165,7 +179,7 @@ Your final configuration file should look something like:
 .. include:: shared/wrf_execute.rst
 
 **NOTE** Some of these experiments can take a while to execute. Experiments can
-be filtered using the :ref:`--where<filter-experiments>`` option to execute the
+be filtered using the :ref:`--where <filter-experiments>` option to execute the
 higher scale experiments if desired. To do this, try:
 
 .. code-block:: console

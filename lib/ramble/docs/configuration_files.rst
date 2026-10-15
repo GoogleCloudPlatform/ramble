@@ -1,10 +1,12 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
    <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
    option. This file may not be copied, modified, or distributed
    except according to those terms.
+
+.. _configuration-files:
 
 ===================
 Configuration Files
@@ -27,6 +29,11 @@ Configuration Sections:
 Currently, Ramble supports the following configuration sections:
 
 * :ref:`applications <application-config>`
+* :ref:`base_application_repos <repos-config>`
+* :ref:`base_class_repos <repos-config>`
+* :ref:`base_modifier_repos <repos-config>`
+* :ref:`base_package_manager_repos <repos-config>`
+* :ref:`base_workflow_manager_repos <repos-config>`
 * :ref:`config <config-yaml>`
 * :ref:`env_vars <env-vars-config>`
 * :ref:`formatted_executables <formatted-execs-config>`
@@ -35,11 +42,15 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`mirrors <mirrors-config>`
 * :ref:`modifier_repos <modifier-repos-config>`
 * :ref:`modifiers <modifiers-config>`
+* :ref:`package_manager_repos <repos-config>`
 * :ref:`repos <repos-config>`
 * :ref:`software <software-config>`
 * :ref:`success_criteria <success-criteria-config>`
+* :ref:`tables <tables-config>`
 * :ref:`variables <variables-config>`
 * :ref:`variants <variants-config>`
+* :ref:`workflow_manager_repos <repos-config>`
+* :ref:`zips <zips-config>`
 
 Each of these config sections has a defined schema contained in
 ``lib/ramble/ramble/schemas``.
@@ -140,6 +151,7 @@ In the above ``[optional_definitions]`` can include any of:
 * :ref:`internals <internals-config>`
 * :ref:`modifiers <modifiers-config>`
 * :ref:`success_criteria <success-criteria-config>`
+* :ref:`tables <tables-config>`
 * :ref:`variables <variables-config>`
 * :ref:`variants <variants-config>`
 
@@ -164,17 +176,17 @@ The current default configuration is as follows:
 .. code-block:: yaml
 
     config:
-      shell: ''
+      shell: 'bash'
       spack:
         install:
-          flags: '--reuse'
+          flags: '--fresh'
         concretize:
-          flags: '--reuse'
+          flags: '--fresh'
         buildcache:
           flags: ''
         env_create:
           flags: ''
-        global
+        global:
           flags: ''
         env_view:
           link_type: 'symlink'
@@ -213,8 +225,9 @@ Upload
 
 Ramble aims to support the upload of experiment outcomes (including FOMs), to
 SQL-like datastores. To do this we can specify an ``upload:type`` as defined by
-:mod:`ramble.experimental.uploader.Upload`, and a ``upload:uri`` to specify the
-destination.
+:mod:`ramble.uploader.uploader_types`, and a ``upload:uri`` to specify the
+destination. Supported types include ``BigQuery`` and ``PrintOnly`` (which
+only logs the data without performing an actual upload).
 
 As part of the upload it tries to attribute the data to a user. This can be
 specified via ``config:user``, or if blank ramble will try deduce it based on
@@ -240,6 +253,23 @@ through and not cause an error. This is useful for things like `${ENV_VAR}`
 that are recognized as a variable. When passthrough is disabled, any variables
 that fail to expand will raise a syntax error, which can aid in debugging.
 
+.. _overwrite-inventories-config-option:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Overwrite Experiment Inventories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An optional flag can be set in ``config`` or with ``--overwrite-inventories``
+on the command line to force workspace pipelines to overwrite existing
+experiment inventories and hashes. This will disable the hash checking / error
+semantics, and replace them with reconstruction of the hash regardless of it's
+previous contents. Its format is as follows:
+
+.. code-block:: yaml
+
+    config:
+      overwrite_inventories: True
+
 .. _experiment-repeats-config-option:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -254,15 +284,31 @@ the set of repeats. Its format is as follows:
 
     config:
       n_repeats: 'int'
-      repeats_success_strict: [True/False]
+      repeat_success_strict: [True/False]
 
 By default, a set of repeats is successful if all individual repeats are successful.
-When ``repeats_success_strict`` is set to false, the set will be considered successful
+When ``repeat_success_strict`` is set to false, the set will be considered successful
 if any repeat succeeds, and statistics will be calculated over the successful experiments
 only.
 
 More information on using repeats within a workspace can be found in the
 :ref:`workspace configuration file<workspace-config>`.
+
+.. _general-config-options:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+General Config Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Several general configuration options can be set within the ``config`` section:
+
+* ``report_dirs``: Defines the directory where Ramble will store generated reports.
+  Default is ``~/.ramble/reports``.
+* ``stage_method``: Defines the method used to stage files. Valid options are
+  ``cp``, ``rsync``, ``symbolic_link``, and ``hard_link``. Default is ``cp``.
+* ``resolve_variables_in_subprocesses``: A boolean flag that controls if environment
+  variables should be resolved in subprocesses. Default is ``False``.
+* ``shell``: Defines the shell to use for generated scripts. Default is ``bash``.
 
 .. _env-vars-config:
 
@@ -306,6 +352,61 @@ actions is available. These actions are:
   definition. Only supports paths, delimiter is ``:``
 * ``unset`` - Remove a variable definition, if it is set.
 
+.. _filter-groups-config:
+
+----------------------
+Filter Groups Section:
+----------------------
+
+The filter groups config section is named ``filter_groups`` and allows users to
+define persistent, named groups of filters. These groups can be referenced in
+commands to easily select subsets of experiments (e.g., specific workloads,
+scaling studies) without typing complex logical expressions on the CLI.
+
+Filter groups can be defined globally in ``~/.ramble/filter_groups.yaml`` (user scope)
+or per-workspace in ``$workspace/configs/ramble.yaml`` (workspace scope).
+
+If a filter group with the same name is defined in multiple configuration scopes (e.g., in both the user scope and a workspace scope), the definition in the higher-precedence scope completely overrides any definitions from lower-precedence scopes. The definitions (including the ``where`` and ``exclude_where`` lists) are not merged.
+
+The format of this config section is as follows:
+
+.. code-block:: yaml
+
+    filter_groups:
+      small-scale:
+        where:
+        - "{n_nodes} < 4"
+        exclude_where:
+        - "'{mpi_provider}' == 'tcp'"
+      large-scale:
+        where:
+        - "{n_nodes} >= 8"
+
+Each filter group maps to an object containing lists of filter expressions:
+
+* ``where``: A list of inclusive filter expressions. All expressions must evaluate to ``True`` for an experiment to be included.
+* ``exclude_where``: A list of exclusive filter expressions. If any expression evaluates to ``True``, the experiment is excluded.
+
+These groups can then be used on the CLI using the ``-fg`` / ``--filter-group`` (inclusive) and ``-efg`` / ``--exclude-filter-group`` (exclusive) flags on commands like ``ramble on`` or ``ramble workspace setup``. Multiple filter groups can be combined in a single flag using logical expressions (supporting ``and``, ``or``, ``not``, and parentheses):
+
+.. code-block:: console
+
+    $ ramble on -fg "small-scale and not single-node"
+
+Global filter groups can be managed using the top-level ``ramble filter-groups`` command:
+
+.. code-block:: console
+
+    $ ramble filter-groups add -n global-small --where "{n_nodes} < 2"
+    $ ramble filter-groups remove -n global-small
+    $ ramble filter-groups list
+    $ ramble filter-groups blame
+
+By default, these commands edit the global ``user`` scope. You can target a different scope (such as ``workspace``) using the ``--scope`` option.
+
+Alternatively, workspace-scoped filter groups can also be managed using the :ref:`workspace-manage` command.
+
+
 .. _formatted-execs-config:
 
 ------------------------------
@@ -341,7 +442,7 @@ The default values for the attributes are:
 .. code-block:: yaml
 
   formatted_executables:
-    command_name:
+    command:
       indentation: 0
       prefix: ''
       join_separator: '\n'
@@ -392,6 +493,7 @@ The format of the internals config section is as follows:
           use_mpi: [True/False] # Default: False
           redirect: 'where_to_redirect_output' # Default '{log_file}'
           output_capture: 'operator_to_use_for_redirection' # Default >>
+          force: [True/False] # Default: False
       executables:
       - list of
       - executables
@@ -401,12 +503,31 @@ The format of the internals config section is as follows:
       - name: <executable_name>
         order: 'before' / 'after' # Default: 'after'
         [relative_to: <relative_executable_name>]
+      custom_inputs:
+        <input_name>:
+          url: 'url_or_path_to_input' # Supports variable expansion: {var}
+          sha256: 'checksum_or_null' # Default: None (or null to disable check)
+          target_dir: 'target_directory' # Default: '{workload_input_dir}'
+          expand: [True/False] # Default: True
+          extension: 'extension' # Optional file extension override
+          description: 'description_of_input' # Optional
+      custom_workloads:
+        <workload_name>:
+          executables:
+          - list of executables
+          inputs:
+          - list of input names
+          tags:
+          - list of tags
 
-Currently this section has two sub-sections.
+Currently this section has five sub-sections: ``custom_executables``,
+``executables``, ``executable_injection``, ``custom_inputs``, and
+``custom_workloads``.
 
 The ``custom_executables`` sub-section can be used to define new executables
-that an experiment should use. It can also be used to override the definition
-of an internally defined executable within an experiment.
+that an experiment can use. It can also be used to override the definition
+of an internally defined executable within an experiment, when the ``force``
+property is set to ``True``.
 
 The ``executables`` sub-section can be used to control the order executables
 will be used in the experiment. This is also the mechanism to inject custom
@@ -427,6 +548,23 @@ Processing the ``executable_injection`` sub-section occurs after processing the
 listed in the YAML file, with lower precedence scopes being processed first.
 (e.g. ``workspace`` executables are injected before ``experiment`` executables
 are).
+
+The ``custom_inputs`` sub-section can be used to define new input files or
+override built-in inputs for an experiment. When overriding an existing input,
+unspecified attributes (such as ``target_dir``, ``expand``, or ``description``)
+are preserved from the original application definition. The ``url`` attribute
+supports variable expansion (e.g., ``url: 'https://mirror.org/{dataset}.tar.gz'``),
+allowing datasets to be swept across variable matrices. To disable sha256 checksum
+verification (for instance when using modified or custom datasets), specify
+``sha256: null``.
+
+The ``custom_workloads`` sub-section allows users to compose custom workloads or
+override built-in workloads directly in YAML without writing Python application code.
+It links executables (built-in or ``custom_executables``), inputs (built-in or
+``custom_inputs``), and tags. Any workload tags defined here are attached to the
+experiment's tags. Workload variables corresponding to the input names (e.g.
+``{<input_name>}``) are automatically made available to templates and executable
+commands, expanding to the expanded input directory or file path.
 
 .. _licenses-config:
 
@@ -524,7 +662,19 @@ Repos Section:
 --------------
 
 The repos config section is used to control which repositories should
-be searched for when looking for application definitions. Its format is as follows:
+be searched for when looking for application definitions. Other sections
+controlling different types of object repositories follow the same format.
+These include:
+
+* ``base_application_repos``
+* ``base_class_repos``
+* ``base_modifier_repos``
+* ``base_package_manager_repos``
+* ``base_workflow_manager_repos``
+* ``package_manager_repos``
+* ``workflow_manager_repos``
+
+The format for these sections is as follows:
 
 .. code-block:: yaml
 
@@ -534,9 +684,9 @@ be searched for when looking for application definitions. Its format is as follo
 
 .. _software-config:
 
---------------
+-----------------
 Software Section:
---------------
+-----------------
 
 The software config section is used to define package definitions, and software
 environments created from those packages. Its format is as follows:
@@ -587,19 +737,19 @@ Below is an annotated example of the software dictionary.
 
     software:
       packages:
-        gcc9: # Abstract name to refer to this package
-          pkg_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
-          compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
-        impi2021:
-          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
-          compiler: gcc9 # Other package name to use as compiler for this package
+        gcc14: # Abstract name to refer to this package
+          pkg_spec: gcc@14.2.0 target=x86_64 # Spack spec for this package
+          compiler_spec: gcc@14.2.0 # Spack compiler spec for this package
+        intel-mpi:
+          pkg_spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+          compiler: gcc14 # Other package name to use as compiler for this package
         gromacs:
-          pkg_spec: gromacs@2022.4
-          compiler: gcc9
+          pkg_spec: gromacs@2025.3
+          compiler: gcc14
       environments:
         gromacs:
           packages: # List of packages to include in this environment
-          - impi2021
+          - intel-mpi
           - gromacs
 
 Packages and environments defined inside the ``software`` config section are
@@ -673,6 +823,122 @@ use when determining if they were successful or not. Its format is as follows:
 For more information about using success criteria, see the
 :ref:`success criteria documentation<success-criteria>`.
 
+.. _tables-config:
+
+---------------
+Tables Section:
+---------------
+
+The tables section is used to define tables that should be generated when a
+workspace is analyzed. Its format is as follows:
+
+.. code-block:: yaml
+
+     tables:
+     - name: "table_name_template"
+       [optional table attributes]
+       columns:
+       - name: "column_name_template"
+         [column_attributes]
+
+
+In the tables section, a list of tables can be provided. Tables can also be
+included in the :ref:`applications<application-config>` section. In this case,
+tables are scoped to the section they are added in (i.e. a table added within a
+specific application name will only generate data for that application's
+experiments, and likewise for workloads and experiment blocks).
+
+In the above, ``[optional table attributes]`` includes any of the following:
+
+.. code-block:: yaml
+
+   group_by:
+   - "list of column names"
+   - "to group (collapse) data by"
+   group_method: "max" # Method of applying the grouping
+   sort_by:
+   - "list of column names"
+   - "to sort data by"
+   where:
+   - "list of expressions"
+   - "to filter experiments"
+   - "to build table from"
+   transpose: true # Optional: transpose the table before writing out
+
+The ``group_method`` can be selected from any `groupby method supported by
+Pandas dataframes
+<https://pandas.pydata.org/docs/reference/groupby.html#dataframegroupby-computations-descriptive-stats>`_.
+
+Additionally, ``[column_attributes]`` can include any of the following:
+
+.. code-block:: yaml
+
+   columns:
+   - name: "column name template"
+     where:
+     - "list of expressions"
+     - "to filter experiments"
+     - "when building this column"
+     expression: "Ramble-style expression for column value"
+     figure_of_merit: "Figure of merit name for column value"
+     figure_of_merit_context: "Context name to extract figure of merit from"
+     figure_of_merit_origin_type: "Origin type to extract figure of merit from"
+
+One of ``expression`` and ``figure_of_merit`` are required for each column. If
+a context is not provided, Ramble will attempt to auto-detect the context.
+Similarly, if the origin type is not provided, Ramble will auto detect the
+origin type.
+
+Tables also support ``autocolumns``, which allow columns to be generated
+dynamically based on the contexts and figures of merit found in an experiment's
+results. The attributes for ``autocolumns`` are as follows:
+
+.. code-block:: yaml
+
+   autocolumns:
+   - name: "column name template"
+     context_name: "glob or regex for context definition name or instance name"
+     figure_of_merit: "glob or regex for figure of merit name"
+     figure_of_merit_origin_type: "Origin type to extract figure of merit from"
+     sort_by:
+     - "list of context variables"
+     - "to sort generated columns by"
+     where:
+     - "list of expressions"
+     - "to filter experiments"
+     - "when building this column"
+
+In an ``autocolumn``, ``name`` and ``figure_of_merit`` are required. If
+``context_name`` is omitted, Ramble will match figures of merit that are not
+within any specific context (the "null" context).
+
+The ``name`` template for an ``autocolumn`` can include any variables from the
+matched context, as well as the special variables ``{fom_name}`` and
+``{context_name}`` (the name of the specific context instance). If regular
+expressions are used for ``context_name`` or ``figure_of_merit``, any named
+capture groups will also be available as variables in the ``name`` template.
+
+Columns are built in YAML order. The ``expression`` attribute can be used to
+refer to values from other columns that are defined before the current column.
+Explicitly defined columns are always added to the table before any generated
+``autocolumns``. Within a set of generated columns from the same template, the
+``sort_by`` field determines their relative order.
+
+Both ``table_name_template`` and ``column_name_template`` can include Ramble
+variables, to automatically generate new tables and columns. As an example:
+
+.. code-block:: yaml
+
+   tables:
+   - name: '{workload_name} status'
+     columns:
+     - name: Experiment
+       expression: '{experiment_name}'
+     - name: Status
+       expression: '{experiment_status}'
+
+Will automatically create one table per workload, with the status summary of
+that workload's experiments.
 
 .. _variables-config:
 
@@ -705,17 +971,39 @@ Variants Section
 
 The variants config section is used to customize variants to the experiment creation.
 These can include application defined variants, or higher level Ramble provided
-variants. Currently, the only supported variants is ``package_manager`` which
-allows an experiment to define the package manager it should use.
-The format of this section is as follows:
+variants. The format of this section, along with some example variants, can be seen below:
 
 .. code-block:: yaml
 
     variants:
-      package_manager: <pkg_man_name> or null or None
+      package_manager: <pkg_man_name> or user-managed
+      workflow_manager: <work_flow_man_name> or user-managed
+      system: <sys_name> or user-managed
+      platform: <plat_name> or user-managed
 
 Variants are expanded following the same logic to expand variables (so a
 variant could be lazily expanded based on an experiment's variable definitions).
 
-The default value for ``package_manager`` is ``null`` which disables the use of
-a package manager.
+Selection of variants can customize your workspace beyond the YAML
+configuration. These can be used to change the behavior of experiment objects,
+or define system or platform selections that can encapsulate many defaults.
+
+.. _zips-config:
+
+-------------
+Zips Section:
+-------------
+
+The zips config section is used to define explicit groupings of variables that
+are related and should be iterated over together when generating experiments.
+Its format is as follows:
+
+.. code-block:: yaml
+
+    zips:
+      <zip_name>:
+      - <var1>
+      - <var2>
+
+For more information on using zips, see the :ref:`explicit variable zips
+documentation<ramble-explicit-zips>`.

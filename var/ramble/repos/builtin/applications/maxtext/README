@@ -1,0 +1,48 @@
+# Copyright 2022-2025 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+Before running MaxText, it needs to be installed locally and the path specified
+in the config.
+
+Maxtext model variables can be parameterized by prefixing them with 'maxtext.',
+and they will be added to the generated base.yml.
+
+It can be run in a container using the pyxis-enroot modifier. The
+container needs to be built first. An example ramble.yaml for running Maxtext on
+Slurm using pyxis-enroot is below.
+
+ramble:
+  variants:
+    workflow_manager: slurm
+  modifiers:
+  - name: pyxis-enroot
+  variables:
+    batch_submit: sbatch {execute_experiment}
+    srun_args: --container-image {container_path} --container-mounts "{container_mounts}"
+      --container-env {container_env_vars} --container-writable
+    mpi_command: srun {srun_args}
+    maxtext_path: ~/maxtext
+    container_uri: dockerd://{container_name}
+    container_dir: '{maxtext_path}'
+    container_name: my_container_name
+    container_env_vars: SLURM_NODEID
+    gpus_per_node: 8
+    processes_per_node: 8
+    base_config_source: ~/maxtext/MaxText/configs/base.yml
+    model_config_source: ~/maxtext/MaxText/configs/models/gemma-2b.yml
+    maxtext.base_output_directory: gs://my_gcs_bucket
+    maxtext.hardware: gpu
+    maxtext.steps: 10
+  applications:
+    maxtext:
+      workloads:
+        train:
+          experiments:
+            test_{n_nodes}_nodes:
+              variables:
+                n_nodes: '8'

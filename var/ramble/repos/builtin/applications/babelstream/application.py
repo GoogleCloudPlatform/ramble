@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,34 +19,30 @@ class Babelstream(ExecutableApplication):
 
     name = "babelstream"
 
-    tags("babelstream")
+    tags("memory-benchmark", "gpu-benchmark", "cuda")
 
     maintainers("rfbgo", "kaanolgu", "douglasjacobsen", "tomdeakin")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    version("5.0", "Version 5.0 of babelstream", preferred=True)
 
-    software_spec(
-        "babelstream",
-        pkg_spec="babelstream@5.0",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
-    executable(
-        "get_bin",
-        template=[
-            "cp {env_path}/.spack-env/view/bin/{exec_name} {experiment_run_dir}/{exec_name}"
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.STDERR,
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+
+        software_spec(
+            "babelstream-{application::babelstream::version}",
+            pkg_spec="babelstream@{application::babelstream::version} +omp",
+            compiler="gcc12",
+        )
+    stage_files(
+        name="stage-bin",
+        src="{env_path}/.spack-env/view/bin/{exec_name}",
+        dst="{experiment_run_dir}/{exec_name}",
     )
 
-    executable(
-        "get_bin_fortran",
-        template=[
-            "export F_COMPILER_NAME={compiler_list}; cp {env_path}/.spack-env/view/bin/BabelStream.${F_COMPILER_NAME//[0-9]/}.{f_model} {experiment_run_dir}/{exec_name}"
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.STDERR,
+    stage_files(
+        name="stage-bin-fortran",
+        src="{env_path}/.spack-env/view/bin/BabelStream.${F_COMPILER_NAME//[0-9]/}.{f_model}",
+        dst="{experiment_run_dir}/{exec_name}",
     )
 
     executable(
@@ -63,10 +59,10 @@ class Babelstream(ExecutableApplication):
         output_capture=OUTPUT_CAPTURE.ALL,
     )
 
-    workload("cpp-models", executables=["get_bin", "execute_template"])
+    workload("cpp-models", executables=["stage-bin", "execute_template"])
 
     workload(
-        "fortran-models", executables=["get_bin_fortran", "execute_fortran"]
+        "fortran-models", executables=["stage-bin-fortran", "execute_fortran"]
     )
 
     workload_group("all_workloads", workloads=["cpp-models", "fortran-models"])
@@ -96,13 +92,6 @@ class Babelstream(ExecutableApplication):
         "array_size",
         description="Number of elements in array that will be streamed",
         default="2**27",
-        workload_group="all_workloads",
-    )
-
-    workload_variable(
-        "num_times",
-        description="Number of times to repeat stream test",
-        default="10",
         workload_group="all_workloads",
     )
 

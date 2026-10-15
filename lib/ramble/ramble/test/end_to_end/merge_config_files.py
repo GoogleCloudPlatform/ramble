@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,10 +11,7 @@ import os
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -23,7 +20,9 @@ workspace = RambleCommand("workspace")
 config = RambleCommand("config")
 
 
-def test_merge_config_files(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_merge_config_files(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_applications = """
 applications:
   zlib:
@@ -65,13 +64,12 @@ licenses:
     set:
       TEST_LICENSE: 'port@server'
 """
-    workspace_name = "test_merge_config_files"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws._re_read()
@@ -80,13 +78,13 @@ licenses:
         software_file = os.path.join(ws.root, "software_test.yaml")
         licenses_file = os.path.join(ws.root, "licenses.yaml")
 
-        with open(applications_file, "w+") as f:
+        with open(applications_file, "w+", encoding="utf-8") as f:
             f.write(test_applications)
 
-        with open(software_file, "w+") as f:
+        with open(software_file, "w+", encoding="utf-8") as f:
             f.write(test_software)
 
-        with open(licenses_file, "w") as f:
+        with open(licenses_file, "w", encoding="utf-8") as f:
             f.write(test_licenses)
 
         config("add", "-f", applications_file, global_args=["-w", workspace_name])
@@ -95,7 +93,7 @@ licenses:
 
         ws._re_read()
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "ensure_installed" in data
@@ -109,5 +107,5 @@ licenses:
         exec_file = os.path.join(
             ws.experiment_dir, "zlib", "ensure_installed", "test_experiment", "execute_experiment"
         )
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             assert "license.inc" in f.read()

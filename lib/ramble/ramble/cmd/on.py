@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,14 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.cmd
 import ramble.config
-import ramble.workspace
-import ramble.expander
-import ramble.pipeline
 import ramble.filters
-
-import ramble.cmd.common.arguments as arguments
-
+import ramble.pipeline
+from ramble.cmd.common import arguments
 
 description = '"And now\'s the time, the time is now" (execute workspace experiments)'
 section = "workspaces"
@@ -43,7 +40,16 @@ def setup_parser(subparser):
         help="Disable the logger header.",
     )
 
-    arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
+    arguments.add_common_arguments(
+        subparser,
+        [
+            "where",
+            "exclude_where",
+            "filter_tags",
+            "filter_group",
+            "exclude_filter_group",
+        ],
+    )
 
 
 def ramble_on(args):
@@ -51,6 +57,8 @@ def ramble_on(args):
     ws = ramble.cmd.require_active_workspace(cmd_name="on")
 
     executor = args.executor if args.executor else "{batch_submit}"
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     filters = ramble.filters.Filters(
         phase_filters=["*"],

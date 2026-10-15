@@ -1,4 +1,0 @@
-rule cc
-  command = true
-
-build check: cc

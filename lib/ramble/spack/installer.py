@@ -48,7 +48,6 @@ import spack.binary_distribution as binary_distribution
 import spack.compilers
 import spack.error
 import spack.hooks
-import spack.monitor
 import spack.package
 import spack.package_prefs as prefs
 import spack.repo

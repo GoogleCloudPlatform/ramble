@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,15 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import pytest
+
 from ramble.util.shell_utils import (
+    UnsupportedError,
+    cmd_sub_str,
+    gen_dict_definition,
+    get_compatible_base_shell,
     last_pid_var,
     source_str,
-    get_compatible_base_shell,
-    cmd_sub_str,
-    UnsupportedError,
 )
-
-import pytest
 
 
 @pytest.mark.parametrize(
@@ -40,3 +41,19 @@ def test_cmd_sub_str():
 
     assert cmd_sub_str("fish", "uname -n") == "(uname -n)"
     assert cmd_sub_str("bash", "uname -n") == "`uname -n`"
+
+
+def test_gen_dict_definition_error():
+    with pytest.raises(UnsupportedError, match="only supported in bash"):
+        gen_dict_definition("foo", {"bar": "baz"}, shell="fish")
+
+
+@pytest.mark.parametrize(
+    "dict,expected_str",
+    [
+        ({}, ""),
+        ({"foo": "bar"}, 'declare -A map\nmap["foo"]="bar"'),
+    ],
+)
+def test_gen_dict_definition(dict, expected_str):
+    assert gen_dict_definition("map", dict, shell="bash") == expected_str

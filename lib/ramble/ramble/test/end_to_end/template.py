@@ -1,0 +1,255 @@
+# Copyright 2022-2026 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+import os
+
+import pytest
+
+import ramble.workspace
+from ramble.error import ApplicationError
+from ramble.main import RambleCommand
+
+pytestmark = pytest.mark.usefixtures(
+    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+)
+
+workspace = RambleCommand("workspace")
+
+
+def test_template(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+  applications:
+    template:
+      workloads:
+        test_template:
+          experiments:
+            test:
+              variables:
+                n_nodes: 1
+                hello_name: santa
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    run_dir = os.path.join(ws.experiment_dir, "template/test_template/test/")
+    script_path = os.path.join(run_dir, "bar.sh")
+    assert os.path.isfile(script_path)
+    with open(script_path, encoding="utf-8") as f:
+        content = f.read()
+        assert "echo foobar" in content
+        assert "echo hello santa" in content
+        assert "echo not_exist" not in content
+    execute_path = os.path.join(run_dir, "execute_experiment")
+    script2_path = os.path.join(ws.shared_dir, "script.sh")
+    script3_path = os.path.join(run_dir, "expansion_script.sh")
+    script4_path = os.path.join(run_dir, "bar")
+    with open(execute_path, encoding="utf-8") as f:
+        content = f.read()
+        assert script_path in content
+        # The workspace path should be expanded
+        assert "$workspace_shared" not in content
+        assert script2_path in content
+        assert script3_path in content
+    assert os.path.isfile(script2_path)
+    assert os.path.isfile(script3_path)
+    assert os.path.isfile(script4_path)
+
+    # Test template archival
+    workspace("archive", global_args=["-w", ws_name])
+    exp_archive_path = os.path.join(
+        ws.latest_archive_path, "experiments", "template", "test_template", "test"
+    )
+    files = os.listdir(exp_archive_path)
+    assert "bar.sh" in files
+    assert "script.sh" in files
+
+
+def test_template_inherited(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    template-inherited:
+      workloads:
+        test_template:
+          experiments:
+            test: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    run_dir = os.path.join(ws.experiment_dir, "template-inherited/test_template/test/")
+    script_path = os.path.join(run_dir, "bar.sh")
+    assert os.path.isfile(script_path)
+    with open(script_path, encoding="utf-8") as f:
+        content = f.read()
+        assert "echo hello world-inherited" in content
+    execute_path = os.path.join(run_dir, "execute_experiment")
+    with open(execute_path, encoding="utf-8") as f:
+        content = f.read()
+        assert script_path in content
+
+    script_path = os.path.join(ws.shared_dir, "script.sh")
+    assert os.path.isfile(script_path)
+
+
+def test_executable_templates_no_trailing_spaces(
+    mutable_mock_apps_repo, make_workspace_from_config
+):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+  applications:
+    basic:
+      workloads:
+        template_wl:
+          experiments:
+            test:
+              variables:
+                n_ranks: '1'
+  software:
+    packages: {}
+    environments: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    run_dir = os.path.join(ws.experiment_dir, "basic/template_wl/test/")
+    execute_path = os.path.join(run_dir, "execute_experiment")
+
+    with open(execute_path, encoding="utf-8") as f:
+        content = f.read()
+        assert "EOF" in content
+        assert "EOF " not in content
+
+
+def test_template_wrong_extension(mutable_mock_apps_repo, make_workspace_from_config):
+    template_src_name = "template_wrong_extension.sh"
+    ext = ramble.workspace.TEMPLATE_EXTENSION
+    test_config = f"""
+ramble:
+  variables:
+    mpi_command: mpirun -n {{n_ranks}}
+    batch_submit: 'batch_submit {{execute_experiment}}'
+    processes_per_node: 1
+    n_nodes: 1
+    src_script_path: $workspace_configs/{template_src_name}
+  applications:
+    template:
+      workloads:
+        test_template:
+          experiments:
+            test: {{}}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    # Create a template file without the correct extension
+    open(os.path.join(ws.config_dir, template_src_name), "w", encoding="utf-8")
+
+    with pytest.raises(
+        ApplicationError,
+        match=f"Template file .*template_wrong_extension.sh{ext} does not exist",
+    ):
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    # It should pick up the correctly named template
+    open(os.path.join(ws.config_dir, template_src_name + ext), "w", encoding="utf-8")
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    assert os.path.isfile(
+        os.path.join(ws.experiment_dir, f"template/test_template/test/{template_src_name}")
+    )
+
+
+def test_template_inclusion(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+  applications:
+    template:
+      workloads:
+        test_template:
+          experiments:
+            test:
+              variables:
+                n_nodes: 1
+                hello_name: inclusion_test
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    # 1. Create a child workspace template
+    child_path = os.path.join(ws.config_dir, "child_tpl.tpl")
+    with open(child_path, "w", encoding="utf-8") as f:
+        f.write("Child content: hello {hello_name}\n")
+
+    # 2. Create a parent workspace template that includes the child workspace template
+    # and the object template 'bar'
+    parent_path = os.path.join(ws.config_dir, "parent_tpl.tpl")
+    with open(parent_path, "w", encoding="utf-8") as f:
+        f.write("Parent header\n")
+        f.write("include({child_tpl})\n")
+        f.write("include({bar})\n")
+        f.write("Parent footer\n")
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    run_dir = os.path.join(ws.experiment_dir, "template/test_template/test/")
+
+    # Verify child_tpl rendered output
+    rendered_child_path = os.path.join(run_dir, "child_tpl")
+    assert os.path.isfile(rendered_child_path)
+    with open(rendered_child_path, encoding="utf-8") as f:
+        child_content = f.read()
+        assert child_content == "Child content: hello inclusion_test\n"
+
+    # Verify parent_tpl rendered output
+    rendered_parent_path = os.path.join(run_dir, "parent_tpl")
+    assert os.path.isfile(rendered_parent_path)
+    with open(rendered_parent_path, encoding="utf-8") as f:
+        parent_content = f.read()
+        # It should contain parent header
+        assert "Parent header\n" in parent_content
+        # It should expand child_tpl in-place (with variables expanded in child context)
+        assert "Child content: hello inclusion_test\n" in parent_content
+        # It should expand object template 'bar' in-place (with bar's extra_vars/func expanded)
+        assert "foobar\n" in parent_content  # dynamic_var1 from bar's extra_vars
+        # dynamic_hello_world from bar's extra_vars_func
+        assert "hello inclusion_test\n" in parent_content
+        # It should contain parent footer
+        assert "Parent footer\n" in parent_content
+
+    # 3. Test circular inclusion raises ApplicationError
+    circ_a_path = os.path.join(ws.config_dir, "circ_a.tpl")
+    circ_b_path = os.path.join(ws.config_dir, "circ_b.tpl")
+    with open(circ_a_path, "w", encoding="utf-8") as f:
+        f.write("include({circ_b})\n")
+    with open(circ_b_path, "w", encoding="utf-8") as f:
+        f.write("include({circ_a})\n")
+
+    # Re-read workspace to pick up new templates
+    ws._re_read()
+
+    with pytest.raises(
+        ApplicationError,
+        match="Circular template inclusion detected: circ_a -> circ_b -> circ_a",
+    ):
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])

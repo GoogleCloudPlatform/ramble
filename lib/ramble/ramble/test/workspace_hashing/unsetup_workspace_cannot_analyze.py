@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,13 +10,9 @@ import os
 
 import pytest
 
-import ramble.application
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
-
+from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -25,7 +21,10 @@ workspace = RambleCommand("workspace")
 
 
 def test_unsetup_workspace_cannot_analyze(
-    mutable_config, mutable_mock_workspace_path, mock_applications, capsys
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    workspace_name,
 ):
     test_config = """
 ramble:
@@ -57,18 +56,19 @@ ramble:
         packages:
         - zlib
 """
-    workspace_name = "test_unsetup_workspace_cannot_analyze"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
         assert not os.path.exists(os.path.join(ws.experiment_dir, "zlib"))
 
         with pytest.raises(RambleCommandError):
-            output = workspace("analyze", global_args=["-w", workspace_name])
-            assert "Make sure your workspace is fully setup" in output
+            workspace("analyze", global_args=["-w", workspace_name])
+        analyze_log = os.path.join(ws.log_dir, "analyze.latest.out")
+        with open(analyze_log, encoding="utf-8") as f:
+            assert "Make sure your workspace is setup" in f.read()

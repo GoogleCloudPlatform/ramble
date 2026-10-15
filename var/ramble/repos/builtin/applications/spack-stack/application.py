@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,6 +10,7 @@ import os
 
 import ramble.config
 from ramble.appkit import *
+
 import spack.util.executable
 
 
@@ -34,7 +35,7 @@ class SpackStack(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("software", "configuration")
+    tags("spack", "software-stack", "build-tool")
 
     executable(
         "configure",
@@ -103,21 +104,21 @@ class SpackStack(ExecutableApplication):
     )
 
     success_criteria(
-        "view-updated", mode="string", match=r".*==> Updating view at.*"
+        "view-updated", mode="string", match=r".*?==> Updating view at"
     )
 
-    pkg_regex = r"\s*==\> (?P<name>.*) Successfully installed (?P<spec>.*)"
+    pkg_regex = r"\s*==\> (?P<name>.*?) Successfully installed (?P<spec>.*)"
 
     figure_of_merit(
         "Previously installed packages",
-        fom_regex=r"\s*==\> (?P<quant>.*) of the packages are already installed",
+        fom_regex=r"\s*==\> (?P<quant>.*?) of the packages are already installed",
         group_name="quant",
         units="",
     )
 
     figure_of_merit(
         "{pkg_name} installed",
-        fom_regex=r"\s*==\> (?P<pkg_name>.*): Successfully installed (?P<spec>.*)",
+        fom_regex=r"\s*==\> (?P<pkg_name>.*?): Successfully installed (?P<spec>.*)",
         group_name="spec",
         units="",
     )
@@ -138,8 +139,8 @@ class SpackStack(ExecutableApplication):
         "Stage",
         "Total",
     ]
-    for i, fom_part in enumerate(fom_parts):
-        full_regex = r".*\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s.*"
+    for fom_part in fom_parts:
+        full_regex = r".*?\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s"
         figure_of_merit(
             fom_part,
             fom_regex=full_regex,
@@ -172,8 +173,10 @@ class SpackStack(ExecutableApplication):
                 "external_packages", merge_used_stage=False, typed=True
             )
             self.expander.flush_used_variable_stage()
-            for pkg in external_packages:
-                cmds.append(f"spack external find --not-buildable {pkg}")
+            cmds.extend(
+                f"spack external find --not-buildable {pkg}"
+                for pkg in external_packages
+            )
         return cmds
 
     register_builtin("remove_packages", required=False)
@@ -207,6 +210,9 @@ class SpackStack(ExecutableApplication):
     def evaluate_success(self):
         import spack.util.spack_yaml as syaml
 
+        if not self.expander.satisfies("package_manager_family=spack"):
+            return True
+
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
 
@@ -220,13 +226,12 @@ class SpackStack(ExecutableApplication):
         if not os.path.isfile(spack_file):
             return False
 
-        with open(spack_file) as f:
+        with open(spack_file, encoding="utf-8") as f:
             spack_data = syaml.load_config(f)
 
-        tty.debug(f"Spack data: {spack_data}")
+        logger.debug(f"Spack data: {spack_data}")
 
-        for spec in spack_data["spack"]["specs"]:
-            spec_list.append(spec)
+        spec_list.extend(spack_data["spack"]["specs"])
 
         self.package_manager.runner.set_env(self.expander.env_path)
         self.package_manager.runner.activate()

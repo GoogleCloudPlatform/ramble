@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,13 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 
 import pytest
 
-import ramble.workspace
-from ramble.main import RambleCommand
 from ramble.graphs import GraphNodeAmbiguousError
+from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -22,7 +20,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_short_builtin_dep_name(mock_applications):
+def test_short_builtin_dep_name(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:
   variants:
@@ -42,17 +40,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_short_builtin_dep_name"
-    ws = ramble.workspace.create(ws_name)
-    ramble.workspace.activate(ws)
-    ws.write()
-
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
     with pytest.raises(GraphNodeAmbiguousError):
         workspace("setup", "--dry-run", global_args=["-w", ws_name])

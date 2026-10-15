@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,23 +14,23 @@
 # Following line is a shell no-op, and starts a multi-line Python comment.
 # See https://stackoverflow.com/a/47886254
 """:"
-# prefer python3, then python, then python2
-## prefer RAMBLE_PYTHON environment variable, python3, python, then python2
-RAMBLE_PREFERRED_PYTHONS="python3 python python2 /usr/libexec/platform-python"
-for cmd in "${RAMBLE_PYTHON:-}" ${RAMBLE_PREFERRED_PYTHONS}; do
+# prefer python3, then python
+## prefer RAMBLE_PYTHON environment variable, python3, python
+RAMBLE_PREFERRED_PYTHONS="python3 python /usr/libexec/platform-python"
+for cmd in "${_RAMBLE_PYTHON}" "${RAMBLE_PYTHON:-}" ${RAMBLE_PREFERRED_PYTHONS}; do
     if command -v > /dev/null "$cmd"; then
-        export RAMBLE_PYTHON="$(command -v "$cmd")"
-        exec "${RAMBLE_PYTHON}" "$0" "$@"
+        export _RAMBLE_PYTHON="$(command -v "$cmd")"
+        exec "${_RAMBLE_PYTHON}" "$0" "$@"
     fi
 done
 
 echo "==> Error: ramble could not find a python interpreter!" >&2
 exit 1
 ":"""
+
 # Line above is a shell no-op, and ends a python multi-line comment.
 # The code above runs this file with our preferred python interpreter.
 
-from __future__ import print_function
 
 import os
 import sys

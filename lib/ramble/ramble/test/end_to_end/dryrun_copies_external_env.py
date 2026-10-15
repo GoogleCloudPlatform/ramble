@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import glob
 import os
 
 import pytest
@@ -13,10 +14,7 @@ import pytest
 import ramble.filters
 import ramble.pipeline
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -24,14 +22,16 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
+def test_dryrun_copies_external_env(
+    mutable_config, mutable_mock_workspace_path, tmpdir, workspace_name
+):
     test_spack_env = """
 spack:
   specs: [ 'wrf' ]
 """
 
     env_path = str(tmpdir)
-    with open(os.path.join(env_path, "spack.yaml"), "w+") as f:
+    with open(os.path.join(env_path, "spack.yaml"), "w+", encoding="utf-8") as f:
         f.write(test_spack_env)
 
     test_config = f"""
@@ -64,13 +64,12 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_copies_external_env"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -79,9 +78,13 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        env_file = os.path.join(ws.software_dir, "spack", "wrfv4", "spack.yaml")
+        env_file = os.path.join(
+            glob.glob(os.path.join(ws.software_dir, "spack*"))[0],
+            "wrfv4",
+            "spack.yaml",
+        )
 
         assert os.path.exists(env_file)
 
-        with open(env_file) as f:
+        with open(env_file, encoding="utf-8") as f:
             assert "wrf" in f.read()

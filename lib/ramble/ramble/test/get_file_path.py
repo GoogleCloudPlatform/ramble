@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,10 +11,7 @@ import os
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
@@ -25,7 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_get_file_path(mock_applications, mock_file_auto_create):
+def test_get_file_path(mock_applications, mock_file_auto_create, workspace_name):
     test_config = """
 ramble:
   config:
@@ -46,13 +43,12 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test-get-file-path"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -60,7 +56,7 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     test_out = os.path.join(ws.log_dir, "setup.latest", "file-open.test_wl.test.out")
-    with open(test_out) as f:
+    with open(test_out, encoding="utf-8") as f:
         content = f.read()
         # When in dry-run, the test mock pretends the file exists
         assert "Config loaded from dry-run/path/to/file-open/my/config.yaml" in content

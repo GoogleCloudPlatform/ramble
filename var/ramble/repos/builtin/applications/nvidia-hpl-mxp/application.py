@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-
 from ramble.base_app.builtin.hpl import Hpl as HplBase
 from ramble.base_app.builtin.nvidia_hpc_benchmarks import (
     NvidiaHpcBenchmarks as NvidiaHpcBase,
@@ -35,7 +34,7 @@ class NvidiaHplMxp(HplBase, NvidiaHpcBase):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "benchmark", "linpack", "optimized", "nvidia")
+    tags("mixed-precision")
 
     executable(
         "execute",

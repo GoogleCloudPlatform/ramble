@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -181,6 +181,15 @@ The second file you should edit is the ``execute_experiment.tpl`` template file.
 This file contains a template script that will be rendered into an execution
 script for each generated experiment. You can feel free to edit it as you need
 to for your given system, but for this tutorial the default value will work.
+
+As an alternative to directly editing the configuration files, Ramble provides
+a set of commands (under the ``ramble workspace manage`` subcommand) that can
+be used to manipulate the workspace configuration. To replicate the experiments
+from this tutorial, you can run the following command (with a fresh workspace):
+
+.. code-block:: console
+
+     $ ramble workspace manage experiments hostname --wf local -v n_ranks=1 -e test
 
 Setting Up the Experiments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

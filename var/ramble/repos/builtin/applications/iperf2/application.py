@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -18,16 +19,20 @@ class Iperf2(ExecutableApplication):
 
     maintainers("rfbgo")
 
+    tags("network-benchmark")
+
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "iperf2",
-        pkg_spec="iperf2@2.0.12",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+    version("2.0.12", "Version 2.0.12 of iperf2", preferred=True)
 
-    required_package("iperf2", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        software_spec(
+            "iperf2-{application::iperf2::version}",
+            pkg_spec="iperf2@{application::iperf2::version}",
+            compiler="gcc9",
+        )
+
+        required_package("iperf2")
 
     # Need to support these use cases:
     # iperf -s // set up server
@@ -106,7 +111,7 @@ class Iperf2(ExecutableApplication):
     figure_of_merit(
         "Total BW",
         log_file=log_str,
-        fom_regex=r"\[SUM\]\s.*sec\s.*GBytes\s(?P<bw>.*)\sGbits/sec.*",
+        fom_regex=r"\[SUM\]\s.*?sec\s.*?GBytes\s(?P<bw>.*)\sGbits/sec",
         group_name="bw",
         units="Gbits/sec",
     )

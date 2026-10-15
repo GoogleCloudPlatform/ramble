@@ -1,0 +1,14 @@
+# -------------------------------------------------------------------------
+# This is the default ramble repository configuration. It includes the
+# builtin ramble platform repository.
+#
+# Users can override these settings by editing the following files.
+#
+# Per-ramble-instance settings (overrides defaults):
+#   $RAMBLE_ROOT/etc/ramble/platform_repos.yaml
+#
+# Per-user settings (overrides default and site settings):
+#   ~/.ramble/platform_repos.yaml
+# -------------------------------------------------------------------------
+platform_repos:
+  - $ramble/var/ramble/repos/builtin

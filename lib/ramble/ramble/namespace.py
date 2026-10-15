@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,12 +20,16 @@ class namespace:
     custom_executables = "custom_executables"
     executables = "executables"
     executable_injection = "executable_injection"
+    custom_inputs = "custom_inputs"
+    custom_workloads = "custom_workloads"
+    inputs = "inputs"
     env_var = "env_vars"
     packages = "packages"
     environments = "environments"
     template = "template"
     chained_experiments = "chained_experiments"
     modifiers = "modifiers"
+    tables = "tables"
     tags = "tags"
     n_repeats = "n_repeats"
     formatted_executables = "formatted_executables"
@@ -46,10 +50,9 @@ class namespace:
     # For software definitions
     software = "software"
     external_env = "external_env"
+    utilities = "utilities"
 
     # v2 configs
-    packages = "packages"
-    environments = "environments"
     pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"
@@ -63,6 +66,11 @@ class namespace:
     # For variants
     package_manager = "package_manager"
     workflow_manager = "workflow_manager"
+    system = "system"
+    platform = "platform"
+    version = "version"
+    containerized = "containerized"
 
     metadata = "metadata"
     include = "include"
+    workspace = "workspace"

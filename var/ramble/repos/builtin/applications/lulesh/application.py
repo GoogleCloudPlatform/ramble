@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -14,26 +15,29 @@ from ramble.expander import Expander
 class Lulesh(ExecutableApplication):
     """Define LULESH application"""
 
-    name = "LULESH"
+    name = "lulesh"
 
     maintainers("douglasjacobsen")
 
-    tags("proxy-app", "mini-app")
+    tags("mini-app", "shock-physics")
 
-    define_compiler("gcc13", pkg_spec="gcc@13.1.0", package_manager="spack*")
+    version("2.0.3", "Version 2.0.3 of LULESH", preferred=True)
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-    software_spec(
-        "lulesh",
-        pkg_spec="lulesh@2.0.3 +openmp",
-        compiler="gcc13",
-        package_manager="spack*",
-    )
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
 
-    required_package("lulesh", package_manager="spack*")
+        software_spec(
+            "lulesh-{application::lulesh::version}",
+            pkg_spec="lulesh@{application::lulesh::version} +openmp",
+            compiler="gcc14",
+        )
+
+        required_package("lulesh")
 
     executable("execute", "lulesh2.0 {flags}", use_mpi=True)
 
@@ -68,7 +72,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "Time",
         log_file=log_str,
-        fom_regex=r"\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+)",
         group_name="time",
         units="s",
     )
@@ -76,7 +80,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "FOM",
         log_file=log_str,
-        fom_regex=r"\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+)",
         group_name="fom",
         units="z/s",
     )
@@ -92,7 +96,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "Grind Time",
         log_file=log_str,
-        fom_regex=r"\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+)",
         group_name="grind",
         units="s/element",
     )

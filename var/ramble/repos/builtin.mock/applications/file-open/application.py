@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,8 @@
 # except according to those terms.
 
 import os
-import ruamel.yaml as yaml
+
+from ruamel import yaml
 
 from ramble.appkit import *
 
@@ -27,6 +28,6 @@ class FileOpen(ExecutableApplication):
         config_path = get_file_path(
             os.path.join("file-open", "my", "config.yaml"), workspace
         )
-        with open(config_path) as conf:
+        with open(config_path, encoding="utf-8") as conf:
             yaml.safe_load(conf)
             logger.info(f"Config loaded from {config_path}")

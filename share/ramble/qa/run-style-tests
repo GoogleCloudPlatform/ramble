@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -36,6 +36,12 @@ fi
 # Only check for modified files as this is for pre-commit.
 # The other PR check ramble-pr-style still verifies all files.
 ramble license verify --modified
+if [ $? != 0 ]; then
+  ERROR=1
+fi
+
+# verify that external packages in COPYRIGHT match actual external packages
+python3 "$(dirname $0)/check_external_copyright.py"
 if [ $? != 0 ]; then
   ERROR=1
 fi

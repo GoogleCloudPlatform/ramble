@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -22,6 +22,12 @@ class ContainerBase(BasicModifier):
     tags("container")
 
     maintainers("douglasjacobsen")
+
+    variant(
+        "containerized",
+        default=True,
+        description="Whether this experiment is run inside a container",
+    )
 
     mode("standard", description="Standard execution mode")
     default_mode("standard")
@@ -77,7 +83,7 @@ class ContainerBase(BasicModifier):
             path = None
             # If using spack, load spack environment before getting container runtime exec path
             if check_software_env and app_inst.package_manager is not None:
-                if app_inst.package_manager.spec_prefix() == "spack":
+                if app_inst.package_manager.spec_prefix == "spack":
                     app_inst.package_manager.runner.activate()
                     _, base = app_inst.package_manager.runner.get_package_path(
                         runtime
@@ -112,7 +118,7 @@ class ContainerBase(BasicModifier):
         container_env_vars variable.
         """
 
-        def extract_names(itr, name_set=set()):
+        def extract_names(itr, name_set=None):
             """Extract names of environment variables from the environment variable action sets
 
             Given an iterator over environment variable action sets, extract
@@ -120,6 +126,8 @@ class ContainerBase(BasicModifier):
 
             Modifies the name_set argument inplace.
             """
+            if name_set is None:
+                name_set = set()
             for action, conf in itr:
                 if action in ["set", "unset"]:
                     for name in conf:
@@ -140,7 +148,8 @@ class ContainerBase(BasicModifier):
             extract_names(env_var_set.items(), set_names)
 
         for mod_inst in app_inst._modifier_instances:
-            extract_names(mod_inst.all_env_var_modifications(), set_names)
+            for env_var_mod in mod_inst.all_env_var_modifications():
+                set_names.add(env_var_mod.name)
 
         env_var_list = ",".join(set_names)
         app_inst.define_variable("container_env_vars", env_var_list)
@@ -148,7 +157,7 @@ class ContainerBase(BasicModifier):
         # Define container_mounts
         input_mounts = app_inst.expander.expand_var("{container_mounts}")
 
-        workload = app_inst.workloads[app_inst.expander.workload_name]
+        workload = app_inst.get_workload()
 
         exp_mount = "{experiment_run_dir}:{experiment_run_dir}"
         if len(workload.inputs) > 0:
@@ -160,12 +169,14 @@ class ContainerBase(BasicModifier):
             exp_mount not in input_mounts
             and expanded_exp_mount not in input_mounts
         ):
-            add_mod = self._usage_mode not in self.variable_modifications
-            add_mod = add_mod or (
-                self._usage_mode in self.variable_modifications
-                and "container_mounts"
-                not in self.variable_modifications[self._usage_mode]
-            )
+            add_mod = True
+            for when_set, var_mod_dict in self.variable_modifications.items():
+                if self.expander.satisfies(
+                    when_set, self.experiment_variants()
+                ):
+                    if "container_mounts" in var_mod_dict:
+                        add_mod = False
+                        break
             if add_mod:
                 self.variable_modification(
                     "container_mounts",

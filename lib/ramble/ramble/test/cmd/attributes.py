@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,6 +9,8 @@
 import pytest
 
 from ramble.main import RambleCommand
+
+pytestmark = pytest.mark.usefixtures("config")
 
 attributes = RambleCommand("attributes")
 
@@ -22,14 +24,13 @@ attributes = RambleCommand("attributes")
         ["hostname"],
         ["--modifiers", "-a"],
         ["--modifiers", "-a", "--by-attribute"],
-        ["--modifiers", "-a"],
         ["--tags", "--defined"],
         ["--tags", "-a"],
         ["--tags", "-a", "--by-attribute"],
         ["--tags", "hostname"],
         ["--tags", "--modifiers", "-a"],
         ["--tags", "--modifiers", "-a", "--by-attribute"],
-        ["--tags", "--modifiers", "-a"],
+        ["--tags", "--by-attribute", "test-app"],
     ],
 )
 def test_attributes_runs(flags):
@@ -110,6 +111,8 @@ def untagged_mods():
     ],
 )
 def test_mock_attributes_list(
+    mutable_mock_base_apps_repo,
+    mock_base_applications,
     mutable_mock_apps_repo,
     mock_applications,
     mutable_mock_mods_repo,
@@ -132,3 +135,30 @@ def test_mock_attributes_list(
 
     for obj in unexpected_objs:
         assert obj not in out_list
+
+
+def test_attributes_no_results_warning():
+    out = attributes("nonexistent_app_name_xyz", fail_on_error=False)
+    assert attributes.returncode == 1
+    assert "Object 'nonexistent_app_name_xyz' not found in applications repository" in out
+
+    out = attributes("--modifiers", "nonexistent_mod_name_xyz", fail_on_error=False)
+    assert attributes.returncode == 1
+    assert "Object 'nonexistent_mod_name_xyz' not found in modifiers repository" in out
+
+    out = attributes("--by-attribute", "nonexistent_attr_xyz")
+    assert attributes.returncode == 0
+    assert "No applications found with maintainers 'nonexistent_attr_xyz'" in out
+
+    out = attributes("--tags", "--by-attribute", "nonexistent_tag_xyz")
+    assert attributes.returncode == 0
+    assert "No applications found with tags 'nonexistent_tag_xyz'" in out
+
+
+def test_attributes_unmaintained_object_warning(
+    mutable_mock_apps_repo,
+    mock_applications,
+):
+    out = attributes("unmaintained-1")
+    assert attributes.returncode == 0
+    assert "No maintainers found for applications 'unmaintained-1'" in out

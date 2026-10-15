@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,8 @@
 # except according to those terms.
 
 import sys
-from llnl.util.tty.color import colorize
+
+from ramble.util.colors import colorize
 
 description = "get help on ramble and its commands"
 section = "help"
@@ -76,3 +77,4 @@ def help(parser, args):
         parser.parse_args([args.help_command, "-h"])
     else:
         sys.stdout.write(parser.format_help(level=args.all))
+        return 0

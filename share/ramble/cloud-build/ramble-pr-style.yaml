@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,8 +6,22 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-
+tags:
+  # This is used for filtering builds related to a specific PR
+  - '$TRIGGER_NAME-$_PR_NUMBER'
 steps:
+  # Cancel older builds
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'share/ramble/cloud-build/cancel-older-builds.sh'
+    env:
+      - 'PR_NUMBER=$_PR_NUMBER'
+      - 'TRIGGER_NAME=$TRIGGER_NAME'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'LOCATION=$LOCATION'
   - name: gcr.io/cloud-builders/git
     args:
       - fetch
@@ -17,24 +31,9 @@ steps:
     args:
       - '-c'
       - |
-        cd /workspace
+        . /workspace/share/ramble/cloud-build/setup-ci-env.sh
 
-        git branch develop origin/develop
-
-        . /opt/spack/share/spack/setup-env.sh
-
-        spack load py-pip ^python
-
-        pip install -r /workspace/requirements-dev.txt
-
-        export SPACK_PYTHON=`which python3`
-
-        . /workspace/share/ramble/setup-env.sh
-
-        echo "Spack version is $(spack --version)"
-        echo "Python version is $(python3 --version)"
-
-        ramble style -U
+        ramble style -a -U
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         style_err=$$?
@@ -54,17 +53,27 @@ steps:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         license_err=$$?
 
-        # Test removing a dependency
-        pip uninstall -y pytest
-
         ramble help
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         missing_req_err=$$?
 
         error=0
+        # Check to see if dependencies are present and simple command succeed
         if [ $$missing_req_err -gt 0 ]; then
-          echo " ***** Ramble failed to work when requirements.txt were not installed"
+          echo " ***** ramble help call failed. Perhaps a required package was not installed?"
+          error=1
+        fi
+
+        # Test removing a dependency
+        pip uninstall -y pytest
+
+        ramble help
+        missing_req_err=$$?
+
+        # Check to see if dependencies are loaded lazily and simple commands can still succeed
+        if [ $$missing_req_err -gt 0 ]; then
+          echo " ***** ramble help call failed. Perhaps a required packed loaded too early?"
           error=1
         fi
 
@@ -108,8 +117,7 @@ steps:
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6
-  _BASE_IMG: centos
-  _BASE_VER: '7'
+  _BASE_IMG: rockylinux 
+  _BASE_VER: '8'
 timeout: 600s
-options:
-  machineType: N1_HIGHCPU_8
+queueTtl: 7200s

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,9 +15,9 @@ the main server for a particular input is down.  Or, if the computer
 where ramble is run is not connected to the internet, it allows ramble
 to download inputs directly from a mirror (e.g., on an intranet).
 """
+
 import collections
 import operator
-import os
 import os.path
 
 import ruamel.yaml.error as yaml_error
@@ -27,12 +27,11 @@ from llnl.util.compat import Mapping
 import ramble.config
 import ramble.error
 import ramble.fetch_strategy as fs
+from ramble.util import json_util
 from ramble.util.logger import logger
 
 import spack.url
-import spack.util.spack_json
 import spack.util.spack_yaml
-import spack.util.url as url_util
 from spack.util.spack_yaml import syaml_dict
 
 
@@ -66,7 +65,7 @@ class Mirror:
         return self._fetch_url == other._fetch_url and self._push_url == other._push_url
 
     def to_json(self, stream=None):
-        return spack.util.spack_json.dump(self.to_dict(), stream)
+        return json_util.dump(self.to_dict(), stream)
 
     def to_yaml(self, stream=None):
         return spack.util.spack_yaml.dump(self.to_dict(), stream)
@@ -77,15 +76,15 @@ class Mirror:
             data = spack.util.spack_yaml.load(stream)
             return Mirror.from_dict(data, name)
         except yaml_error.MarkedYAMLError as e:
-            raise spack.util.spack_yaml.SpackYAMLError("error parsing YAML mirror:", str(e)) from e
+            raise MirrorError(f"error parsing YAML mirror: {e}") from e
 
     @staticmethod
     def from_json(stream, name=None):
         try:
-            d = spack.util.spack_json.load(stream)
+            d = json_util.load(stream)
             return Mirror.from_dict(d, name)
         except Exception as e:
-            raise spack.util.spack_json.SpackJSONError("error parsing JSON mirror:", str(e)) from e
+            raise MirrorError(f"error parsing JSON mirror: {e}") from e
 
     def to_dict(self):
         return syaml_dict(
@@ -111,7 +110,7 @@ class Mirror:
         if name is None:
             name = ""
         else:
-            name = ' "%s"' % name
+            name = f' "{name}"'
 
         if self._push_url is None:
             return f"[Mirror{name} ({self._fetch_url})]"
@@ -138,62 +137,6 @@ class Mirror:
     @property
     def name(self):
         return self._name or "<unnamed>"
-
-    def get_profile(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("profile", None)
-            return self._fetch_url.get("profile", None)
-        else:
-            return None
-
-    def set_profile(self, url_type, profile):
-        if url_type == "push":
-            self._push_url["profile"] = profile
-        else:
-            self._fetch_url["profile"] = profile
-
-    def get_access_pair(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("access_pair", None)
-            return self._fetch_url.get("access_pair", None)
-        else:
-            return None
-
-    def set_access_pair(self, url_type, connection_tuple):
-        if url_type == "push":
-            self._push_url["access_pair"] = connection_tuple
-        else:
-            self._fetch_url["access_pair"] = connection_tuple
-
-    def get_endpoint_url(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("endpoint_url", None)
-            return self._fetch_url.get("endpoint_url", None)
-        else:
-            return None
-
-    def set_endpoint_url(self, url_type, url):
-        if url_type == "push":
-            self._push_url["endpoint_url"] = url
-        else:
-            self._fetch_url["endpoint_url"] = url
-
-    def get_access_token(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("access_token", None)
-            return self._fetch_url.get("access_token", None)
-        else:
-            return None
-
-    def set_access_token(self, url_type, connection_token):
-        if url_type == "push":
-            self._push_url["access_token"] = connection_token
-        else:
-            self._fetch_url["access_token"] = connection_token
 
     @property
     def fetch_url(self):
@@ -237,7 +180,7 @@ class MirrorCollection(Mapping):
         return self._mirrors == other._mirrors
 
     def to_json(self, stream=None):
-        return spack.util.spack_json.dump(self.to_dict(True), stream)
+        return json_util.dump(self.to_dict(True), stream)
 
     def to_yaml(self, stream=None):
         return spack.util.spack_yaml.dump(self.to_dict(True), stream)
@@ -358,13 +301,13 @@ def mirror_archive_paths(fetcher, per_input_ref):
     ext = None or _determine_extension(fetcher)
 
     if ext:
-        per_input_ref += ".%s" % ext
+        per_input_ref += f".{ext}"
 
     global_ref = fetcher.mirror_id()
     if global_ref:
         global_ref = os.path.join("_input-cache", global_ref)
     if global_ref and ext:
-        global_ref += ".%s" % ext
+        global_ref += f".{ext}"
 
     return MirrorReference(per_input_ref, global_ref)
 
@@ -419,29 +362,7 @@ class MirrorStats:
     def __init__(self):
         self.present = {}
         self.new = {}
-        self.errors = {}
-
-        self.current_spec = None
-        self.added_resources = set()
-        self.existing_resources = set()
-
-    def next_spec(self, spec):
-        self._tally_current_spec()
-        self.current_spec = spec
-
-    def _tally_current_spec(self):
-        if self.current_spec:
-            if self.added_resources:
-                self.new[self.current_spec] = len(self.added_resources)
-            if self.existing_resources:
-                self.present[self.current_spec] = len(self.existing_resources)
-            self.added_resources = set()
-            self.existing_resources = set()
-        self.current_spec = None
-
-    def stats(self):
-        self._tally_current_spec()
-        return list(self.present), list(self.new), list(self.errors)
+        self.errors = set()
 
     def already_existed(self, resource):
         self.present[resource] = True
@@ -450,36 +371,7 @@ class MirrorStats:
         self.new[resource] = True
 
     def error(self, resource):
-        self.errors.add(self.current_spec)
-
-
-def push_url_from_directory(output_directory):
-    """Given a directory in the local filesystem, return the URL on
-    which to push resources.
-    """
-    scheme = url_util.parse(output_directory, scheme="<missing>").scheme
-    if scheme != "<missing>":
-        raise ValueError("expected a local path, but got a URL instead")
-    mirror_url = "file://" + output_directory
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
-    return url_util.format(mirror.push_url)
-
-
-def push_url_from_mirror_name(mirror_name):
-    """Given a mirror name, return the URL on which to push resources."""
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_name)
-    if mirror.name == "<unnamed>":
-        raise ValueError(f'no mirror named "{mirror_name}"')
-    return url_util.format(mirror.push_url)
-
-
-def push_url_from_mirror_url(mirror_url):
-    """Given a mirror URL, return the URL on which to push resources."""
-    scheme = url_util.parse(mirror_url, scheme="<missing>").scheme
-    if scheme == "<missing>":
-        raise ValueError(f'"{mirror_url}" is not a valid URL')
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
-    return url_util.format(mirror.push_url)
+        self.errors.add(resource)
 
 
 class MirrorError(ramble.error.RambleError):

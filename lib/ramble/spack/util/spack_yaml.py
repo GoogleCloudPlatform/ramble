@@ -50,10 +50,25 @@ class syaml_int(int):
     __repr__ = int.__repr__
 
 
+class syaml_bool(int):
+    def __new__(cls, val, string_val=None):
+        obj = super(syaml_bool, cls).__new__(cls, val)
+        obj.string_val = string_val
+        return obj
+
+    def __repr__(self):
+        return self.string_val if self.string_val else ('True' if self else 'False')
+
+    def __str__(self):
+        return self.string_val if self.string_val else ('True' if self else 'False')
+
+
+
 #: mapping from syaml type -> primitive type
 syaml_types = {
     syaml_str: str,
     syaml_int: int,
+    syaml_bool: bool,
     syaml_dict: dict,
     syaml_list: list,
 }
@@ -121,13 +136,21 @@ class OrderedLineLoader(RoundTripLoader):
     # and fill in with mappings later.  We preserve this behavior.
     #
 
+
+    def construct_yaml_bool(self, node):
+        value = super(OrderedLineLoader, self).construct_yaml_bool(node)
+        b = syaml_bool(value, string_val=node.value)
+        mark(b, node)
+        return b
+
     def construct_yaml_str(self, node):
         value = super(OrderedLineLoader, self).construct_yaml_str(node)
         # There is no specific marker to indicate that we are parsing a key,
         # so this assumes we are talking about a Spack config override key if
         # it ends with a ':' and does not contain a '@' (which can appear
         # in config values that refer to Spack specs)
-        if value and value.endswith(':') and '@' not in value:
+        # and is not quoted (identified by a non-empty node.style)
+        if value and value.endswith(':') and '@' not in value and not node.style:
             value = syaml_str(value[:-1])
             value.override = True
         else:
@@ -156,6 +179,8 @@ class OrderedLineLoader(RoundTripLoader):
 
 # register above new constructors
 OrderedLineLoader.add_constructor(
+    'tag:yaml.org,2002:bool', OrderedLineLoader.construct_yaml_bool)
+OrderedLineLoader.add_constructor(
     'tag:yaml.org,2002:map', OrderedLineLoader.construct_yaml_map)
 OrderedLineLoader.add_constructor(
     'tag:yaml.org,2002:seq', OrderedLineLoader.construct_yaml_seq)
@@ -183,9 +208,17 @@ class OrderedLineDumper(RoundTripDumper):
             result.value = syaml_str("null")
         return result
 
+
+    def represent_bool(self, data):
+        if hasattr(data, 'string_val') and data.string_val:
+            return self.represent_scalar('tag:yaml.org,2002:bool', data.string_val)
+        return super(OrderedLineDumper, self).represent_bool(bool(data))
+
     def represent_str(self, data):
         if hasattr(data, 'override') and data.override:
             data = data + ':'
+        if len(data.splitlines()) > 1:
+            return super(OrderedLineDumper, self).represent_scalar('tag:yaml.org,2002:str', data, style='|')
         return super(OrderedLineDumper, self).represent_str(data)
 
 
@@ -195,12 +228,19 @@ class SafeDumper(RoundTripDumper):
         """Make the dumper NEVER print YAML aliases."""
         return True
 
+    def represent_bool(self, data):
+        if hasattr(data, 'string_val') and data.string_val:
+            return self.represent_scalar('tag:yaml.org,2002:bool', data.string_val)
+        return super(SafeDumper, self).represent_bool(bool(data))
+
 
 # Make our special objects look like normal YAML ones.
 RoundTripDumper.add_representer(syaml_dict, RoundTripDumper.represent_dict)
 RoundTripDumper.add_representer(syaml_list, RoundTripDumper.represent_list)
 RoundTripDumper.add_representer(syaml_int, RoundTripDumper.represent_int)
+RoundTripDumper.add_representer(syaml_bool, RoundTripDumper.represent_bool)
 RoundTripDumper.add_representer(syaml_str, RoundTripDumper.represent_str)
+OrderedLineDumper.add_representer(syaml_bool, OrderedLineDumper.represent_bool)
 OrderedLineDumper.add_representer(syaml_str, OrderedLineDumper.represent_str)
 
 
@@ -208,9 +248,9 @@ OrderedLineDumper.add_representer(syaml_str, OrderedLineDumper.represent_str)
 maxint = 2 ** (ctypes.sizeof(ctypes.c_int) * 8 - 1) - 1
 
 
-def dump(obj, default_flow_style=False, stream=None):
+def dump(obj, default_flow_style=False, stream=None, Dumper=SafeDumper):
     return yaml.dump(obj, default_flow_style=default_flow_style, width=maxint,
-                     Dumper=SafeDumper, stream=stream)
+                     Dumper=Dumper, stream=stream)
 
 
 def file_line(mark):

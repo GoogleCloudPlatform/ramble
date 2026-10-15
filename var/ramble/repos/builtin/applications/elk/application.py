@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,7 +29,7 @@ class Elk(ExecutableApplication):
 
     name = "elk"
 
-    tags("LAPW", "density-functional-theory")
+    tags("quantum-chemistry", "materials-science", "dft", "lapw")
 
     input_file(
         "examples",
@@ -39,17 +39,22 @@ class Elk(ExecutableApplication):
     )
 
     executable("execute", "{install_prefix}/elk_openmpi", use_mpi=True)
-    executable(
-        "copy", "cp {input_path}/elk.in {experiment_run_dir}/.", use_mpi=False
+    stage_files(
+        name="stage-input",
+        src="{input_path}/elk.in",
+        dst="{experiment_run_dir}/.",
     )
-    executable(
+    edit_file(
         "update_input",
-        "sed -i 's|../../../species/|{examples}/species/|g' elk.in",
-        use_mpi=False,
+        file_path="elk.in",
+        match=r"\.\./\.\./\.\./species/",
+        replace="{examples}/species/",
     )
 
     workload(
-        "Cu", executables=["copy", "update_input", "execute"], input="examples"
+        "Cu",
+        executables=["stage-input", "update_input", "execute"],
+        input="examples",
     )
 
     workload_variable(
@@ -69,7 +74,7 @@ class Elk(ExecutableApplication):
     success_criteria(
         "prints_done",
         mode="string",
-        match=r".*Elk code stopped.*",
+        match=r".*?Elk code stopped",
         file="{experiment_run_dir}/{experiment_name}.out",
     )
 
@@ -88,7 +93,7 @@ class Elk(ExecutableApplication):
         figure_of_merit(
             metric,
             log_file=output_file,
-            fom_regex=rf"\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*).*",
+            fom_regex=rf"\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*)",
             group_name="value",
             units="s",
         )

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,23 +13,24 @@ These functions are intended to help read, write, and manipulate YAML based
 configuration files that an experiment might use as input.
 
 Workload variables that represent configuration files should be defined using a
-'.' delimiter between YAML object names. As an example:
+'.' delimiter between YAML object names. As an example::
 
-```
-foo:
-    bar:
-        baz: 1.0
-```
+    foo:
+        bar:
+            baz: 1.0
 
 Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 """
 
-from typing import Dict, Any
-import ruamel.yaml as yaml
-import spack.util.spack_yaml as syaml
+from collections import deque
+from typing import Any, Dict, Union
+
+from ruamel import yaml
 
 from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
 
 
 def read_config_file(conf_path: str):
@@ -39,9 +40,9 @@ def read_config_file(conf_path: str):
         conf_path (str): Path to input configuration file to read
 
     Returns:
-        (dict): Dictionary representation of the data contained in conf_path
+        dict[str, Any]: Dictionary representation of the data contained in conf_path
     """
-    with open(conf_path) as base_conf:
+    with open(conf_path, encoding="utf-8") as base_conf:
         logger.debug(f"Reading config from {conf_path}")
         try:
             config_dict = syaml.load(base_conf)
@@ -58,28 +59,26 @@ def all_config_options(config_data: Dict):
         config_data (dict): A config dictionary representing data read from a YAML file.
 
     Returns:
-        (set): Set containing all detected fully qualified option names
+        set[str]: Set containing all detected fully qualified option names
     """
 
     all_configs = set()
-    option_parts = []
-    for top_level in config_data:
-        option_parts.append((top_level, config_data[top_level]))
+    option_parts = deque(config_data.items())
 
     while option_parts:
-        cur_part = option_parts.pop(0)
+        cur_part = option_parts.popleft()
 
         if isinstance(cur_part[1], dict):
             for level in cur_part[1]:
-                option_parts.insert(0, (f"{cur_part[0]}.{level}", cur_part[1][level]))
+                option_parts.appendleft((f"{cur_part[0]}.{level}", cur_part[1][level]))
         else:
-            if len(cur_part[0].split(".")) > 1:
+            if "." in cur_part[0]:
                 all_configs.add(cur_part[0])
 
     return all_configs
 
 
-def _type_value(input_value):
+def _type_value(input_value: str) -> Union[int, float, str]:
     """Attempt to convert an input value to other types.
 
     Precedence order is:
@@ -92,14 +91,12 @@ def _type_value(input_value):
     """
 
     try:
-        out = int(input_value)
-        return out
+        return int(input_value)
     except ValueError:
         pass
 
     try:
-        out = float(input_value)
-        return out
+        return float(input_value)
     except ValueError:
         pass
 
@@ -117,7 +114,7 @@ def get_config_value(config_data: Dict, option_name: str):
         option_name (str): Name of config option to get
 
     Returns:
-        (Any): Value of config option
+        Any: Value of config option
     """
     option_parts = option_name.split(".")
 
@@ -145,7 +142,7 @@ def set_config_value(config_data: Dict, option_name: str, option_value: Any, for
     Args:
         config_data (dict): A config dictionary representing data read from a YAML file.
         option_name (str): Name of config option to set
-        option_value (any): Value to set config option to
+        option_value (Any): Value to set config option to
         force (bool): If true, all missing layers in the attribute list are created.
                       If false, only sets existing attributes
     """
@@ -211,14 +208,12 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
 
     Args:
         config_data (dict): Dictionary of config data read from a YAML file
-        app_inst (application): Application instance representing an experiment
+        app_inst: Application instance representing an experiment
         default_config_string (str): String that conveys the default config_data
                                      should be used in place of the current value.
     """
-    workload = app_inst.workloads[app_inst.expander.workload_name]
-
     # Set all '{default_config_value}' values to value from the base config
-    for var_name in workload.variables.keys():
+    for var_name in app_inst.selected_variables:
         if len(var_name.split(".")) > 1:
             var_val = app_inst.expander.expand_var(app_inst.expander.expansion_str(var_name))
 

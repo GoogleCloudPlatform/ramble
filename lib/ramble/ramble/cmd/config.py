@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,15 +12,15 @@ import shutil
 from typing import List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble.cmd.common.arguments
 import ramble.config
+import ramble.util.editor
 import ramble.workspace
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
-import ramble.util.editor
 
 description = "get and set configuration options"
 section = "config"
@@ -28,15 +28,16 @@ level = "long"
 
 
 def setup_parser(subparser):
-    scopes = ramble.config.scopes()
     scopes_metavar = ramble.config.scopes_metavar
 
     # User can only choose one
     subparser.add_argument(
+        "-s",
         "--scope",
-        choices=scopes,
+        choices=ramble.config.scopes_choices(include_workspace=True),
         metavar=scopes_metavar,
-        help="configuration scope to read/modify",
+        help="configuration scope to read/modify (default: user if no workspace, "
+        "workspace if active)",
     )
 
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="config_command")
@@ -113,21 +114,21 @@ def _get_scope_and_section(args):
     section = getattr(args, "section", None)
     path = getattr(args, "path", None)
 
-    # w/no args and an active workspace, point to workspace config
-    if not section:
-        ws = ramble.workspace.active_workspace()
-        if ws:
-            scope = ws.ws_file_config_scope_name()
-
-    # set scope defaults
-    elif not scope:
-        scope = ramble.config.default_modify_scope(section)
-
     # special handling for commands that take value instead of section
     if path:
         section = path[: path.find(":")] if ":" in path else path
-        if not scope:
-            scope = ramble.config.default_modify_scope(section)
+
+    if scope:
+        try:
+            scope = ramble.config.resolve_scope(scope)
+        except ValueError as e:
+            logger.die(str(e))
+    else:
+        ws = ramble.workspace.active_workspace()
+        if ws:
+            scope = ws.ws_file_config_scope_name()
+        else:
+            scope = "user"
 
     return scope, section
 
@@ -146,10 +147,10 @@ def config_get(args):
     elif scope and scope.startswith("workspace:"):
         config_file = ramble.config.config.get_config_filename(scope, section)
         if os.path.exists(config_file):
-            with open(config_file) as f:
+            with open(config_file, encoding="utf-8") as f:
                 print(f.read())
         else:
-            logger.die(f"workspace has no {ramble.workspace.config_file_name} file")
+            logger.die(f"workspace has no {ramble.workspace.CONFIG_FILE_NAME} file")
 
     else:
         logger.die("`ramble config get` requires a section argument " "or an active workspace.")
@@ -166,7 +167,7 @@ def config_edit(args):
     With no arguments and an active workspace, edit the ramble.yaml for
     the active workspace.
     """
-    ramble_ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+    ramble_ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
     if ramble_ws and not args.scope:
         # Don't use the scope object for workspaces, as `config edit` can be called
         # for a malformed workspace. Use RAMBLE_WORKSPACE to find ramble.yaml.
@@ -174,7 +175,7 @@ def config_edit(args):
     else:
         # If we aren't editing a ramble.yaml file, get config path from scope.
         scope, section = _get_scope_and_section(args)
-        if not scope and not section:
+        if not section and (not scope or not scope.startswith("workspace:")):
             logger.die(
                 "`ramble config edit` requires a section argument " "or an active workspace."
             )
@@ -252,7 +253,7 @@ def _can_update_config_file(scope_dir, cfg_file):
     return dir_ok and cfg_ok
 
 
-def config_update(args):
+def config_update(args) -> None:
     # Read the configuration files
     ramble.config.config.get_config(args.section, scope=args.scope)
     updates: List[ramble.config.ConfigScope] = list(
@@ -315,7 +316,7 @@ def config_update(args):
             'be retrieved with "ramble config revert"'
         )
         logger.msg(msg)
-        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
+        proceed = bool(tty.get_yes_or_no("Do you want to proceed?", default=False))
 
     if not proceed:
         logger.die("Operation aborted.")
@@ -324,8 +325,8 @@ def config_update(args):
     update_fn = ramble.config.ensure_latest_format_fn(args.section)
     for scope in updates:
         cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
-        with open(cfg_file) as f:
-            data = syaml.load_config(f) or {}
+        with open(cfg_file, encoding="utf-8") as f:
+            data = ramble.config.load_config(f) or {}
             data = data.pop(args.section, {})
         update_fn(data)
 
@@ -386,7 +387,7 @@ def config_revert(args):
             msg += "\t[scope={0.scope}, bkp={0.bkp}]\n".format(entry)
         msg += "This operation cannot be undone."
         logger.msg(msg)
-        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
+        proceed = bool(tty.get_yes_or_no("Do you want to proceed?", default=False))
 
     if not proceed:
         logger.die("Operation aborted.")

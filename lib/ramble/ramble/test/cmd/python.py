@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,7 +20,7 @@ python = RambleCommand("python")
 
 def test_python():
     out = python("-c", "import ramble; print(ramble.ramble_version)")
-    assert out.strip() == ramble.ramble_version
+    assert ramble.ramble_version in out.strip()
 
 
 def test_python_interpreter_path():
@@ -45,3 +45,23 @@ def test_python_with_module():
 def test_python_raises():
     out = python("--foobar", fail_on_error=False)
     assert "Error: Unknown arguments" in out
+
+
+def test_python_script(tmpdir):
+    script = tmpdir.join("test_script.py")
+    script.write("""
+import sys
+import ramble
+print(f"ARG:{sys.argv[1]}")
+print(f"VER:{ramble.ramble_version}")
+""")
+    out = python(str(script), "hello")
+    assert "ARG:hello" in out
+    assert f"VER:{ramble.ramble_version}" in out
+
+
+def test_python_command_and_script(tmpdir):
+    script = tmpdir.join("dummy.py")
+    script.write("print('hello')")
+    out = python("-c", "print('cmd')", str(script), fail_on_error=False)
+    assert "You can only specify a command OR script" in out

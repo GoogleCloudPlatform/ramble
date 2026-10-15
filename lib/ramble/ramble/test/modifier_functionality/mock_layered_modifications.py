@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,20 +8,17 @@
 
 import os
 
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
-
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
+from ramble.test.modifier_functionality import modifier_helpers
 
 workspace = RambleCommand("workspace")
 
 
 def test_layered_variable_modifications(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, workspace_name
 ):
-    workspace_name = "test_gromacs_dry_run_mock_spack_mod"
-
     test_modifiers = [
         (SCOPES.experiment, modifier_helpers.named_modifier("test-mod")),
         (SCOPES.experiment, modifier_helpers.named_modifier("test-mod-2")),
@@ -34,10 +31,10 @@ def test_layered_variable_modifications(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         template_path = os.path.join(ws1.config_dir, "test.tpl")
 
-        with open(template_path, "w+") as f:
+        with open(template_path, "w+", encoding="utf-8") as f:
             f.write(test_template)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
@@ -52,7 +49,7 @@ def test_layered_variable_modifications(
         )
         assert os.path.exists(rendered_template)
 
-        with open(rendered_template) as f:
+        with open(rendered_template, encoding="utf-8") as f:
             data = f.read()
             assert "test-mod-2-append" in data
             assert "test-mod-append" in data

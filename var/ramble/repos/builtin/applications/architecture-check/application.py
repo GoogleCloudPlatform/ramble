@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -16,43 +16,37 @@ class ArchitectureCheck(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("sysinfo", "system-info", "tools")
+    tags("system-utility", "diagnostics")
 
     executable(
         "spack_test",
-        template=[
-            """which spack &> /dev/null
+        template=["""which spack &> /dev/null
 if [ $? == 0 ]; then
     echo "Spack tuple: `spack arch`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )
 
     executable(
         "gcc_version",
-        template=[
-            r"""which gcc &> /dev/null
+        template=[r"""which gcc &> /dev/null
 if [ $? == 0 ]; then
     echo "Gcc version: `gcc --version | grep "[0-9]*\.[0-9]*\.[0-9]*"`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )
 
     executable(
         "gcc_test",
-        template=[
-            """which gcc &> /dev/null
+        template=["""which gcc &> /dev/null
 if [ $? == 0 ]; then
     echo "Gcc arch: `gcc -march=native -Q --help=target | grep "march=  "`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )
@@ -74,7 +68,7 @@ fi
 
     workload_group("all_workloads", workloads=["standard"])
 
-    spack_regex = r"Spack tuple: (?P<platform>\S+)-(?P<os>\S+)-(?P<arch>\S+)"
+    spack_regex = r"Spack tuple: (?P<platform>\S+?)-(?P<os>\S+?)-(?P<arch>\S+)"
 
     figure_of_merit(
         "Spack Platform",

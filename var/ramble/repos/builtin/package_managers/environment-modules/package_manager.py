@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,14 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
 import os
+import re
+from typing import List
+
 import llnl.util.filesystem as fs
 
-import ramble.util.hashing
-
 import ramble.config
+import ramble.software_info
+import ramble.util.hashing
+from ramble.pkgmankit import *
 from ramble.util.shell_utils import source_str
 
 
@@ -31,11 +33,25 @@ class EnvironmentModules(PackageManagerBase):
 
     _spec_prefix = "environment_modules"
 
+    _list_file = ".environment_modules_list"
+
+    package_manager_family("environment-modules")
+
     register_phase(
         "write_module_commands",
         pipeline="setup",
         run_before=["make_experiments"],
     )
+
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
 
     def _generate_loads_content(self, workspace):
         if not hasattr(self, "_load_string"):
@@ -43,7 +59,7 @@ class EnvironmentModules(PackageManagerBase):
                 self.keywords.env_name
             )
 
-            require_env = self.environment_required()
+            require_env = self.environment_required
 
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
@@ -53,24 +69,18 @@ class EnvironmentModules(PackageManagerBase):
             load_content = []
 
             if software_env is not None:
-                for spec in software_envs.package_specs_for_environment(
-                    software_env
-                ):
-                    load_content.append(f"module load {spec}")
+                load_content.extend(
+                    f"module load {spec}"
+                    for spec in software_envs.package_specs_for_environment(
+                        software_env
+                    )
+                )
 
             self._load_string = "\n".join(load_content)
 
         return self._load_string
 
-    def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-            }
-        )
-
+    def populate_inventory(self, workspace, force_compute=False) -> bool:
         env_path = self.app_inst.expander.env_path
         env_hash = ramble.util.hashing.hash_string(
             self._generate_loads_content(workspace)
@@ -79,12 +89,13 @@ class EnvironmentModules(PackageManagerBase):
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": env_path.replace(workspace.root + os.path.sep, ""),
+                "package_manager": self.name,
                 "digest": env_hash,
             }
         )
 
     def _write_module_commands(self, workspace, app_inst=None):
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
 
         module_file_path = os.path.join(env_path, "module_loads")
 
@@ -92,7 +103,7 @@ class EnvironmentModules(PackageManagerBase):
 
         loads_content = self._generate_loads_content(workspace)
 
-        with open(module_file_path, "w+") as f:
+        with open(module_file_path, "w+", encoding="utf-8") as f:
             f.write(loads_content)
 
     register_builtin("module_load", required=True)
@@ -101,30 +112,44 @@ class EnvironmentModules(PackageManagerBase):
         shell = ramble.config.get("config:shell")
         return [f"{source_str(shell)} " + "{env_path}/module_loads"]
 
-    def _add_software_to_results(self, workspace, app_inst=None):
-        app_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
+    register_builtin("module_list", required=True, depends_on=["module_load"])
+
+    def module_list(self):
+        list_file = "{experiment_run_dir}/" + self._list_file
+        return [
+            f"module list &> {list_file}",
+        ]
+
+    def get_package_list(self, workspace):
+        del workspace
+        app_inst = self.app_inst
+        list_file = app_inst.expander.expand_var(
+            f"{{experiment_run_dir}}/{self._list_file}"
         )
 
-        require_env = self.environment_required()
+        if not os.path.exists(list_file):
+            return []
 
-        software_envs = workspace.software_environments
-        software_env = software_envs.render_environment(
-            app_context, self.app_inst.expander, self, require=require_env
-        )
+        pkg_list = []
+        pkg_regex = re.compile(r"\S+$")
+        with open(list_file, encoding="utf-8") as f:
+            packages = re.split(r"[0-9]*\)", f.read())
+            for spec in packages:
+                cleaned = spec.strip()
+                m = pkg_regex.match(cleaned)
+                if m:
+                    parts = cleaned.split("/")
+                    name = parts[0].strip()
+                    version = "/".join(parts[1:]) if len(parts) > 1 else ""
+                    pkg_list.append(
+                        ramble.software_info.SoftwareInfo(
+                            name=name, version=version
+                        )
+                    )
+        return pkg_list
 
-        if self._spec_prefix not in app_inst.result.software:
-            app_inst.result.software[self._spec_prefix] = []
+    def environment_load_commands(self) -> List[str]:
+        return self.module_list()
 
-        package_list = app_inst.result.software[self._spec_prefix]
-
-        if software_env is not None:
-            for spec in software_envs.package_specs_for_environment(
-                software_env
-            ):
-                parts = spec.split("/")
-                name = parts[0]
-                version = "/".join(parts[1:]) if len(parts) > 1 else ""
-                package_list.append(
-                    {"name": name, "version": version, "variants": ""}
-                )
+    def environment_unload_commands(self) -> List[str]:
+        return ["module purge"]

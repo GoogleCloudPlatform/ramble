@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,24 +6,29 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ast
 import os
 import re
 import shutil
 import sys
 import urllib.parse
 
-from ramble.application import ApplicationError
-from ramble.pkgmankit import *
+import llnl.util.filesystem as fs
 
-import ramble.config
+from ramble.error import ApplicationError
+from ramble.pkgmankit import *
+from ramble.util.executable import PrefixedExecutable, which
+from ramble.util.format import when_order
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
-import ramble.stage
-import ramble.fetch_strategy
 
 from spack.util.executable import Executable
-import llnl.util.filesystem as fs
+
+# The collection of attributes pulled from Python sysconfig.get_paths()
+# This is used to expose the two site_packages paths of a given Python
+# installation.
+_SYSCONFIG_PATH_ATTRIBUTES = ("purelib", "platlib")
 
 
 class Pip(PackageManagerBase):
@@ -33,10 +38,38 @@ class Pip(PackageManagerBase):
 
     _spec_prefix = "pip"
 
+    package_manager_family("pip")
+
+    archive_pattern(os.path.join("{env_path}", "requirements.txt"))
+    archive_pattern(os.path.join("{env_path}", "requirements.lock"))
+
+    for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+        package_manager_variable(
+            f"pip_{attr_name}_path",
+            default="",
+            description=f"Path to {attr_name} site-packages directory for pip venv. Set during workspace setup.",
+        )
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
-        self.runner = PipRunner()
+        self._runner = None
+
+    @property
+    def runner(self):
+        if self._runner is None:
+            self._runner = PipRunner()
+        return self._runner
+
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
 
     register_builtin(
         "pip_activate", required=True, depends_on=["builtin::env_vars"]
@@ -62,13 +95,13 @@ class Pip(PackageManagerBase):
 
         logger.msg("Creating venv + pip environment")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
         cache_tupl = ("pip-env", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug("{cache_tupl} already in cache")
+            logger.debug(f"{cache_tupl} already in cache")
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -76,13 +109,11 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.create_env(env_path)
 
-        env_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
-        require_env = self.environment_required()
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
+        require_env = self.environment_required
         software_envs = workspace.software_environments
         software_env = software_envs.render_environment(
-            env_context, self.app_inst.expander, self, require=require_env
+            env_context, app_inst.expander, self, require=require_env
         )
         if software_env:
             if isinstance(software_env, ExternalEnvironment):
@@ -102,44 +133,65 @@ class Pip(PackageManagerBase):
         """Install packages using pip"""
         logger.msg("Installing packages")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
         cache_tupl = ("pip-install", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug("{cache_tupl} already in cache")
+            logger.debug(f"{cache_tupl} already in cache")
             return
         else:
             workspace.add_to_cache(cache_tupl)
 
-        env_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
-        if self.environment_required():
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
+        logger.debug(f" Required environment: {self.environment_required}")
+        try:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
 
             installed_pkgs = self.runner.installed_packages()
-            for pkg in self.app_inst.required_packages.keys():
-                if pkg not in installed_pkgs:
+            for pkg, conf in app_inst.required_packages.items():
+                if (
+                    app_inst.expander.satisfies(
+                        conf["when"], variant_set=self.experiment_variants()
+                    )
+                    and pkg not in installed_pkgs
+                ):
+                    sorted_vars = sorted(
+                        self.experiment_variants().as_set(for_output=True),
+                        key=when_order,
+                    )
                     logger.die(
                         f"Package {pkg} is not installed "
                         f"in environment {env_context}, but is "
-                        f"required by the {self.name} application "
-                        "definition"
+                        f"required by the {app_inst.name} application "
+                        "definition\n",
+                        f"{sorted_vars}\n",
+                        f"{conf['when']}",
                     )
 
-            for mod_inst in self.app_inst._modifier_instances:
-                for pkg in mod_inst.required_packages.keys():
-                    if pkg not in installed_pkgs:
+            for mod_inst in app_inst._modifier_instances:
+                for pkg, conf in mod_inst.required_packages.items():
+                    if (
+                        app_inst.expander.satisfies(
+                            conf["when"],
+                            variant_set=self.experiment_variants(
+                                include_modifier=mod_inst
+                            ),
+                        )
+                        and pkg not in installed_pkgs
+                    ):
                         logger.die(
                             f"Package {pkg} is not installed "
                             f"in environment {env_context}, but is "
                             f"required by the {mod_inst.name} modifier "
                             "definition"
                         )
+        except RunnerError as e:
+            if self.environment_required:
+                logger.die(e)
 
     register_phase(
         "define_package_paths",
@@ -153,15 +205,17 @@ class Pip(PackageManagerBase):
 
         logger.msg("Defining pip package path variables")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
-        if self.environment_required():
+        self.runner.define_site_package_paths(app_inst)
+
+        if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.define_path_vars(
-                self.app_inst, workspace.pkg_path_cache[self.name]
+                app_inst, workspace.pkg_path_cache[self.name]
             )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
@@ -170,9 +224,13 @@ class Pip(PackageManagerBase):
         Args:
             pkg (RenderedPackage): Reference to a rendered package
             all_pkgs (dict): All related packages
-            compiler (boolean): True if this pkg is used as a compiler
+            compiler (bool): True if this pkg is used as a compiler
         """
         return pkg.spec
+
+    @PackageManagerBase.workspace_cache
+    def get_version(self, workspace=None):
+        return self.runner.get_version()
 
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
@@ -183,20 +241,12 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        pkgman_version = self.runner.get_version()
-
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-                "version": pkgman_version,
-                "digest": hash_string(pkgman_version),
-            }
-        )
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": self.runner.env_path.replace(
                     workspace.root + os.path.sep, ""
                 ),
+                "package_manager": self.name,
                 "digest": self.runner.inventory_hash(),
             }
         )
@@ -210,30 +260,24 @@ class Pip(PackageManagerBase):
             "If a software mirror is required, it needs to be set up outside of Ramble"
         )
 
-    def _add_software_to_results(self, workspace, app_inst=None):
+    def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information
 
-        This is a registered phase by the base package manager class, so here
-        we only override its base definition.
-
-        Args:
-            workspace (Workspace): A reference to the workspace that owns the
-                                   current pipeline
-            app_inst (Application): A reference to the application instance for
-                                    the current experiment
+        This is called by the `add_software_to_results` phase registered in the base
+        package manager class.
         """
-
         env_path = self.app_inst.expander.env_path
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        if self._spec_prefix not in app_inst.result.software:
-            app_inst.result.software[self._spec_prefix] = []
+        return list(self.runner.package_provenance())
 
-        package_list = app_inst.result.software[self._spec_prefix]
+    def environment_load_commands(self):
+        self.runner.configure_env(self.app_inst.expander.env_path)
+        return self.runner.generate_activate_command()
 
-        for info in self.runner.package_provenance():
-            package_list.append(info)
+    def environment_unload_commands(self):
+        return self.runner.generate_deactivate_command()
 
 
 package_name_regex = re.compile(
@@ -252,6 +296,37 @@ def _extract_pkg_name(pkg_spec):
     return match.group("pkg_name") if match else None
 
 
+class PipSoftwareInfo(ramble.software_info.SoftwareInfo):
+    # TODO: should this "parse" function have a unified interface?
+    def parse_from_string(self, in_str):
+        """Construct a package dictionary from a package string
+
+        Args:
+            in_str (str): String representing a package, as output from `pip freeze`
+
+        Returns:
+            (dict): Dictionary representing the package information
+        """
+
+        if not in_str:
+            return
+
+        parts = in_str.replace("\n", "").split("==")
+
+        if len(parts) <= 1:
+            return
+
+        self.version = parts[1]
+
+        if "[" in parts[0]:
+            name_parts = parts[0].replace("]", "").split("[")
+            self.name = name_parts[0].strip()
+            self.variants = name_parts[1]
+        else:
+            self.name = parts[0].strip()
+            self.variants = ""
+
+
 class PipRunner(CommandRunner):
     """Runner for executing pip+venv commands."""
 
@@ -263,7 +338,10 @@ class PipRunner(CommandRunner):
 
     def __init__(self, dry_run=False):
         super().__init__(name="pip", command=sys.executable, dry_run=dry_run)
-        self.bs_python = self.command
+        if self.command is None:
+            self.bs_python = PrefixedExecutable(sys.executable)
+        else:
+            self.bs_python = self.command
         self.env_path = None
         self.configs = []
         self.specs = set()
@@ -290,6 +368,18 @@ class PipRunner(CommandRunner):
 
         # Ensure subsequent commands use the created env now.
         self.env_path = env_path
+
+    def reset_bs_python(self, exec=None, path=None):
+        if isinstance(exec, Executable):
+            self.bs_python = exec
+        elif isinstance(path, str):
+            self.bs_python = which("python", path=path) or PrefixedExecutable(
+                sys.executable
+            )
+        else:
+            self.bs_python = which("python") or PrefixedExecutable(
+                sys.executable
+            )
 
     def _get_venv_python(self):
         if self.dry_run:
@@ -319,12 +409,9 @@ class PipRunner(CommandRunner):
         out = self.execute(installer, freeze_args, return_output=True)
         if out is not None:
             lock_file = os.path.join(self.env_path, self._lock_file_name)
-            with open(lock_file, "w") as f:
+            with open(lock_file, "w", encoding="utf-8") as f:
                 f.write(out)
         self.installed = True
-
-    def get_bootstrap_python(self):
-        return self.bs_python
 
     def _get_activate_script_path(self):
         return os.path.join(self.env_path, self._venv_name, "bin", "activate")
@@ -362,12 +449,12 @@ class PipRunner(CommandRunner):
             existing_req_mtime = os.path.getmtime(req_file)
             existing_lock_mtime = os.path.getmtime(lock_file)
             if existing_lock_mtime >= existing_req_mtime:
-                with open(req_file) as f:
+                with open(req_file, encoding="utf-8") as f:
                     if f.read() == contents:
                         self.installed = True
                         logger.debug("requirement file already up-to-date")
                         return
-        with open(req_file, "w") as f:
+        with open(req_file, "w", encoding="utf-8") as f:
             f.write(contents)
 
     def copy_from_external_env(self, external_env_path):
@@ -416,7 +503,7 @@ class PipRunner(CommandRunner):
             ext_python, ["-m", "pip", "freeze"], return_output=True
         )
         if out is not None:
-            with open(dest, "w") as f:
+            with open(dest, "w", encoding="utf-8") as f:
                 f.write(out)
 
     def define_path_vars(self, app_inst, cache):
@@ -428,8 +515,8 @@ class PipRunner(CommandRunner):
         if not lock_file:
             raise RunnerError(f"Lock file {lock_file} is missing")
         pkgs = []
-        with open(lock_file) as f:
-            for line in f.readlines():
+        with open(lock_file, encoding="utf-8") as f:
+            for line in f:
                 # pip freeze generates such a comment, which serves as a divider
                 # for packages that are added as deps of the ones defined directly.
                 # This is a crude way to avoid defining path vars for
@@ -480,6 +567,20 @@ class PipRunner(CommandRunner):
                     + "Skipping extraction from pip"
                 )
 
+    def define_site_package_paths(self, app_inst):
+        """Define site_package paths into variables"""
+        self._check_env_configured()
+        logger.debug("Resolving site package paths")
+        exe = self._get_venv_python()
+        paths_info_raw = exe(
+            "-c", "import sysconfig; print(sysconfig.get_paths())", output=str
+        )
+        paths_info = ast.literal_eval(paths_info_raw)
+        for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+            attr_value = paths_info.get(attr_name)
+            if attr_value is not None:
+                app_inst.define_variable(f"pip_{attr_name}_path", attr_value)
+
     def add_spec(self, spec):
         """Add a package spec to the pip environment"""
         self._check_env_configured()
@@ -513,44 +614,15 @@ class PipRunner(CommandRunner):
                 if pkg_name:
                     pkgs.add(pkg_name)
         else:
-            with open(os.path.join(self.env_path, self._lock_file_name)) as f:
-                reqs = f.readlines()
+            with open(
+                os.path.join(self.env_path, self._lock_file_name),
+                encoding="utf-8",
+            ) as f:
+                reqs = f
                 for req in reqs:
                     if "==" in req:
                         pkgs.add(req.split("==")[0].strip())
         return pkgs
-
-    def _package_dict_from_str(self, in_str):
-        """Construct a package dictionary from a package string
-
-        Args:
-            in_str (str): String representing a package, as output from `pip freeze`
-
-        Returns:
-            (dict): Dictionary representing the package information
-        """
-
-        if not in_str:
-            return None
-
-        parts = in_str.replace("\n", "").split("==")
-
-        if len(parts) <= 1:
-            return None
-
-        version = parts[1]
-
-        if "[" in parts[0]:
-            name_parts = parts[0].replace("]", "").split("[")
-            name = name_parts[0]
-            variants = name_parts[1]
-        else:
-            name = parts[0]
-            variants = ""
-
-        info_dict = {"name": name, "version": version, "variants": variants}
-
-        return info_dict
 
     def package_provenance(self):
         """Iterator over package information dictionaries
@@ -565,11 +637,10 @@ class PipRunner(CommandRunner):
         lock_file = os.path.join(self.env_path, self._lock_file_name)
 
         if os.path.exists(lock_file):
-            with open(lock_file) as f:
-                for line in f.readlines():
-                    info_dict = self._package_dict_from_str(
-                        line.replace("\n", "")
-                    )
+            with open(lock_file, encoding="utf-8") as f:
+                for line in f:
+                    software_info = PipSoftwareInfo()
+                    software_info.parse_from_string(line.replace("\n", ""))
 
-                    if info_dict:
-                        yield info_dict
+                    if software_info.name:
+                        yield software_info

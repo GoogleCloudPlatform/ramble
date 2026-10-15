@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,10 +11,7 @@ import os
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
@@ -25,9 +22,7 @@ on = RambleCommand("on")
 workspace = RambleCommand("workspace")
 
 
-def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, request):
-    workspace_name = request.node.name
-
+def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, workspace_name):
     global_args = ["-w", workspace_name]
 
     ws = ramble.workspace.create(workspace_name)
@@ -41,6 +36,8 @@ def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, req
         "n_ranks=1",
         "-v",
         "batch_submit={execute_experiment}",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -51,7 +48,7 @@ def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, req
 
     workspace("analyze", global_args=global_args)
 
-    with open(os.path.join(ws.root, "results.latest.txt")) as f:
+    with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
         data = f.read()
 
         assert "FAILED" not in data

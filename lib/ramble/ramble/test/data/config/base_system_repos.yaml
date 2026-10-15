@@ -1,0 +1,2 @@
+base_system_repos:
+  - $ramble/var/ramble/repos/builtin

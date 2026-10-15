@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,21 +12,17 @@ import pytest
 
 import ramble.filters
 import ramble.pipeline
-import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
 
-
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
+pytestmark = pytest.mark.usefixtures(
+    "mutable_config", "mutable_mock_workspace_path", "workspace_deactivate"
+)
 
 workspace = RambleCommand("workspace")
 
 
-def test_dryrun_series_contains_package_paths(
-    mutable_config, mutable_mock_workspace_path, mock_applications
-):
+def test_dryrun_series_contains_package_paths(mock_applications, make_workspace_from_config):
     test_config = r"""
 ramble:
   variants:
@@ -60,26 +56,17 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_series_contains_package_paths"
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config, activate=True)
+    ws.dry_run = True
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    setup_pipeline = setup_cls(ws, filters)
+    setup_pipeline.run()
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
+    for test in ["test_1", "test_2"]:
+        script = os.path.join(
+            ws.experiment_dir, "zlib", "ensure_installed", test, "execute_experiment"
+        )
 
-        ws.dry_run = True
-        ws._re_read()
-
-        setup_pipeline = setup_cls(ws, filters)
-        setup_pipeline.run()
-
-        for test in ["test_1", "test_2"]:
-            script = os.path.join(
-                ws.experiment_dir, "zlib", "ensure_installed", test, "execute_experiment"
-            )
-
-            assert os.path.exists(script)
-            with open(script) as f:
-                assert r"{zlib}" not in f.read()
+        assert os.path.exists(script)
+        with open(script, encoding="utf-8") as f:
+            assert r"{zlib}" not in f.read()

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -18,23 +19,20 @@ class Streamc(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags(
-        "memorybenchmark",
-        "microbenchmark",
-        "memory-benchmark",
-        "micro-benchmark",
-    )
+    tags("memory-benchmark", "micro-benchmark")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    version("5.10", "Version 5.10 of STREAMC", preferred=True)
 
-    software_spec(
-        "streamc",
-        pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    required_package("stream", package_manager="spack*")
+        software_spec(
+            "streamc-{application::streamc::version}",
+            pkg_spec='stream@{application::streamc::version} +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+            compiler="gcc12",
+        )
+
+        required_package("stream")
 
     executable("execute_c", "stream_c.exe")
 

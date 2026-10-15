@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import ramble.config
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class ExitCode(BasicModifier):
@@ -112,7 +112,9 @@ class ExitCode(BasicModifier):
 
         return pre_exec, post_exec
 
-    exit_code_regex = r"Exit code for (?P<exec_name>.*): (?P<exit_code>[0-9]+)"
+    exit_code_regex = (
+        r"Exit code for (?P<exec_name>.*?): (?P<exit_code>[0-9]+)"
+    )
 
     figure_of_merit_context(
         "Executable Exit Code",
@@ -151,8 +153,8 @@ class ExitCode(BasicModifier):
         final_found = False
 
         if os.path.exists(log_file):
-            with open(log_file) as f:
-                for line in f.readlines():
+            with open(log_file, encoding="utf-8") as f:
+                for line in f:
                     m = exit_regex.match(line)
 
                     if m:
@@ -162,7 +164,7 @@ class ExitCode(BasicModifier):
                         final_found = True
 
             if not final_found:
-                with open(log_file, "a") as f:
+                with open(log_file, "a", encoding="utf-8") as f:
                     f.write(f"Final exit code: {max_code}")
 
     success_criteria(

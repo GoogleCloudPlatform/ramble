@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class SpackMod(BasicModifier):
@@ -18,30 +18,78 @@ class SpackMod(BasicModifier):
 
     mode("default", description="This is the default mode for the spack-mod")
 
-    package_manager_config(
-        "enable_debug", "config:debug:true", package_manager="spack*"
+    variant(
+        "missing_compiler",
+        description="This variant enables software specs that refer to undefined compilers",
+        default=False,
+        values=[True, False],
     )
 
-    define_compiler(
-        "mod_compiler",
-        pkg_spec="mod_compiler@1.1 target=x86_64",
-        compiler_spec="mod_compiler@1.1",
-        package_manager="spack*",
+    variant(
+        "implicit_compiler",
+        description="This variant enables a software spec that uses an implicit compiler",
+        default=False,
+        values=[True, False],
     )
 
-    software_spec(
-        "mod_package1",
-        pkg_spec="mod_package1@1.1",
-        compiler="mod_compiler",
-        package_manager="spack*",
+    variant(
+        "injected_compiler",
+        description="This variant enables a compiler spec that needs to be injected",
+        default=False,
+        values=[True, False],
     )
 
-    software_spec(
-        "mod_package2",
-        pkg_spec="mod_package2@1.1",
-        compiler="mod_compiler",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        package_manager_config("enable_debug", "config:debug:true")
+
+        define_compiler(
+            "mod_compiler",
+            pkg_spec="mod_compiler@1.1 target=x86_64",
+            compiler_spec="mod_compiler@1.1",
+        )
+
+        software_spec(
+            "mod_package1",
+            pkg_spec="mod_package1@1.1",
+            compiler="mod_compiler",
+        )
+
+        software_spec(
+            "mod_package2",
+            pkg_spec="mod_package2@1.1",
+            compiler="mod_compiler",
+        )
+
+        with when("+injected_compiler"):
+            define_compiler(
+                "injected_compiler",
+                pkg_spec="injected_compiler@1.1",
+                compiler_spec="injected_compiler@1.1",
+                inject_if_missing=True,
+            )
+
+        with when("~missing_compiler"):
+            with when("+implicit_compiler"):
+                software_spec(
+                    "missing_mod_package",
+                    pkg_spec="missing_package@1.1",
+                    compiler="mod_compiler",
+                    inject_if_missing=True,
+                )
+
+            # with when("~implicit_compiler"):
+            #    software_spec(
+            #        "missing_mod_package",
+            #        pkg_spec="missing_package@1.1",
+            #    )
+
+        with when("+missing_compiler"):
+            software_spec(
+                "missing_mod_package",
+                pkg_spec="missing_package@1.1",
+                compiler="non_existent_compiler",
+                inject_if_missing=True,
+            )
 
     package_manager_requirement(
         "list not-a-package", validation_type="empty", modes=["default"]
@@ -60,4 +108,32 @@ class SpackMod(BasicModifier):
         validation_type="does_not_contain_regex",
         modes=["default"],
         regex=r"\s*Broken versions:\s*",
+    )
+
+    variant(
+        "mod_pkg_args",
+        values=[True, False],
+        default=False,
+        description="Use pkg_args for modifier",
+    )
+
+    with when("package_manager_family=spack"):
+        with when("+mod_pkg_args"):
+            software_spec(
+                "mod_package_with_args-{modifier::variant::bool}-{modifier::variant::val}",
+                pkg_spec="mod_package@1.1 {modifier::variant::bool} {modifier::variant::val}",
+            )
+
+    variant(
+        "bool",
+        values=[True, False],
+        default=False,
+        description="Include bool in versions package spec",
+    )
+
+    variant(
+        "val",
+        values=["one", "two", "three"],
+        default="three",
+        description="Include val option in versions package spec",
     )

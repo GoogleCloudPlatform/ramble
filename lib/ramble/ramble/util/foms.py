@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,11 @@
 # except according to those terms.
 
 import copy
+import functools
+import re
 from enum import Enum
+
+NULL_CONTEXT = "null"
 
 
 # For a FOM, the direction that is 'better' e.g., faster is better
@@ -34,16 +38,7 @@ class FomType(Enum):
     UNDEFINED = 6
 
     def better_direction(self):
-        direction = {
-            FomType.TIME: BetterDirection.LOWER,
-            FomType.THROUGHPUT: BetterDirection.HIGHER,
-            FomType.MEASURE: BetterDirection.INDETERMINATE,
-            FomType.CATEGORY: BetterDirection.INAPPLICABLE,
-            FomType.INFO: BetterDirection.INAPPLICABLE,
-            FomType.UNDEFINED: BetterDirection.INDETERMINATE,
-        }
-
-        return direction[self]
+        return _FOM_TYPE_DIRECTIONS[self]
 
     def copy(self):
         return copy.deepcopy(self)
@@ -57,4 +52,74 @@ class FomType(Enum):
 
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
-        return {"name": self.name, "better_direction": self.better_direction().name}
+        return _FOM_TYPE_DICTS[self]
+
+
+class SummaryFoms(str, Enum):
+    SUMMARY = "Experiment Summary"
+    N_TOTAL = "n_total_repeats"
+    N_SUCCESS = "n_success_repeats"
+
+
+_FOM_TYPE_DIRECTIONS = {
+    FomType.TIME: BetterDirection.LOWER,
+    FomType.THROUGHPUT: BetterDirection.HIGHER,
+    FomType.MEASURE: BetterDirection.INDETERMINATE,
+    FomType.CATEGORY: BetterDirection.INAPPLICABLE,
+    FomType.INFO: BetterDirection.INAPPLICABLE,
+    FomType.UNDEFINED: BetterDirection.INDETERMINATE,
+}
+
+_FOM_TYPE_DICTS = {
+    member: {"name": member.name, "better_direction": _FOM_TYPE_DIRECTIONS[member].name}
+    for member in FomType
+}
+
+
+# Try to import the internal parser for the re module
+try:
+    # See https://github.com/python/cpython/issues/91308
+    import re._parser as sre_parse
+except ImportError:
+    try:
+        # This is for Python 3.10 or earlier
+        import sre_parse
+    except ImportError:
+        sre_parse = None
+
+
+@functools.lru_cache(maxsize=1024)
+def _get_literal_from_regex_cached(regex_str: str) -> str:
+    if not sre_parse:
+        return ""
+
+    try:
+        tree = sre_parse.parse(regex_str)
+    # re.error is renamed, but it's kept around for backward compatibility
+    # See https://docs.python.org/3/library/re.html#exceptions
+    except re.error:
+        return ""
+
+    current_literal = ""
+    for node in tree:
+        node_name = str(node[0])
+        if node_name == "LITERAL":
+            current_literal += chr(node[1])
+        elif current_literal:
+            break
+
+    return current_literal.strip()
+
+
+def get_literal_from_regex(regex_str: str) -> str:
+    """
+    Extracts a first-encountered required literal string from a regex pattern.
+
+    This is used to create fast string pre-filters to avoid executing complex regex matching.
+    This is not exhaustive, as it doesn't recurse into sub-patterns. It is only intended as a
+    heuristic to short-circuit the matching process.
+    """
+    if not regex_str or not sre_parse:
+        return ""
+
+    return _get_literal_from_regex_cached(regex_str)

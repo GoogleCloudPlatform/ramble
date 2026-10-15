@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -49,19 +49,19 @@ Installation
 -------------
 
 There are two ways to install Ramble. The first, and recommended, approach is to
-clone its `github repository <https://github.com/GoogleCloudPlatform/ramble>`_.
+clone its `github repository <https://github.com/Ramble-Project/ramble>`_.
 This can be done with:
 
 .. code-block:: console
 
-    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    $ git clone -c feature.manyFiles=true https://github.com/Ramble-Project/ramble.git
 
 By default, this will checkout the ``develop`` branch, which is the most
 up-to-date version of Ramble. Several tags, as well as the ``main`` branch
 (which contains the latest tag) can provide a more stable exeperience.
 
 The second approach is to download one of the releases from
-`Ramble's releases page <https://github.com/GoogleCloudPlatform/ramble/releases>`_
+`Ramble's releases page <https://github.com/Ramble-Project/ramble/releases>`_
 
 Once Ramble is available on your system, its python dependencies can be
 installed using the ``requirements.txt`` file included in the root of Ramble's
@@ -149,14 +149,13 @@ In order to get information about the available applications defined within
 
    $ ramble list
 
-
 This command uses filtering to search the defined applications, e.g.:
 
 .. code-block:: console
 
-   $ ramble list wrf
+   $ ramble list hpl
 
-will list both ``wrfv3`` and ``wrfv4``.
+will list ``hpl``, ``intel-hpl``, and other versions of ``hpl``.
 
 Available applications can be filtered using tags, e.g.:
 
@@ -164,7 +163,8 @@ Available applications can be filtered using tags, e.g.:
 
     $ ramble list -t weather
 
-will also list both ``wrfv3`` and ``wrfrv4``. The available tags can be seen with:
+will list ``wrf``, ``ufs-weather-model``, and other applications tagged with
+``weather``. The available tags can be seen with:
 
 .. code-block:: console
 
@@ -184,12 +184,12 @@ For example:
 
 .. code-block:: console
 
-    $ ramble info wrfv3
+    $ ramble info hpl
 
-Will show that ``wrfv3`` has two workloads
+Will show that ``hpl`` has two workloads
 
-* ``CONUS_12km``
-* ``CONUS_2p5km``
+* ``standard``
+* ``calculator``
 
 that experiments can be generated from. The ``ramble info`` command can also be
 used to see what variables each workload has, and potentially some suggested
@@ -271,16 +271,15 @@ These files can be edited with your favorite editor, or though the command:
 Flags exist to control whether you want to edit a template file, or the
 configuration file.
 
-Variables are defined of the format ``{file_prefix}``, that contain the path to
-the rendered version within every experiment. As an example:
+Ramble automatically defines variables for each template file found in the
+``configs`` directory. The variable name is the template's path relative to
+the ``configs`` directory, without the ``.tpl`` extension. Its value contains the path to the rendered file
+within every experiment directory.
 
-.. code-block:: console
-
-    configs/execute_experiment.tpl
-
-Will define ``{execute_experiment}`` with a value set to the path of the
-generated file.
-(More explicitly, ``execute_experiment={experiment_run_dir}/{template_name_sans_extension}``)
+For example, a template named ``configs/execute_experiment.tpl`` will define
+a variable ``{execute_experiment}`` that expands to the path of the generated
+file within the experiment directory (more explicitly,
+``{experiment_run_dir}/execute_experiment``).
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Concretizing A Workspace

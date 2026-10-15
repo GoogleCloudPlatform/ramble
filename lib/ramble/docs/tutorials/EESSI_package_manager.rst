@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -46,33 +46,35 @@ Under the workloads marked by ``Workload: water_bare`` and
         Inputs: ['water_gmx50_bare']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water GMX50
-                Default: {water_gmx50_bare}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water GMX50
+                    Default: {water_gmx50_bare}/{size}
     Workload: water_bare
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water bare hbonds
-                Default: {water_bare_hbonds}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water bare hbonds
+                    Default: {water_bare_hbonds}/{size}
 
 Here we see that both of these workloads have a ``type`` variable (with
 possible values of ``pme`` and ``rf``) and a ``size`` variable with a variety
@@ -91,32 +93,35 @@ With this command, you should see output similar to the following:
   ##################
   # software_specs #
   ##################
-  impi2018:
-      pkg_spec: intel-mpi@2018.4.274
-      compiler_spec: None
-      compiler: None
-      package_manager: spack*
-  
-  spack_gromacs:
-      pkg_spec: gromacs@2020.5
-      compiler_spec: None
-      compiler: gcc9
-      package_manager: spack*
-  
-  eessi_gromacs:
+  intel-mpi:
+      pkg_spec: intel-oneapi-mpi@2021.17.2
+
+      When:
+          package_manager_family=spack
+
+  gromacs:
+      pkg_spec: gromacs@2025.3
+      compiler: gcc14
+
+      When:
+          package_manager_family=spack
+
+  gromacs:
       pkg_spec: GROMACS/2024.1-foss-2023b
-      compiler_spec: None
-      compiler: None
-      package_manager: eessi
-  
+
+      When:
+          package_manager_family=eessi
+          application_version@2024.1
+
   #############
   # compilers #
   #############
-  gcc9:
-      pkg_spec: gcc@9.3.0
-      compiler_spec: None
-      compiler: None
-      package_manager: spack*
+  gcc14:
+      pkg_spec: gcc@14.2.0
+
+      When:
+          package_manager_family=spack
+
 
 
 Package Manager Information
@@ -129,6 +134,8 @@ the following command:
 .. code-block:: console
 
   $ ramble info --type package_managers eessi
+  or;
+  $ ramble info builtin.pkg_man.eessi
 
 This should print a summary of the ``eessi`` definition, as follows:
 
@@ -153,17 +160,25 @@ This should print a summary of the ``eessi`` definition, as follows:
       douglasjacobsen
 
   pipelines:
-      analyze  archive  mirror  setup  pushdeployment  pushtocache  execute
+      analyze  archive  mirror  setup  pushdeployment  pushtocache  execute  logs
 
   builtins:
-      package_manager_builtin::eessi::module_load  package_manager_builtin::eessi::eessi_init
+      package_manager_builtin::eessi::module_load  package_manager_builtin::eessi::module_list  package_manager_builtin::eessi::eessi_init
+
+  object_variables:
+      eessi_version:
+      Description: Version of EESSI to use
+      Default: 2023.06
+      Suggested Values: [None]
+
 
   registered_phases:
+      analyze:
+          add_software_to_results
+
       setup:
           write_module_commands
 
-  package_manager_variables:
-      eessi_version
 
 Examining the ``package_manager_variables`` section, you can see that ``eessi``
 has a defined variable named ``eessi_version``. To get more information about
@@ -171,16 +186,18 @@ this portion of the package manager definition, you can execute the following:
 
 .. code-block:: console
 
-  $ ramble info --type package_managers --attrs package_manager_variables -v eessi
+  $ ramble info --type package_managers --attrs object_variables -v eessi
+  or;
+  $ ramble info builtin.pkg_man.eessi --attrs object_variables -v
 
 Which should print something like the following output:
 
 .. code-block:: console
 
-  #############################
-  # package_manager_variables #
-  #############################
-  eessi_version:
+  ####################
+  # object_variables #
+  ####################
+      eessi_version:
       Description: Version of EESSI to use
       Default: 2023.06
       Suggested Values: [None]

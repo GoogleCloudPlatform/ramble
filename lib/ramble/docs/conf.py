@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,13 +15,6 @@ from docutils.statemachine import StringList
 from sphinx.domains.python import PythonDomain
 from sphinx.ext.apidoc import main as sphinx_apidoc
 from sphinx.parsers import RSTParser
-
-# The name of the Pygments (syntax highlighting) style to use.
-# We use our own extension of the default style with a few modifications
-from pygments.styles.default import DefaultStyle
-from pygments.token import Generic
-
-import pkg_resources
 
 # -- Ramble customizations -----------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -46,7 +39,23 @@ os.environ["COLIFY_SIZE"] = "25x120"
 os.environ["COLUMNS"] = "120"
 
 # Generate full package list if needed
-subprocess.call(["ramble", "list", "--format=html", "--update=package_list.html"])
+object_types = [
+    ("applications", "application"),
+    ("modifiers", "modifier"),
+    ("package_managers", "package_manager"),
+    ("utilities", "utility"),
+    ("workflow_managers", "workflow_manager"),
+    ("base_applications", "base_application"),
+    ("base_modifiers", "base_modifier"),
+    ("base_package_managers", "base_package_manager"),
+    ("base_utilities", "base_utility"),
+    ("base_workflow_managers", "base_workflow_manager"),
+]
+
+for obj, fn in object_types:
+    subprocess.call(
+        ["ramble", "list", f"--type={obj}", "--format=html", f"--update={fn}_list.html"]
+    )
 
 # Generate a command index if an update is needed
 subprocess.call(
@@ -54,6 +63,7 @@ subprocess.call(
         "ramble",
         "commands",
         "--format=rst",
+        "--header=command_index.in",
         "--update=command_index.rst",
     ]
     + glob("*rst")
@@ -159,7 +169,11 @@ master_doc = "index"
 
 # General information about the project.
 project = "Ramble"
-copyright = "2022-2025, Google LLC"
+copyright = (
+    "2022-2026, Ramble a Series of LF projects, LLC."
+    "For website terms of use, trademark policy and other "
+    "project policies please see https://lfprojects.org"
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -191,18 +205,42 @@ gettext_uuid = False
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build", "_ramble_root"]
 
+# TODO: re-enable docutils warnings once they are cleaned up.
+suppress_warnings = ["docutils"]
+
 nitpicky = True
 nitpick_ignore = [
     # Python classes that intersphinx is unable to resolve
     ("py:class", "argparse.HelpFormatter"),
+    ("py:class", "callable"),
     ("py:class", "contextlib.contextmanager"),
+    ("py:class", "func"),
     ("py:class", "module"),
     ("py:class", "_io.BufferedReader"),
     ("py:class", "unittest.case.TestCase"),
     ("py:class", "_frozen_importlib_external.SourceFileLoader"),
     ("py:class", "clingo.Control"),
-    ("py:class", "six.moves.urllib.parse.ParseResult"),
     ("py:class", "TextIO"),
+    ("py:class", "llnl.util.argparsewriter.ArgparseCompletionWriter"),
+    ("py:class", "llnl.util.argparsewriter.ArgparseRstWriter"),
+    ("py:class", "llnl.util.argparsewriter.ArgparseWriter"),
+    ("py:class", "llnl.util.lock.Lock"),
+    ("py:class", "llnl.util.lock.LockTransaction"),
+    ("py:class", "packaging.version.Version"),
+    ("py:class", "pandas.core.frame.DataFrame"),
+    ("py:class", "spack.environment.Environment"),
+    ("py:class", "spack.error.SpackError"),
+    ("py:class", "spack.error.SpecError"),
+    ("py:class", "spack.parse.Lexer"),
+    ("py:class", "spack.parse.Parser"),
+    ("py:class", "spack.package.Package"),
+    ("py:class", "spack.util.environment.EnvironmentModifications"),
+    ("py:class", "spack.util.executable.Executable"),
+    ("py:class", "spack.util.pattern.Composite"),
+    ("py:class", "spack.util.spack_yaml.OrderedLineLoader"),
+    ("py:class", "ramble.keywords.type"),
+    ("py:class", "ramble.keywords.level"),
+    ("py:class", "ramble.cmd.common.info.formats"),
 ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -219,22 +257,12 @@ nitpick_ignore = [
 # output. They are ignored by default.
 # show_authors = False
 
-
-class RambleStyle(DefaultStyle):
-    styles = DefaultStyle.styles.copy()
-    background_color = "#f4f4f8"
-    styles[Generic.Output] = "#355"
-    styles[Generic.Prompt] = "bold #346ec9"
-
-
-dist = pkg_resources.Distribution(__file__)
-sys.path.append(".")  # make 'conf' module findable
-ep = pkg_resources.EntryPoint.parse("ramble = conf:RambleStyle", dist=dist)
-dist._ep_map = {"pygments.styles": {"plugin1": ep}}
-pkg_resources.working_set.add(dist)
-
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
+
+# Custom Pygments styling
+sys.path.append(os.path.abspath("./_pygments"))
+pygments_style = "style.RambleStyle"
 
 
 # -- Options for HTML output ---------------------------------------------------
@@ -331,7 +359,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "Ramble.tex", "Ramble Documentation", "Google LLC", "manual"),
+    ("index", "Ramble.tex", "Ramble Documentation", "Ramble a Series of LF projects, LLC", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -359,7 +387,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [("index", "Ramble", "Ramble Documentation", ["Google LLC"], 1)]
+man_pages = [("index", "Ramble", "Ramble Documentation", ["Ramble a Series of LF projects, LLC"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False

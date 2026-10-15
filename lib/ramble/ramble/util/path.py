@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,20 +10,18 @@
 
 TODO: this is really part of ramble.config. Consolidate it.
 """
+
+import getpass
 import os
 import re
-import getpass
-import subprocess
 import tempfile
 import urllib.parse
 
-from llnl.util.lang import memoized
-
 import ramble.paths
-from ramble.util.logger import logger
-
 
 __all__ = ["substitute_config_variables", "substitute_path_variables", "canonicalize_path"]
+
+_PATH_VAR_RE = re.compile(r"(\$\w+\b|\$\{\w+\})")
 
 # Substitutions to perform
 replacements = {
@@ -31,35 +29,6 @@ replacements = {
     "user": getpass.getuser(),
     "tempdir": tempfile.gettempdir(),
 }
-
-# This is intended to be longer than the part of the install path
-# ramble generates from the root path we give it.  Included in the
-# estimate:
-#
-#   os-arch      ->   30
-#   compiler     ->   30
-#   package name ->   50   (longest is currently 47 characters)
-#   version      ->   20
-#   hash         ->   32
-#   buffer       ->  138
-#  ---------------------
-#   total        ->  300
-
-
-@memoized
-def get_system_path_max():
-    # Choose a conservative default
-    sys_max_path_length = 256
-    try:
-        path_max_proc = subprocess.Popen(
-            ["getconf", "PATH_MAX", "/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-        )
-        proc_output = str(path_max_proc.communicate()[0].decode())
-        sys_max_path_length = int(proc_output)
-    except (ValueError, subprocess.CalledProcessError, OSError):
-        logger.msg(f"Unable to find system max path length, using: {sys_max_path_length}")
-
-    return sys_max_path_length
 
 
 def substitute_config_variables(path, local_replacements):
@@ -76,6 +45,9 @@ def substitute_config_variables(path, local_replacements):
 
     """
 
+    if "$" not in path:
+        return path
+
     # Look up replacements for re.sub in the replacements dict.
     def repl(match):
         m = match.group(0).strip("${}")
@@ -83,7 +55,7 @@ def substitute_config_variables(path, local_replacements):
         return replacements.get(lower_key, local_replacements.get(lower_key, match.group(0)))
 
     # Replace $var or ${var}.
-    return re.sub(r"(\$\w+\b|\$\{\w+\})", repl, path)
+    return _PATH_VAR_RE.sub(repl, path)
 
 
 def substitute_path_variables(path, local_replacements=None):
@@ -106,19 +78,18 @@ def canonicalize_path(path):
 
 def normalize_path_or_url(path):
     """Convert a scheme-less path to absolute local path
-    Also, remove trailing back-slashes from the input path
+    Also, remove trailing slashes from the input path
 
     Args:
         path (str): Input path
 
     Returns:
-        (str): Absolute local path or cleaned remote url
+        str: Absolute local path or cleaned remote url
     """
+    if not path:
+        return path
 
-    # Remove trailing back-slashes from path
-    real_path = path.rstrip("/")
-
-    parsed = urllib.parse.urlparse(real_path)
+    parsed = urllib.parse.urlparse(path)
     if not parsed.scheme:
-        return os.path.abspath(real_path)
-    return real_path
+        return os.path.abspath(path)
+    return path.rstrip("/")

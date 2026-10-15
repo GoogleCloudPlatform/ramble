@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,31 +6,57 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from enum import Enum
+import re
+from enum import Enum, auto
 
 import ramble.error
+from ramble.repository import type_definitions
 from ramble.util.logger import logger
 
-key_type = Enum("type", ["reserved", "optional", "required"])
-output_level = Enum("level", ["key", "variable"])
+
+class key_type(Enum):
+    reserved = auto()
+    optional = auto()
+    required = auto()
+
+
+class output_level(Enum):
+    key = auto()
+    variable = auto()
+
+
 default_keys = {
     "workspace_name": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_root": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_configs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_software": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_logs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_inputs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_experiments": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_shared": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_archives": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_deployments": {"type": key_type.reserved, "level": output_level.variable},
     "application_name": {"type": key_type.reserved, "level": output_level.key},
     "application_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "application_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "application_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "application_spec": {"type": key_type.reserved, "level": output_level.variable},
+    "application_version": {"type": key_type.reserved, "level": output_level.variable},
     "simplified_application_namespace": {"type": key_type.reserved, "level": output_level.key},
     "workload_name": {"type": key_type.reserved, "level": output_level.key},
     "workload_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "workload_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "workload_namespace": {"type": key_type.reserved, "level": output_level.key},
     "simplified_workload_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "workload_group": {"type": key_type.reserved, "level": output_level.key},
     "license_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "experiments_file": {"type": key_type.reserved, "level": output_level.key},
     "experiment_name": {"type": key_type.reserved, "level": output_level.key},
     "experiment_hash": {"type": key_type.reserved, "level": output_level.key},
     "experiment_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "experiment_status": {"type": key_type.reserved, "level": output_level.key},
+    "RAMBLE_STATUS": {"type": key_type.reserved, "level": output_level.key},
     "experiment_index": {"type": key_type.reserved, "level": output_level.variable},
     "experiment_namespace": {"type": key_type.reserved, "level": output_level.key},
     "simplified_experiment_namespace": {"type": key_type.reserved, "level": output_level.key},
@@ -39,17 +65,26 @@ default_keys = {
     "err_file": {"type": key_type.reserved, "level": output_level.variable},
     "env_path": {"type": key_type.reserved, "level": output_level.variable},
     "input_name": {"type": key_type.reserved, "level": output_level.variable},
+    "is_repeat_parent": {"type": key_type.reserved, "level": output_level.variable},
+    "is_repeat_child": {"type": key_type.reserved, "level": output_level.variable},
     "repeat_index": {"type": key_type.reserved, "level": output_level.variable},
     "spec_name": {"type": key_type.optional, "level": output_level.variable},
     "env_name": {"type": key_type.optional, "level": output_level.variable},
-    "n_ranks": {"type": key_type.required, "level": output_level.key},
-    "n_nodes": {"type": key_type.required, "level": output_level.key},
-    "processes_per_node": {"type": key_type.required, "level": output_level.key},
+    "n_ranks": {"type": key_type.optional, "level": output_level.key},
+    "n_nodes": {"type": key_type.optional, "level": output_level.key},
+    "processes_per_node": {"type": key_type.optional, "level": output_level.key},
     "n_threads": {"type": key_type.optional, "level": output_level.key},
+    "n_accelerators": {"type": key_type.optional, "level": output_level.key},
+    "accelerators_per_node": {"type": key_type.optional, "level": output_level.key},
     "batch_submit": {"type": key_type.required, "level": output_level.variable},
     "mpi_command": {"type": key_type.required, "level": output_level.variable},
+    "workload_template_name": {"type": key_type.reserved, "level": output_level.key},
     "experiment_template_name": {"type": key_type.reserved, "level": output_level.key},
     "unformatted_command": {"type": key_type.reserved, "level": output_level.variable},
+    "unformatted_command_without_logs": {
+        "type": key_type.reserved,
+        "level": output_level.variable,
+    },
 }
 
 
@@ -80,12 +115,23 @@ class Keywords:
                   specific inputs to further configure the experiment.
     """
 
+    # Keyword attributes are set dynamically in update_keys(). This is only
+    # reached for unknown attributes, and tells type checkers keywords are str.
+    def __getattr__(self, name: str) -> str:
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+
     def __init__(self, extra_keys=None):
         # Merge in additional Keys:
         self.keys = default_keys.copy()
         if extra_keys is None:
             extra_keys = {}
         self.update_keys(extra_keys)
+        self.reserved_patterns = set()
+        for type_definition in type_definitions.values():
+            object_type = type_definition["singular"]
+            self.reserved_patterns.add(re.compile(rf"{object_type}::\S+::version"))
+            self.reserved_patterns.add(re.compile(rf"{object_type}_version"))
+            self.reserved_patterns.add(re.compile(rf"{object_type}::variant::\S+"))
 
     def copy(self):
         new_inst = type(self)()
@@ -95,25 +141,25 @@ class Keywords:
 
     def update_keys(self, extra_keys):
         self.keys.update(extra_keys)
+        self._required_keys = frozenset(
+            key for key, key_def in self.keys.items() if key_def["type"] == key_type.required
+        )
         # Define class attributes for all of the keys
-        for key in self.keys.keys():
+        for key in self.keys:
             setattr(self, key, key)
 
     def is_valid(self, key):
         """Check if a key is valid as a known keyword"""
-        return key in self.keys.keys()
+        return key in self.keys
 
     def is_reserved(self, key):
         """Check if a key is reserved"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["type"] == key_type.reserved
-
-    def is_optional(self, key):
-        """Check if a key is optional"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["type"] == key_type.optional
+        if self.is_valid(key):
+            return self.keys[key]["type"] == key_type.reserved
+        for reserved_pattern in self.reserved_patterns:
+            if reserved_pattern.match(key):
+                return True
+        return False
 
     def is_required(self, key):
         """Check if a key is required"""
@@ -127,63 +173,45 @@ class Keywords:
             return False
         return self.keys[key]["level"] == output_level.key
 
-    def is_variable_level(self, key):
-        """Check if key is part of the variable level"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["level"] == output_level.variable
-
     def all_required_keys(self):
         """Yield all required keys
 
         Yields:
             (str): Key name
         """
-        for key in self.keys.keys():
-            if self.is_required(key):
-                yield key
-
-    def all_reserved_keys(self):
-        """Yield all reserved keys
-
-        Yields:
-            (str): Key name
-        """
-        for key in self.keys.keys():
-            if self.is_reserved(key):
-                yield key
+        return iter(self._required_keys)
 
     def check_reserved_keys(self, definitions):
         """Check a dictionary of variable definitions for reserved keywords"""
         if not definitions:
             return
 
-        for definition in definitions.keys():
+        for definition in definitions:
             if self.is_reserved(definition):
                 raise RambleKeywordError(
                     f'Keyword "{definition}" has been defined, ' + "but is reserved by ramble."
                 )
 
-    def check_required_keys(self, definitions):
+    def check_required_keys(self, definitions, warn_validation=True, die_on_validate_error=True):
         """Check a dictionary of variable definitions for all required keywords"""
         if not definitions:
             return
 
-        required_set = set()
-        for key in self.keys.keys():
-            if self.is_required(key):
-                required_set.add(key)
+        required_set = set(self._required_keys)
 
-        for definition in definitions.keys():
+        for definition in definitions:
             if definition in required_set:
                 required_set.remove(definition)
 
-        if len(required_set) > 0:
-            for key in required_set:
-                logger.warn(f'Required key "{key}" is not defined')
-            raise RambleKeywordError(
-                "One or more required keys " + "are not defined within an experiment."
-            )
+        if required_set:
+            if warn_validation:
+                for key in required_set:
+                    logger.warn(f'Required key "{key}" is not defined')
+
+            if die_on_validate_error:
+                raise RambleKeywordError(
+                    "One or more required keys " + "are not defined within an experiment."
+                )
 
 
 class RambleKeywordError(ramble.error.RambleError):

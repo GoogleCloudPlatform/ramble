@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -23,24 +24,29 @@ class IntelMpiBenchmarks(ExecutableApplication):
     https://www.intel.com/content/www/us/en/develop/documentation/imb-user-guide/top.html
     """
 
-    name = "IntelMpiBenchmarks"
+    name = "intel-mpi-benchmarks"
 
     maintainers("rfbgo")
 
-    tags("micro-benchmark", "benchmark", "mpi")
+    tags("mpi-benchmark", "micro-benchmark", "communication-benchmark")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
-    software_spec(
-        "intel-mpi-benchmarks",
-        pkg_spec="intel-mpi-benchmarks@2019.6",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+    version("2019.6", "Version 2019.6 of Intel MPI Benchmarks", preferred=True)
 
-    required_package("intel-mpi-benchmarks", package_manager="spack*")
+    with when("package_manager_family"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
+
+        software_spec(
+            "intel-mpi-benchmarks-{application::intel-mpi-benchmarks::version}",
+            pkg_spec="intel-mpi-benchmarks@{application::intel-mpi-benchmarks::version}",
+            compiler="gcc14",
+        )
+
+        required_package("intel-mpi-benchmarks")
 
     executable(
         "pingpong",
@@ -57,8 +63,8 @@ class IntelMpiBenchmarks(ExecutableApplication):
     )
 
     executable(
-        "exchange",
-        "{install_path}/IMB-MPI1 Exchange -msglog {msglog_min}:{msglog_max} "
+        "transfer",
+        "{install_path}/IMB-MPI1 {transfer_type} -msglog {msglog_min}:{msglog_max} "
         "-iter {num_iterations} {additional_args}",
         use_mpi=True,
     )
@@ -66,11 +72,14 @@ class IntelMpiBenchmarks(ExecutableApplication):
     workload("pingpong", executable="pingpong")
     workload("multi-pingpong", executable="multi-pingpong")
     workload("collective", executable="collective")
-    workload("exchange", executable="exchange")
+    # TODO: should merge pingpong into this workload. For now keeping
+    # the pingpong workload to avoid invalidating existing benchmark
+    # configs.
+    workload("transfer", executable="transfer")
 
     workload_group(
         "mpi1",
-        workloads=["pingpong", "multi-pingpong", "collective", "exchange"],
+        workloads=["pingpong", "multi-pingpong", "collective", "transfer"],
     )
 
     workload_variable(
@@ -125,6 +134,19 @@ class IntelMpiBenchmarks(ExecutableApplication):
         ],
         description="Pingpong Algorithm to Use",
         workloads=["pingpong"],
+    )
+
+    workload_variable(
+        "transfer_type",
+        default="Exchange",
+        values=[
+            "Exchange",
+            "Sendrecv",
+            "Uniband",
+            "Biband",
+        ],
+        description="(Non-collective) Transfer pattern to benchmark",
+        workloads=["transfer"],
     )
 
     workload_variable(
@@ -237,6 +259,15 @@ class IntelMpiBenchmarks(ExecutableApplication):
         contexts=["bw-bytes"],
     )
 
+    figure_of_merit(
+        "Time avg",
+        log_file=log_str,
+        fom_regex=bw_regex,
+        group_name="t_avg",
+        units="usec",
+        contexts=["bw-bytes"],
+    )
+
     # Combiend tables like:
     #  bytes #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]   Mbytes/sec
     #   (happens in sendrecv and exchange)
@@ -273,5 +304,5 @@ class IntelMpiBenchmarks(ExecutableApplication):
     success_criteria(
         "run_to_completion",
         mode="string",
-        match=r".*All processes entering MPI_Finalize",
+        match=r".*?All processes entering MPI_Finalize",
     )

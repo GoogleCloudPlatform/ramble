@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 # 
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -18,7 +18,7 @@ ramble:
     processes_per_node: 16
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
-    openfoam:
+    openfoam-org@10:
       workloads:
         motorbike:
           experiments:
@@ -40,29 +40,29 @@ ramble:
                                 #(part2, 32, openfoam-zen2, 2), (part2, 32, openfoam-zen2, 4)
   software:
     packages:
-      gcc9:
-        pkg_spec: gcc@9.3.0 target=x86_64
-        compiler_spec: gcc@9.3.0
-      ompi412:
-        pkg_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
-        compiler: gcc9
+      gcc14:
+        pkg_spec: gcc@14.2.0 target=x86_64
+        compiler_spec: gcc@14.2.0
+      ompi508:
+        pkg_spec: openmpi@5.0.8 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
+        compiler: gcc14
       openfoam-skx:
-        pkg_spec: openfoam-org@7 target=cascadelake
-        compiler: gcc9
+        pkg_spec: openfoam-org@{application::openfoam-org::version} target=cascadelake
+        compiler: gcc14
       openfoam-zen2:
-        pkg_spec: openfoam-org@7 target=zen2
-        compiler: gcc9
+        pkg_spec: openfoam-org@{application::openfoam-org::version} target=zen2
+        compiler: gcc14
       flex:
         pkg_spec: flex@2.6.4
-        compiler: gcc9
+        compiler: gcc14
     environments:
       openfoam-skx:
         packages:
-        - ompi412
+        - ompi508
         - openfoam-skx
         - flex
       openfoam-zen2:
         packages:
-        - ompi412
+        - ompi508
         - openfoam-zen2
         - flex

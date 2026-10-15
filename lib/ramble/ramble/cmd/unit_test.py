@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,17 +7,18 @@
 # except according to those terms.
 
 
+import argparse
 import collections
 import io
+import os
+import shutil
 import sys
-import re
-import argparse
 
-import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
 
 import ramble.paths
+import ramble.util.colors as color
 import ramble.workspace
 from ramble.util.logger import logger
 
@@ -33,6 +34,52 @@ def setup_parser(subparser):
         action="store_true",
         default=False,
         help="show full pytest help, with advanced options",
+    )
+
+    limited = subparser.add_mutually_exclusive_group()
+    limited.add_argument(
+        "--lib",
+        action="store_true",
+        default=False,
+        help="run only tests under the lib directory",
+    )
+    limited.add_argument(
+        "--obj",
+        action="store_true",
+        default=False,
+        help="run only tests under the builtin object repo directory",
+    )
+    limited.add_argument(
+        "-r",
+        "--repo-path",
+        default=None,
+        dest="repo_path",
+        help="run tests under the given object repo root (used for testing external object repo)",
+    )
+    subparser.add_argument(
+        "--perf",
+        action="store_true",
+        default=False,
+        help="run only performance tests",
+    )
+    subparser.add_argument(
+        "--fail-on-style",
+        action="store_true",
+        default=False,
+        help="fail unit tests if style is bad in the repository",
+    )
+    speed = subparser.add_mutually_exclusive_group()
+    speed.add_argument(
+        "--fast",
+        action="store_true",
+        default=False,
+        help="run only fast tests (skip slow tests)",
+    )
+    speed.add_argument(
+        "--slow",
+        action="store_true",
+        default=False,
+        help="run only slow tests (skip fast tests)",
     )
 
     # extra ramble arguments to list tests
@@ -98,58 +145,43 @@ def setup_parser(subparser):
 
 def do_list(args, extra_args):
     """Print a lists of tests than what pytest offers."""
-    # Run test collection and get the tree out.
-    old_output = sys.stdout
-    try:
-        sys.stdout = output = io.StringIO()
-        try:
-            import pytest
-
-            pytest.main(["--collect-only"] + extra_args)
-        except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
-    finally:
-        sys.stdout = old_output
-
-    lines = output.getvalue().split("\n")
-    tests = collections.defaultdict(set)
-    prefix = []
-
-    print("All lines =")
-    print(lines)
-
-    # collect tests into sections
-    for line in lines:
-        match = re.match(r"(\s*)<([^ ]*) '([^']*)'", line)
-        if not match:
-            continue
-        indent, nodetype, name = match.groups()
-
-        # strip parametrized tests
-        if "[" in name:
-            name = name[: name.index("[")]
-
-        depth = len(indent) // 2
-
-        if nodetype.endswith("Function"):
-            key = tuple(prefix)
-            tests[key].add(name)
-            print(f"added test {key}={name} from {nodetype}")
-        else:
-            prefix = prefix[:depth]
-            prefix.append(name)
-            print(f"added prefix {name}")
 
     def colorize(c, prefix):
         if isinstance(prefix, tuple):
             return "::".join(color.colorize(f"@{c}{{{p}}}") for p in prefix if p != "()")
         return color.colorize(f"@{c}{{{prefix}}}")
 
+    # Run test collection with quiet mode, to extract a list of <path>::<test_name>.
+    old_output = sys.stdout
+    try:
+        sys.stdout = output = io.StringIO()
+        try:
+            import pytest
+
+            pytest.main(["--collect-only", "-q"] + extra_args)
+        except ImportError:
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
+    finally:
+        sys.stdout = old_output
+
+    lines = output.getvalue().split("\n")
+    tests = collections.defaultdict(set)
+    # collect tests into sections
+    for line in lines:
+        if "::" not in line:
+            continue
+        [path, test_name] = line.split("::", 1)
+        # dedupe parametrized tests
+        if "[" in test_name:
+            test_name = test_name[: test_name.index("[")]
+        tests[path].add(test_name)
+
     if args.list == "list":
-        files = {prefix[0] for prefix in tests}
+        files = tests.keys()
         color_files = [colorize("B", file) for file in sorted(files)]
         colify(color_files)
-
     elif args.list == "long":
         for prefix, functions in sorted(tests.items()):
             path = colorize("*B", prefix) + "::"
@@ -157,7 +189,6 @@ def do_list(args, extra_args):
             color.cprint(path)
             colify(functions, indent=4)
             print()
-
     else:  # args.list == "names"
         all_functions = [
             colorize("*B", prefix) + "::" + colorize("c", f)
@@ -174,6 +205,20 @@ def add_back_pytest_args(args, unknown_args):
     they show up in the short help, so we have to reassemble things here.
     """
     result = args.parsed_args or []
+    if args.lib:
+        result += ["--ignore-glob", "var/ramble/repos/*"]
+    elif args.obj:
+        result += ["--ignore-glob", "lib/ramble/ramble/test/*"]
+    elif args.repo_path:
+        result += ["--repo-path", args.repo_path]
+    if args.perf:
+        result += ["--perf"]
+    if args.fast:
+        result += ["--fast"]
+    if args.slow:
+        result += ["--slow"]
+    if args.fail_on_style:
+        result += ["--fail-on-style"]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:
@@ -190,25 +235,55 @@ def unit_test(parser, args, unknown_args):
 
             return pytest.main(["-h"])
         except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
 
-    pytest_root = ramble.paths.ramble_root
+    pytest_root = args.repo_path or ramble.paths.ramble_root
 
-    # pytest.ini lives in the root of the ramble repository.
-    with working_dir(pytest_root):
-        if args.list:
-            do_list(args, pytest_args)
-            return
+    # conftest.py and pytest.ini live in the root of the ramble repository.
+    # need to ensure the same when repo_path is specified.
+    copied_conftest_path = None
+    copied_ini_path = None
+    copied_test_path = None
+    try:
+        with working_dir(pytest_root):
 
-        with ramble.workspace.no_active_workspace():
-            try:
-                import pytest
+            def _ensure_path_in_cwd(filename, src_root=ramble.paths.ramble_root):
+                if not os.path.exists(filename):
+                    shutil.copyfile(os.path.join(src_root, filename), filename)
+                    return os.path.join(os.getcwd(), filename)
+                return None
 
-                return pytest.main(pytest_args)
-            except ImportError:
-                logger.die(
-                    "Pytest python module not found. Ensure requirements.txt are installed."
+            if args.repo_path is not None:
+                copied_conftest_path = _ensure_path_in_cwd("conftest.py")
+                copied_ini_path = _ensure_path_in_cwd("pytest.ini")
+                # This specific test should be run against custom repos, so copy it over.
+                copied_test_path = _ensure_path_in_cwd(
+                    "setup_analyze.py", src_root=os.path.join(ramble.paths.test_path, "end_to_end")
                 )
+
+            if args.list:
+                do_list(args, pytest_args)
+                return
+
+            with ramble.workspace.no_active_workspace():
+                try:
+                    import pytest
+
+                    return pytest.main(pytest_args)
+                except ImportError:
+                    logger.die(
+                        "Pytest python module not found. "
+                        "Ensure requirements-dev.txt are installed."
+                    )
+    finally:
+        if copied_conftest_path is not None:
+            os.remove(copied_conftest_path)
+        if copied_ini_path is not None:
+            os.remove(copied_ini_path)
+        if copied_test_path is not None:
+            os.remove(copied_test_path)

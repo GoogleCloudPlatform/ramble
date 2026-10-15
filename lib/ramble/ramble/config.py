@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,88 +30,123 @@ When read in, Ramble validates configurations with jsonschemas.  The
 schemas are in submodules of :py:mod:`ramble.schema`.
 
 """
+
 import collections
 import contextlib
 import copy
 import functools
+import itertools
 import os
 import re
 import sys
 from contextlib import contextmanager
+from typing import Any, Dict, List
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from ruamel.yaml.error import MarkedYAMLError
 
 import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
 
-import spack.compilers
 import ramble.paths
-import spack.platforms
-
-import ramble.schema
+import ramble.schema.applications
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.filter_groups
 import ramble.schema.formatted_executables
-import ramble.schema.workspace
-import ramble.schema.applications
 import ramble.schema.internals
 import ramble.schema.licenses
 import ramble.schema.mirrors
 import ramble.schema.modifiers
-import ramble.schema.spack
+import ramble.schema.repo_schema
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.tables
+import ramble.schema.utilities
 import ramble.schema.variables
 import ramble.schema.variants
-
-# Objects
-import ramble.schema.repos
-import ramble.schema.modifier_repos
-import ramble.schema.package_manager_repos
-import ramble.schema.workflow_manager_repos
-import ramble.schema.base_application_repos
-import ramble.schema.base_modifier_repos
-import ramble.schema.base_package_manager_repos
-import ramble.schema.base_workflow_manager_repos
-
+import ramble.schema.workspace
+import ramble.schema.zips
 from ramble.error import RambleError
+from ramble.util import cpus
 from ramble.util.logger import logger
+
+import spack.compilers
+import spack.platforms
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml
-from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
-section_schemas = {
+section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
     "config": ramble.schema.config.schema,
     "env_vars": ramble.schema.env_vars.schema,
+    "filter_groups": ramble.schema.filter_groups.schema,
     "internals": ramble.schema.internals.schema,
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
     "modifiers": ramble.schema.modifiers.schema,
-    "spack": ramble.schema.spack.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
+    "tables": ramble.schema.tables.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,
     "variants": ramble.schema.variants.schema,
     "zips": ramble.schema.zips.schema,
-    "repos": ramble.schema.repos.schema,
-    "modifier_repos": ramble.schema.modifier_repos.schema,
-    "package_manager_repos": ramble.schema.package_manager_repos.schema,
-    "workflow_manager_repos": ramble.schema.workflow_manager_repos.schema,
-    "base_application_repos": ramble.schema.base_application_repos.schema,
-    "base_modifier_repos": ramble.schema.base_modifier_repos.schema,
-    "base_package_manager_repos": ramble.schema.base_package_manager_repos.schema,
-    "base_workflow_manager_repos": ramble.schema.base_workflow_manager_repos.schema,
+    "utilities": ramble.schema.utilities.schema,
+    **ramble.schema.repo_schema.schemas,
 }
 
 # Same as above, but including keys for workspaces
 # this allows us to unify config reading between configs and workspaces
 all_schemas = copy.deepcopy(section_schemas)
-all_schemas.update({key: ramble.schema.workspace.schema for key in ramble.schema.workspace.keys})
+all_schemas.update(dict.fromkeys(ramble.schema.workspace.keys, ramble.schema.workspace.schema))
+
+
+class _RambleLineLoader(syaml.OrderedLineLoader):
+    def construct_mapping(self, node, maptyp, deep=False):
+        from builtins import set
+
+        import llnl.util.tty as tty
+
+        seen_keys = set()
+        for key_node, _ in node.value:
+            key = self.construct_object(key_node, deep=True)
+
+            # Check if key is hashable; convert lists to tuples
+            try:
+                hash(key)
+                is_hashable = True
+            except TypeError:
+                if isinstance(key, list):
+                    try:
+                        key = tuple(key)
+                        hash(key)
+                        is_hashable = True
+                    except TypeError:
+                        is_hashable = False
+                else:
+                    is_hashable = False
+
+            if is_hashable:
+                if key in seen_keys:
+                    filename = node.start_mark.name
+                    line = key_node.start_mark.line + 1
+                    tty.warn(
+                        f'Duplicate key "{key}" detected in {filename} at line {line}. '
+                        "This will overwrite the previous value."
+                    )
+                seen_keys.add(key)
+
+        super().construct_mapping(node, maptyp, deep=deep)
+
+
+def load_config(*args, **kwargs):
+    """Load YAML using Ramble's custom Loader that warns on duplicate keys."""
+    kwargs["Loader"] = _RambleLineLoader
+    return syaml.load(*args, **kwargs)
+
 
 #: Builtin paths to configuration files in ramble
 configuration_paths = (
@@ -142,23 +177,63 @@ config_defaults = {
         "verify_ssl": True,
         "checksum": True,
         "dirty": False,
-        "build_jobs": min(16, cpus_available()),
+        "build_jobs": min(16, cpus.cpus_available()),
         "build_stage": "$tempdir/ramble-stage",
         "concretizer": "clingo",
         "license_dir": spack.paths.default_license_dir,
         "shell": "bash",
-        "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
+        "spack": {"install": {"flags": "--fresh"}, "concretize": {"flags": "--fresh"}},
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
-        "workspace_dirs": "$ramble/var/ramble/workspaces",
+        "workspace_dirs": ["$ramble/var/ramble/workspaces"],
         "upload": {"push_failed": True},
+        "upload_threads": cpus.cpus_available(),
         "report_dirs": "~/.ramble/reports",
+        "enable_strict_versions": True,
     }
 }
 
+
+class ScopesMetavar:
+    def __str__(self):
+        import ramble.workspace
+
+        if ramble.workspace.active_workspace():
+            return "{defaults,system,site,user,workspace}"
+        return "{defaults,system,site,user}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class ScopesChoices:
+    def __init__(self, include_workspace=True):
+        self.include_workspace = include_workspace
+
+    def __contains__(self, item):
+        import ramble.workspace
+
+        all_scopes = [s for s in scopes() if not s.startswith("workspace:")]
+        if self.include_workspace and ramble.workspace.active_workspace():
+            all_scopes.append("workspace")
+        return item in all_scopes
+
+    def __iter__(self):
+        import ramble.workspace
+
+        all_scopes = [s for s in scopes() if not s.startswith("workspace:")]
+        if self.include_workspace and ramble.workspace.active_workspace():
+            all_scopes.append("workspace")
+        return iter(all_scopes)
+
+
+def scopes_choices(include_workspace=True):
+    return ScopesChoices(include_workspace)
+
+
 #: metavar to use for commands that accept scopes
 #: this is shorter and more readable than listing all choices
-scopes_metavar = "{defaults,system,site,user}"
+scopes_metavar = ScopesMetavar()
 
 #: Base name for the (internal) overrides scope.
 overrides_base_name = "overrides-"
@@ -166,10 +241,10 @@ overrides_base_name = "overrides-"
 
 def first_existing(dictionary, keys):
     """Get the value of the first key in keys that is in the dictionary."""
-    try:
-        return next(k for k in keys if k in dictionary)
-    except StopIteration:
-        raise KeyError("None of %s is in dict!" % keys)
+    for k in keys:
+        if k in dictionary:
+            return k
+    raise KeyError(f"None of {keys} is in dict!")
 
 
 class ConfigScope:
@@ -190,7 +265,7 @@ class ConfigScope:
 
     def get_section_filename(self, section):
         _validate_section_name(section)
-        return os.path.join(self.path, "%s.yaml" % section)
+        return os.path.join(self.path, f"{section}.yaml")
 
     def get_section(self, section):
         if section not in self.sections:
@@ -204,16 +279,15 @@ class ConfigScope:
         filename = self.get_section_filename(section)
         data = self.get_section(section)
 
-        # We copy data here to avoid adding defaults at write time
-        validate_data = copy.deepcopy(data)
-        validate(validate_data, section_schemas[section])
+        # validate handles copying data to avoid adding defaults at write time
+        validate(data, section_schemas[section])
 
         try:
             mkdirp(self.path)
-            with open(filename, "w") as f:
+            with open(filename, "w", encoding="utf-8") as f:
                 syaml.dump_config(data, stream=f, default_flow_style=False)
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def clear(self):
         """Empty cached config information."""
@@ -302,7 +376,7 @@ class SingleFileScope(ConfigScope):
             for section_key, data in section_data.items():
                 self.sections[section_key] = {section_key: data}
 
-        return self.sections.get(section, None)
+        return self.sections.get(section)
 
     def _write_section(self, section):
         data_to_write = self._raw_data
@@ -337,13 +411,13 @@ class SingleFileScope(ConfigScope):
             parent = os.path.dirname(self.path)
             mkdirp(parent)
 
-            tmp = os.path.join(parent, ".%s.tmp" % os.path.basename(self.path))
-            with open(tmp, "w") as f:
+            tmp = os.path.join(parent, f".{os.path.basename(self.path)}.tmp")
+            with open(tmp, "w", encoding="utf-8") as f:
                 syaml.dump_config(data_to_write, stream=f, default_flow_style=False)
             rename(tmp, self.path)
 
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def __repr__(self):
         return f"<SingleFileScope: {self.name}: {self.path}>"
@@ -356,7 +430,7 @@ class ImmutableConfigScope(ConfigScope):
     """
 
     def _write_section(self, section):
-        raise ConfigError("Cannot write to immutable scope %s" % self)
+        raise ConfigError(f"Cannot write to immutable scope {self}")
 
     def __repr__(self):
         return f"<ImmutableConfigScope: {self.name}: {self.path}>"
@@ -398,7 +472,7 @@ class InternalConfigScope(ConfigScope):
         self.sections[section] = _mark_internal(data, self.name)
 
     def __repr__(self):
-        return "<InternalConfigScope: %s>" % self.name
+        return f"<InternalConfigScope: {self.name}>"
 
     def clear(self):
         # no cache to clear here.
@@ -431,7 +505,8 @@ def _config_mutator(method):
 
     @functools.wraps(method)
     def _method(self, *args, **kwargs):
-        self._get_config_memoized.cache.clear()
+        if hasattr(self, "_get_config_cache"):
+            self._get_config_cache.clear()
         return method(self, *args, **kwargs)
 
     return _method
@@ -488,7 +563,7 @@ class Configuration:
         return [
             s
             for s in self.scopes.values()
-            if (type(s) == ConfigScope or type(s) == SingleFileScope)  # noqa: E721
+            if (type(s) is ConfigScope or type(s) is SingleFileScope)
         ]
 
     def highest_precedence_scope(self):
@@ -525,7 +600,7 @@ class Configuration:
             ValueError: if ``scope`` is not valid
 
         Returns:
-            ConfigScope: a valid ConfigScope if ``scope`` is ``None`` or valid
+            ramble.config.ConfigScope: A valid ConfigScope if ``scope`` is ``None`` or valid
         """
         if scope is None:
             # default to the scope with highest precedence.
@@ -625,10 +700,16 @@ class Configuration:
            }
 
         """
-        return self._get_config_memoized(section, scope)
+        if not hasattr(self, "_get_config_cache"):
+            self._get_config_cache = {}
 
-    @llnl.util.lang.memoized
-    def _get_config_memoized(self, section, scope):
+        key = (section, scope)
+        if key not in self._get_config_cache:
+            self._get_config_cache[key] = self._get_config_no_memo(section, scope)
+
+        return self._get_config_cache[key]
+
+    def _get_config_no_memo(self, section, scope):
         _validate_section_name(section)
 
         if scope is None:
@@ -637,10 +718,10 @@ class Configuration:
             scopes = [self._validate_scope(scope)]
 
         merged_section = syaml.syaml_dict()
-        for scope in scopes:
+        for cfg_scope in scopes:
             # read potentially cached data from the scope.
 
-            data = scope.get_section(section)
+            data = cfg_scope.get_section(section)
 
             # Skip empty configs
             if not data or not isinstance(data, dict):
@@ -653,7 +734,7 @@ class Configuration:
             # thus read data and update it in memory if need be.
             changed = _update_in_memory(data, section)
             if changed:
-                self.format_updates[section].append(scope)
+                self.format_updates[section].append(cfg_scope)
 
             merged_section = merge_yaml(merged_section, data)
 
@@ -749,7 +830,7 @@ class Configuration:
             data[section] = self.get_config(section)
             syaml.dump_config(data, stream=sys.stdout, default_flow_style=False, blame=blame)
         except (yaml.YAMLError, OSError):
-            raise ConfigError("Error reading configuration: %s" % section)
+            raise ConfigError(f"Error reading configuration: {section}") from None
 
 
 @contextmanager
@@ -757,8 +838,8 @@ def override(path_or_scope, value=None):
     """Simple way to override config settings within a context.
 
     Arguments:
-        path_or_scope (ConfigScope or str): scope or single option to override
-        value (object or None): value for the single option
+        path_or_scope (ConfigScope | str): scope or single option to override
+        value (object | None): value for the single option
 
     Temporarily push a scope on the current configuration, then remove it
     after the context completes. If a single option is provided, create
@@ -793,7 +874,7 @@ def override(path_or_scope, value=None):
 
 #: configuration scopes added on the command line
 #: set by ``ramble.main.main()``.
-command_line_scopes = []
+command_line_scopes: List[str] = []
 
 
 def _add_platform_scope(cfg, scope_type, name, path):
@@ -813,9 +894,9 @@ def _add_command_line_scopes(cfg, command_line_scopes):
         # We ensure that these scopes exist and are readable, as they are
         # provided on the command line by the user.
         if not os.path.isdir(path):
-            raise ConfigError("config scope is not a directory: '%s'" % path)
+            raise ConfigError(f"config scope is not a directory: '{path}'")
         elif not os.access(path, os.R_OK):
-            raise ConfigError("config scope is not readable: '%s'" % path)
+            raise ConfigError(f"config scope is not readable: '{path}'")
 
         # name based on order on the command line
         name = "cmd_scope_%d" % i
@@ -839,8 +920,6 @@ def _config():
     # first do the builtin, hardcoded defaults
     defaults = InternalConfigScope("_builtin", config_defaults)
     cfg.push_scope(defaults)
-
-    # TODO: do we need the configuration here from Spack?
 
     # add each scope
     for name, path in configuration_paths:
@@ -870,8 +949,8 @@ def add_from_file(filename, scope=None):
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
-    for section in data.keys():
-        if section in section_schemas.keys():
+    for section in data:
+        if section in section_schemas:
             # Special handling for compiler scope difference
             # Has to be handled after we choose a section
             if scope is None:
@@ -879,7 +958,7 @@ def add_from_file(filename, scope=None):
 
             value = data[section]
             existing = get(section, scope=scope)
-            new = merge_yaml(existing, value)
+            new = merge_yaml(existing, value, path=[section])
 
             # We cannot call config.set directly (set is a type)
             config.set(section, new, scope)
@@ -894,7 +973,7 @@ def add(fullpath, scope=None):
     has_existing_value = True
     path = ""
     override = False
-    for idx, name in enumerate(components[:-1]):
+    for idx, name in enumerate(itertools.islice(components, len(components) - 1)):
         # First handle double colons in constructing path
         colon = "::" if override else ":" if path else ""
         path += colon + name
@@ -914,14 +993,14 @@ def add(fullpath, scope=None):
             existing = get_valid_type(path)
 
             # construct value from this point down
-            value = syaml.load_config(components[-1])
+            value = load_config(components[-1])
             for component in reversed(components[idx + 1 : -1]):
                 value = {component: value}
             break
 
     if has_existing_value:
         path, _, value = fullpath.rpartition(":")
-        value = syaml.load_config(value)
+        value = load_config(value)
         existing = get(path, scope=scope)
 
     # append values to lists
@@ -929,7 +1008,7 @@ def add(fullpath, scope=None):
         value = [value]
 
     # merge value into existing
-    new = merge_yaml(existing, value)
+    new = merge_yaml(existing, value, path=process_config_path(path))
     config.set(path, new, scope)
 
 
@@ -951,6 +1030,22 @@ def scopes():
     return config.scopes
 
 
+def resolve_scope(scope):
+    """Resolve a scope name to its canonical name.
+
+    If scope is 'workspace', resolve it to the active workspace's scope name.
+    """
+    if scope == "workspace":
+        import ramble.workspace
+
+        ws = ramble.workspace.active_workspace()
+        if ws:
+            return ws.ws_file_config_scope_name()
+        else:
+            raise ValueError("Workspace scope requires an active workspace")
+    return scope
+
+
 def _validate_section_name(section):
     """Exit if the section is not a valid section."""
     if section not in section_schemas:
@@ -964,8 +1059,8 @@ def validate(data, schema, filename=None):
     """Validate data read in from a Ramble YAML file.
 
     Arguments:
-        data (dict or list): data read from a Ramble YAML file
-        schema (dict or list): jsonschema to validate data
+        data (dict | list): data read from a Ramble YAML file
+        schema (dict | list): jsonschema to validate data
 
     This leverages the line information (start_mark, end_mark) stored
     on Ramble YAML structures.
@@ -1013,15 +1108,15 @@ def read_config_file(filename, schema=None):
         return None
 
     elif not os.path.isfile(filename):
-        raise ConfigFileError("Invalid configuration. %s exists but is not a file." % filename)
+        raise ConfigFileError(f"Invalid configuration. {filename} exists but is not a file.")
 
     elif not os.access(filename, os.R_OK):
-        raise ConfigFileError("Config file is not readable: %s" % filename)
+        raise ConfigFileError(f"Config file is not readable: {filename}")
 
     try:
         logger.debug(f"Reading config file {filename}")
-        with open(filename) as f:
-            data = syaml.load_config(f)
+        with open(filename, encoding="utf-8") as f:
+            data = load_config(f)
 
         if data:
             if not schema:
@@ -1031,13 +1126,15 @@ def read_config_file(filename, schema=None):
         return data
 
     except StopIteration:
-        raise ConfigFileError("Config file is empty or is not a valid YAML dict: %s" % filename)
+        raise ConfigFileError(
+            f"Config file is empty or is not a valid YAML dict: {filename}"
+        ) from None
 
     except MarkedYAMLError as e:
-        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}")
+        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}") from e
 
     except OSError as e:
-        raise ConfigFileError(f"Error reading configuration file {filename}: {str(e)}")
+        raise ConfigFileError(f"Error reading configuration file {filename}") from e
 
 
 def _override(string):
@@ -1110,10 +1207,10 @@ def get_valid_type(path):
                     return types[schema_type]()
     else:
         return type(None)
-    raise ConfigError("Cannot determine valid type for path '%s'." % path)
+    raise ConfigError(f"Cannot determine valid type for path '{path}'.")
 
 
-def merge_yaml(dest, source):
+def merge_yaml(dest, source, path=None):
     """Merges source into dest; entries in source take precedence over dest.
 
     This routine may modify dest and should be assigned to dest, in
@@ -1130,6 +1227,8 @@ def merge_yaml(dest, source):
     with `::` instead of `:`, and the key will override that of the
     parent instead of merging.
     """
+    if path is None:
+        path = []
 
     def they_are(t):
         return isinstance(dest, t) and isinstance(source, t)
@@ -1148,7 +1247,7 @@ def merge_yaml(dest, source):
     elif they_are(dict):
         # save dest keys to reinsert later -- this ensures that  source items
         # come *before* dest in OrderedDicts
-        dest_keys = [dk for dk in dest.keys() if dk not in source]
+        dest_keys = [dk for dk in dest if dk not in source]
 
         for sk, sv in source.items():
             # always remove the dest items. Python dicts do not overwrite
@@ -1157,8 +1256,14 @@ def merge_yaml(dest, source):
             merge = sk in dest
             old_dest_value = dest.pop(sk, None)
 
-            if merge and not _override(sk):
-                dest[sk] = merge_yaml(old_dest_value, sv)
+            current_path = path + [sk]
+            should_override = _override(sk)
+            if not should_override:
+                if len(current_path) == 2 and current_path[0] == "filter_groups":
+                    should_override = True
+
+            if merge and not should_override:
+                dest[sk] = merge_yaml(old_dest_value, sv, current_path)
             else:
                 # if sk ended with ::, or if it's new, completely override
                 dest[sk] = copy.deepcopy(sv)
@@ -1167,9 +1272,7 @@ def merge_yaml(dest, source):
         for dk in dest_keys:
             dest[dk] = dest.pop(dk)
 
-        import ruamel.yaml
-
-        return ruamel.yaml.comments.CommentedMap(dest)
+        return yaml.comments.CommentedMap(dest)
 
     # If we reach here source and dest are either different types or are
     # not both lists or dicts: replace with source.
@@ -1183,14 +1286,14 @@ def merge_yaml(dest, source):
 def process_config_path(path):
     result = []
     if path.startswith(":"):
-        raise syaml.rambleYAMLError(f"Illegal leading `:' in path `{path}'", "")
+        raise ConfigError(f"Illegal leading `:' in path `{path}'", "")
     seen_override_in_path = False
     while path:
         front, sep, path = path.partition(":")
         if (sep and not path) or path.startswith(":"):
             if seen_override_in_path:
-                raise syaml.RambleYAMLError(
-                    "Meaningless second override" " indicator `::' in path `{}'".format(path), ""
+                raise ConfigError(
+                    f"Meaningless second override indicator `::' in path `{path}'", ""
                 )
             path = path.lstrip(":")
             front = syaml.syaml_str(front)
@@ -1226,7 +1329,7 @@ def default_list_scope():
 
     Commands that list configuration list *all* scopes (merged) by default.
     """
-    return None
+    return
 
 
 def _update_in_memory(data, section):
@@ -1240,7 +1343,7 @@ def _update_in_memory(data, section):
         section (str): section of the configuration to update
 
     Returns:
-        True if the data was changed, False otherwise
+        bool: ``True`` if the data was changed, ``False`` otherwise
     """
     update_fn = ensure_latest_format_fn(section)
     changed = update_fn(data[section])
@@ -1273,7 +1376,8 @@ def use_configuration(*scopes_or_paths):
         *scopes_or_paths: scope objects or paths to be used
 
     Returns:
-        Configuration object associated with the scopes passed as arguments
+        ramble.config.Configuration: Configuration object associated with the scopes
+        passed as arguments
     """
     global config
 
@@ -1287,9 +1391,21 @@ def use_configuration(*scopes_or_paths):
 
     saved_config, config = config, configuration
 
+    import ramble.repository
+
+    saved_instances = {}
+    for obj_type, singleton in ramble.repository.paths.items():
+        saved_instances[obj_type] = singleton._instance
+        singleton._instance = None
+    saved_meta_path = list(sys.meta_path)
+
     try:
         yield configuration
     finally:
+        for obj_type, instance in saved_instances.items():
+            ramble.repository.paths[obj_type]._instance = instance
+        sys.meta_path = saved_meta_path
+
         # Restore previous config files
         spack.compilers._cache_config_file = saved_compiler_cache
         config = saved_config
@@ -1346,7 +1462,7 @@ class ConfigFormatError(ConfigError):
             location = f"{filename}"
         if line is not None:
             location += f":{line}"
-            with open(filename) as file:
+            with open(filename, encoding="utf-8") as file:
                 lines = file.readlines()
                 location += f"\n{lines[mark.line]}"
 

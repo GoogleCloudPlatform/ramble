@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,71 +8,25 @@
 
 
 import argparse
-import fnmatch
-import os
-import re
-import sys
 import math
+import os
+import sys
+from typing import Callable, Dict
 
 from llnl.util.tty.colify import colify
 
 import ramble.repository
-import ramble.cmd.common.arguments as arguments
+from ramble.cmd.common import arguments
+from ramble.util import object_utils
 from ramble.util.logger import logger
 
-from html import escape  # novm
-
-
-formatters = {}
+formatters: Dict[str, Callable] = {}
 
 
 def formatter(func):
     """Decorator used to register formatters"""
     formatters[func.__name__] = func
     return func
-
-
-def filter_by_name(objs, args, object_type):
-    """
-    Filters the sequence of objects according to user prescriptions
-
-    Args:
-        objs: sequence of objects
-        args: parsed command line arguments
-
-    Returns:
-        filtered and sorted list of objects
-    """
-    if args.filter:
-        res = []
-        for f in args.filter:
-            if "*" not in f and "?" not in f:
-                r = fnmatch.translate("*" + f + "*")
-            else:
-                r = fnmatch.translate(f)
-
-            rc = re.compile(r, flags=re.IGNORECASE)
-            res.append(rc)
-
-        if args.search_description:
-
-            def match(p, f):
-                if f.match(p):
-                    return True
-
-                obj = ramble.repository.get(p, object_type=object_type)
-                if obj.__doc__:
-                    return f.match(obj.__doc__)
-                return False
-
-        else:
-
-            def match(p, f):
-                return f.match(p)
-
-        objs = [obj for obj in objs if any(match(obj, f) for f in res)]
-
-    return sorted(objs, key=lambda s: s.lower())
 
 
 @formatter
@@ -82,18 +36,6 @@ def name_only(objs, out, object_type):
     if out.isatty():
         logger.msg(f'{len(objs)} {obj_def["dir_name"]}')
     colify(objs, indent=indent, output=out)
-
-
-def github_url(objs, object_type):
-    """Link to an object file on github."""
-    obj_def = ramble.repository.type_definitions[object_type]
-    url = (
-        "https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/"
-        + f'{obj_def["dir_name"]}/'
-        + "{0}"
-        + f'/{obj_def["file_name"]}'
-    )
-    return url.format(objs.name)
 
 
 def rows_for_ncols(elts, ncols):
@@ -115,15 +57,7 @@ def version_json(obj_names, out, object_type):
     out.write("[\n")
 
     # output name and latest version for each object
-    obj_latest = ",\n".join(
-        [
-            '  {{"name": "{0}"\n'
-            "}}".format(
-                obj.name,
-            )
-            for obj in objs
-        ]
-    )
+    obj_latest = ",\n".join([f'  {{"name": "{obj.name}"\n}}' for obj in objs])
     out.write(obj_latest)
     # important: no trailing comma in JSON arrays
     out.write("\n]\n")
@@ -174,7 +108,8 @@ def html(obj_names, out, object_type):
         out.write('<tr class="row-odd">\n' if i % 2 == 0 else '<tr class="row-even">\n')
         for name in row:
             out.write("<td>\n")
-            out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
+            if name is not None:
+                out.write(f'<a class="reference internal" href="#{name}">{name}</a>')
             out.write("</td>\n")
         out.write("</tr>\n")
     out.write("</tbody>\n")
@@ -183,44 +118,11 @@ def html(obj_names, out, object_type):
 
     # Output some text for each objects.
     for obj in objs:
-        out.write('<div class="section" id="%s">\n' % obj.name)
+        out.write(f'<div class="section" id="{obj.name}">\n')
         head(2, span_id, obj.name)
         span_id += 1
 
-        out.write('<dl class="docutils">\n')
-
-        # out.write('<dt>Homepage:</dt>\n')
-        # out.write('<dd><ul class="first last simple">\n')
-        # out.write(('<li>'
-        #            '<a class="reference external" href="%s">%s</a>'
-        #            '</li>\n') % (obj.homepage, escape(obj.homepage, True)))
-        # out.write('</ul></dd>\n')
-
-        out.write(f'<dt>Ramble {obj_def["dir_name"]}:</dt>\n')
-        out.write('<dd><ul class="first last simple">\n')
-        out.write(
-            "<li>"
-            '<a class="reference external" '
-            f'href="{github_url(obj, object_type)}">'
-            f'{obj.name}/{obj_def["file_name"]}</a>'  # noqa: E501
-            "</li>\n"
-        )
-        out.write("</ul></dd>\n")
-
-        # if obj.versions:
-        #     out.write('<dt>Versions:</dt>\n')
-        #     out.write('<dd>\n')
-        #     out.write(', '.join(
-        #         str(v) for v in reversed(sorted(obj.versions))))
-        #     out.write('\n')
-        #     out.write('</dd>\n')
-
-        out.write("<dt>Description:</dt>\n")
-        out.write("<dd>\n")
-        out.write(escape(obj.format_doc(indent=2), True))
-        out.write("\n")
-        out.write("</dd>\n")
-        out.write("</dl>\n")
+        obj.to_html_docs(out, obj_def)
 
         out.write('<hr class="docutils"/>\n')
         out.write("</div>\n")
@@ -260,12 +162,9 @@ def perform_list(args):
     # retrieve the formatter to use from args
     formatter = formatters[args.format]
 
-    object_type = ramble.repository.ObjectTypes[args.type]
+    object_type = ramble.repository.simplify_object_type(args.type)
 
-    # Retrieve the names of all the objects
-    objs = set(ramble.repository.all_object_names(object_type))
-    # Filter the set appropriately
-    sorted_objects = filter_by_name(objs, args, object_type)
+    sorted_objects = object_utils.filter_by_name(args.filter, args.search_description, object_type)
 
     # Filter by tags
     if args.tags:
@@ -273,17 +172,31 @@ def perform_list(args):
         sorted_objects = set(sorted_objects) & objects_with_tags
         sorted_objects = sorted(sorted_objects)
 
+    if not sorted_objects:
+        filter_strs = []
+        if args.filter:
+            filter_strs.append(f"filter '{' '.join(args.filter)}'")
+        if args.tags:
+            filter_strs.append(f"tags '{', '.join(args.tags)}'")
+        if filter_strs:
+            logger.warn(f"No {object_type.name} found matching {' and '.join(filter_strs)}.")
+        else:
+            logger.warn(f"No {object_type.name} found.")
+        return 0
+
     if args.update:
         # change output stream if user asked for update
         if os.path.exists(args.update):
             if os.path.getmtime(args.update) > ramble.repository.paths[object_type].last_mtime():
                 logger.msg(f"File is up to date: {args.update}")
-                return
+                return 0
 
         logger.msg(f"Updating file: {args.update}")
-        with open(args.update, "w") as f:
+        with open(args.update, "w", encoding="utf-8") as f:
             formatter(sorted_objects, f, object_type)
 
     else:
         # Print to stdout
         formatter(sorted_objects, sys.stdout, object_type)
+
+    return 0

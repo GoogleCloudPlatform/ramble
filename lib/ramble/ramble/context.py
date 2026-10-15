@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,10 +6,18 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.namespace import namespace
+import copy
+
+import ramble.error
+import ramble.util.colors as color
 import ramble.util.matrices
+from ramble.namespace import namespace
 
 import spack.util.spack_yaml as syaml
+
+
+class ContextError(ramble.error.RambleError):
+    """Exception raised for errors in context parsing and handling."""
 
 
 class Context:
@@ -19,6 +27,24 @@ class Context:
     (such as application, workload, or experiment) and logic to merge in
     additional contexts by order of precedence."""
 
+    output_mapping = {
+        "variables": namespace.variables,
+        "variants": namespace.variants,
+        "env_variables": namespace.env_var,
+        "internals": namespace.internals,
+        "chained_experiments": namespace.chained_experiments,
+        "modifiers": namespace.modifiers,
+        "template": namespace.template,  # TODO: Make sure this is good
+        "exclude": namespace.exclude,
+        "zips": namespace.zips,
+        "tables": namespace.tables,
+        "tags": namespace.tags,
+        "matrices": namespace.matrices,
+        "n_repeats": namespace.n_repeats,
+        "formatted_executables": namespace.formatted_executables,
+        "success_criteria": namespace.success,
+    }
+
     def __init__(self):
         """Constructor for a Context
 
@@ -27,18 +53,25 @@ class Context:
         self.env_variables = []
         self.variables = syaml.syaml_dict()
         self.variants = syaml.syaml_dict()
+        self.version = None
         self.internals = {}
         self.templates = None
         self.formatted_executables = {}
         self.chained_experiments = []
         self.modifiers = []
         self.context_name = None
+        self.success_criteria = []
         self.exclude = {}
         self.zips = {}
         self.matrices = []
         self.tags = []
+        self.tables = []
         self.is_template = False
         self.n_repeats = 0
+
+    @property
+    def escaped_name(self):
+        return color.escape_str(self.context_name)
 
     def merge_context(self, in_context):
         """Merges another Context into this Context."""
@@ -47,12 +80,16 @@ class Context:
             namespace.custom_executables,
             namespace.executables,
             namespace.executable_injection,
+            namespace.custom_inputs,
+            namespace.custom_workloads,
         ]
 
         if in_context.variables:
             self.variables.update(in_context.variables)
         if in_context.variants:
             self.variants.update(in_context.variants)
+        if in_context.version:
+            self.version = in_context.version
         if in_context.env_variables:
             self.env_variables.append(in_context.env_variables)
         if in_context.internals:
@@ -63,7 +100,16 @@ class Context:
                             self.internals[internal_section] = {}
                         section_dict = in_context.internals[internal_section]
                         for key, val in section_dict.items():
-                            self.internals[internal_section][key] = val
+                            if (
+                                key in self.internals[internal_section]
+                                and isinstance(self.internals[internal_section][key], dict)
+                                and isinstance(val, dict)
+                            ):
+                                self.internals[internal_section][key].update(copy.deepcopy(val))
+                            else:
+                                self.internals[internal_section][key] = (
+                                    copy.deepcopy(val) if isinstance(val, (dict, list)) else val
+                                )
                     elif isinstance(in_context.internals[internal_section], list):
                         if internal_section not in self.internals:
                             self.internals[internal_section] = []
@@ -89,9 +135,40 @@ class Context:
         if in_context.tags:
             self.tags.extend(in_context.tags)
         if in_context.n_repeats != 0:
-            self.n_repeats = int(in_context.n_repeats)
+            try:
+                self.n_repeats = int(in_context.n_repeats)
+            except (ValueError, TypeError) as e:
+                raise ContextError(
+                    f"Cannot cast n_repeats value '{in_context.n_repeats}' to an integer: {e}"
+                ) from e
         if in_context.formatted_executables:
             self.formatted_executables.update(in_context.formatted_executables)
+        if in_context.success_criteria:
+            self.success_criteria.extend(in_context.success_criteria)
+        if in_context.tables:
+            self.tables.extend(in_context.tables)
+
+    def to_workspace_config(self, application_spec, workload_name):
+        experiment_config = {}
+
+        for attr_name, namespace_name in self.output_mapping.items():
+            attr_val = getattr(self, attr_name, None)
+            if attr_val:
+                experiment_config[namespace_name] = attr_val
+
+        workspace_config = {
+            "ramble": {
+                "applications": {
+                    application_spec: {
+                        "workloads": {
+                            workload_name: {"experiments": {self.context_name: experiment_config}}
+                        }
+                    }
+                }
+            }
+        }
+
+        return workspace_config
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -99,24 +176,27 @@ def create_context_from_dict(context_name, in_dict):
 
     Dictionaries should follow the below format:
 
-    in_dict = {
-        'env_vars': [],
-        'variables': {},
-        'variants': {},
-        'internals': {},
-        'template': '',
-        'chained_experiments': [],
-        'modifiers': [],
-        'context_name': '',
-        'exclude': {},
-        'zips': {},
-        'matrices': {} or [],
-        'tags': []
-        'n_repeats': '',
+    .. code-block:: python
+
+        in_dict = {
+            'env_vars': [],
+            'variables': {},
+            'variants': {},
+            'internals': {},
+            'template': '',
+            'chained_experiments': [],
+            'modifiers': [],
+            'context_name': '',
+            'exclude': {},
+            'zips': {},
+            'matrices': {} or [],
+            'tags': [],
+            'n_repeats': ''
+        }
 
     Args:
-        context_name: The name of the context (e.g., application name)
-        in_dict: A dictionary representing the variable definitions
+        context_name (str): The name of the context (e.g., application name)
+        in_dict (dict): A dictionary representing the variable definitions
 
     Returns:
         Context(object)
@@ -134,6 +214,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.variants in in_dict:
         new_context.variants = in_dict[namespace.variants]
+
+    if namespace.version in in_dict:
+        new_context.version = in_dict[namespace.version]
 
     if namespace.internals in in_dict:
         new_context.internals = in_dict[namespace.internals]
@@ -153,6 +236,9 @@ def create_context_from_dict(context_name, in_dict):
     if namespace.zips in in_dict:
         new_context.zips = in_dict[namespace.zips]
 
+    if namespace.tables in in_dict:
+        new_context.tables = in_dict[namespace.tables].copy()
+
     if namespace.tags in in_dict:
         new_context.tags = in_dict[namespace.tags].copy()
 
@@ -161,9 +247,17 @@ def create_context_from_dict(context_name, in_dict):
     )
 
     if namespace.n_repeats in in_dict:
-        new_context.n_repeats = int(in_dict[namespace.n_repeats])
+        try:
+            new_context.n_repeats = int(in_dict[namespace.n_repeats])
+        except (ValueError, TypeError) as e:
+            raise ContextError(
+                f"Cannot cast n_repeats value '{in_dict[namespace.n_repeats]}' to an integer: {e}"
+            ) from e
 
     if namespace.formatted_executables in in_dict:
         new_context.formatted_executables = in_dict[namespace.formatted_executables].copy()
+
+    if namespace.success in in_dict:
+        new_context.success_criteria = in_dict[namespace.success].copy()
 
     return new_context

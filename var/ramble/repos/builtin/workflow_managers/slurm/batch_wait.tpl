@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Ensure job_id is present
-job_id=$(< {experiment_run_dir}/.slurm_job)
-if [ -z "${job_id:-}" ]; then
-    echo "No valid job_id found" 1>&2
-    exit 1
-fi
+. {batch_helpers}
+
+job_id=$(get_job_id) || exit 0
 
 echo "Waiting for job {job_name} with id ${job_id} to complete..."
 

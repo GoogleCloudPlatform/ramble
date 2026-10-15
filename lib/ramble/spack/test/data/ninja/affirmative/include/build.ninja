@@ -1,3 +1,0 @@
-# Tests that Spack can handle targets in include files
-
-include include.ninja

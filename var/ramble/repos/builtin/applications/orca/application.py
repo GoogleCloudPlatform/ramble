@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,12 +19,16 @@ class Orca(ExecutableApplication):
 
     name = "orca"
 
-    tags = ["quantum chemistry"]
+    tags("quantum-chemistry", "electronic-structure")
 
-    software_spec("orca", pkg_spec="orca@5.0.4", package_manager="spack*")
-    software_spec(
-        "openmpi412", pkg_spec="openmpi@4.1.2", package_manager="spack*"
-    )
+    version("5.0.4", "Version 5.0.4 of ORCA", preferred=True)
+
+    with when("package_manager_family=spack"):
+        software_spec(
+            "orca-{application::orca::version}",
+            pkg_spec="orca@{application::orca::version}",
+        )
+        software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(
         "orca_in",
@@ -33,27 +37,27 @@ class Orca(ExecutableApplication):
         description="Input deck archive for ORCA",
     )
 
-    tmp_file_patt1 = os.path.join("{scratch_dir}", "*_Compound_*")
-    tmp_file_patt2 = os.path.join("{scratch_dir}", "*txt")
-    executable(
-        "clear_prior_checkpoints",
-        f"rm -f {tmp_file_patt1} {tmp_file_patt2}",
-        use_mpi=False,
+    cleanup(
+        name="clear_prior_checkpoints",
+        regex=r".*_Compound_.*|.*\.txt$",
+        directory="{scratch_dir}",
+        pre=True,
     )
 
-    executable(
-        "copy_input",
-        f"cp -R {os.path.join('{input_path}', '*')} {{scratch_dir}}",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src=os.path.join("{input_path}", "*"),
+        dst="{scratch_dir}",
     )
 
     # The only way to configure total ranks launched is by changing the PAL nprocs keyword
     # in the main input file.
     scratch_in_path = os.path.join("{scratch_dir}", "{main_input_file}")
-    executable(
+    edit_file(
         "configure_nprocs",
-        f"sed -i 's/nprocs.*/nprocs {{n_ranks}}/' {scratch_in_path}",
-        use_mpi=False,
+        file_path=scratch_in_path,
+        match=r"nprocs.*",
+        replace="nprocs {n_ranks}",
     )
 
     # orca requires the full path when running in parallel
@@ -67,8 +71,7 @@ class Orca(ExecutableApplication):
     workload(
         "standard",
         executables=[
-            "clear_prior_checkpoints",
-            "copy_input",
+            "stage-input",
             "configure_nprocs",
             "run_orca",
         ],
@@ -109,10 +112,10 @@ class Orca(ExecutableApplication):
     success_criteria(
         "Error free",
         mode="string",
-        anti_match=r".*Error:.*",
+        anti_match=r".*?Error:",
     )
     success_criteria(
         "Normal termination",
         mode="string",
-        match=r".*ORCA TERMINATED NORMALLY.*",
+        match=r".*?ORCA TERMINATED NORMALLY",
     )

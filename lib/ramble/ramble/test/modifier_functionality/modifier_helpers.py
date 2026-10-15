@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,13 +28,13 @@ def check_software_env(base_dir, tests):
         spack_file = os.path.join(env_dir, "spack.yaml")
         assert os.path.isfile(spack_file)
 
-        with open(spack_file) as f:
+        with open(spack_file, encoding="utf-8") as f:
             assert test_content in f.read()
 
 
 def check_execute_script(script_path, tests):
     assert os.path.isfile(script_path)
-    with open(script_path) as f:
+    with open(script_path, encoding="utf-8") as f:
         data = f.read()
         for test in tests:
             assert test in data

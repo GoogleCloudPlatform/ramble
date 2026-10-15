@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,15 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
 import os
-
-from ramble.modkit import *
-from ramble.util.hashing import hash_string
-from spack.util.path import canonicalize_path
-from ramble.base_mod.builtin.container_base import ContainerBase
+import re
 
 import llnl.util.filesystem as fs
+
+from ramble.base_mod.builtin.container_base import ContainerBase
+from ramble.modkit import *
+from ramble.util.hashing import hash_string
+
+from spack.util.path import canonicalize_path
 
 
 class Apptainer(ContainerBase):

@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ This guide will provide general steps for creating a new modifier definition fil
 **NOTE:** Modifiers are considered a more advanced feature of Ramble. Writing a
 new modifier definition file in Ramble largely follows the same workflow as
 writing an application definition file, although the intent and behavior are
-different. It is recommended that you review :ref:`application-def-guide`
+different. It is recommended that you review :ref:`application-dev-guide`
 before writing a modifier.
 
 -----------
@@ -78,7 +78,7 @@ stored within a directory named for the modifier. As an example, Ramble comes
 with a repository named ``builtin``. This repository contains several standard
 modifier definitions that are provided to the community. One of the modifier
 definition files provided is
-`lscpu <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py>`_.
+`lscpu <https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py>`_.
 
 The lscpu modifier definition file is named ``modifier.py`` and is stored
 within a directory named ``lscpu``. Within the ``modifier.py`` file, a python
@@ -92,8 +92,7 @@ Base Classes
 
 Ramble provides base classes which can be inherited when creating new modifier
 definition files. These encapsulate most of the basic modifier functionality,
-and allow new modifiers to function with only a little syntax. These can be
-seen in more detail in :mod:`ramble.modifier_types`.
+and allow new modifiers to function with only a little syntax.
 
 New modifier definitions can also inherit their behavior from other
 modifier classes to replicate aspects of their behavior.
@@ -193,6 +192,15 @@ which is implemented as a class method which returns two lists of
 ``CommandExecutable`` objects, which are injected before and after each
 executable.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Modifiers can define requirements that must be met when using a package manager.
+The ``package_manager_requirement`` directive
+(:py:meth:`ramble.language.modifier_language.package_manager_requirement`) can
+be used to ensure certain package manager commands return expected output.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Modification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -223,3 +231,38 @@ correctly by using ``ramble workspace setup --dry-run``. The output from the
 preparation steps can be copied into the experiment directory to verify the
 ``ramble workspace analyze`` pipeline works, without having to execute the
 experiment itself.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Versions, Variants, and Conditional Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble modifiers support versions and variants, just as applications do (see
+:ref:`application-dev-version-directive` and
+:ref:`application-dev-variant-directive`).
+
+Variants can be used to control the behavior of many of the
+directives within a modifier, and their use follows the discussion
+in :ref:`application-dev-conditional-logic`.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Multi-modifier Conflicts
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble supports repeating modifier definitions within the ``modifiers``
+configuration section. This can be useful (when applying varying modes of the
+same modifier) but can also present a challenge to modifier developers.
+Modifiers are not inherently able to be replicated multiple times on the same
+experiment without providing some unexpected behaviors.
+
+In the modifier language, Ramble allows modifiers to define how they should
+conflict with other modifier definitions when aspects of their definitions
+overlap.
+
+The ``modifier_conflict`` language feature can be used to control what Ramble's
+behavior should be when repeated definitions of the same modifier exist. An
+enum is provided in ``ramble.util.conflicts`` named ``MODIFIER_CONFLICT`` to
+understand what options exist.
+
+This language feature supports the ``when`` and variant logic that was
+previously described, which can allow the conflict behavior to change based on
+variant settings.

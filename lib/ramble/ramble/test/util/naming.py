@@ -1,0 +1,86 @@
+# Copyright 2022-2026 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+"""Perform tests of the util/naming functions"""
+
+import pytest
+
+from ramble.util import naming
+
+
+@pytest.mark.parametrize(
+    "mod_name,expected_cls_name",
+    [
+        ("test_mod_1", "TestMod1"),
+        ("2_test_mod", "_2TestMod"),
+    ],
+)
+def test_mod_to_class(mod_name, expected_cls_name):
+    assert naming.mod_to_class(mod_name) == expected_cls_name
+
+
+@pytest.mark.parametrize(
+    "py_mod_name,expected_names",
+    [
+        ("app", ["app"]),
+        ("py_mod", ["py_mod", "py-mod"]),
+        ("num1_app", ["1_app", "1-app"]),
+    ],
+)
+def test_possible_ramble_module_names(py_mod_name, expected_names):
+    assert naming.possible_ramble_module_names(py_mod_name) == expected_names
+
+
+@pytest.mark.parametrize(
+    "in_name,expected_out_name",
+    [
+        ("ImageMagick", "imagemagick"),
+        ("l_mkl", "mkl"),
+        ("ALLCAPS", "allcaps"),
+        ("a_b.c++", "a-b-cpp"),
+    ],
+)
+def test_simplify_name(in_name, expected_out_name):
+    assert naming.simplify_name(in_name) == expected_out_name
+
+
+@pytest.mark.parametrize(
+    "mod_name,expect_error",
+    [
+        ("valid-mod", False),
+        ("a.b", True),
+        ("-ab", True),
+    ],
+)
+def test_validate_module_name(mod_name, expect_error):
+    if expect_error:
+        with pytest.raises(naming.InvalidModuleNameError):
+            naming.validate_module_name(mod_name)
+    else:
+        naming.validate_module_name(mod_name)
+
+
+@pytest.mark.parametrize(
+    "pattern,string,expected_match,expected_groups",
+    [
+        (None, "anything", True, {}),
+        ("Step *", "Step 123", True, {}),  # Glob
+        ("Step (?P<num>[0-9]+)", "Step 123", True, {"num": "123"}),  # Regex
+        ("foo.bar", "fooxbar", True, {}),  # Regex (. matches x)
+        ("foo.bar", "foo.bar", True, {}),  # Glob matches literally
+        ("^start.*", "start_here", True, {}),  # Regex with anchor
+        ("Step [0-9]+", "Step 123", True, {}),  # Regex with []
+        ("a|b", "a", True, {}),  # Regex with |
+        ("a|b", "c", False, {}),  # Regex mismatch
+        ("*.txt", "file.txt", True, {}),  # Glob
+        ("*.txt", "file.py", False, {}),  # Glob mismatch
+    ],
+)
+def test_match_pattern(pattern, string, expected_match, expected_groups):
+    match, groups = naming.match_pattern(pattern, string)
+    assert match == expected_match
+    assert groups == expected_groups

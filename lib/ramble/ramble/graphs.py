@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,16 +6,19 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from collections import defaultdict
 import enum
-import itertools
 import graphlib
+import itertools
+import re
+from collections import defaultdict
+from typing import DefaultDict
 
 import ramble.error
+import ramble.expander
 import ramble.util.graph
-from ramble.util.naming import NS_SEPARATOR
-
 from ramble.util.logger import logger
+from ramble.util.naming import NS_SEPARATOR
+from ramble.workspace import namespace
 
 
 class AttributeGraph:
@@ -42,9 +45,10 @@ class AttributeGraph:
         graph. If the node is new, also construct a new phase node.
 
         Args:
-            node (GraphNode): Node to inject or modify
-            dep_nodes (list(GraphNode) | None): List of nodes that are dependencies
-            internal_order (Boolean): True to process internal dependencies,
+            node (ramble.util.graph.GraphNode): Node to inject or modify
+            dep_nodes (list(ramble.util.graph.GraphNode) | None): List of node
+                that are dependencies
+            internal_order (bool): True to process internal dependencies,
                                       False to skip
 
         """
@@ -59,7 +63,7 @@ class AttributeGraph:
         """Add a node to the graph
 
         Args:
-            node (GraphNode): Node to add into graph
+            node (ramble.util.graph.GraphNode): Node to add into graph
         """
 
         self._make_editable()
@@ -77,9 +81,10 @@ class AttributeGraph:
         to define new graph edges.
 
         Args:
-            node (GraphNode): Node to inject or modify
-            dep_nodes (list(GraphNode) | None): List of nodes that are dependencies
-            internal_order (Boolean): True to process internal dependencies,
+            node (ramble.util.graph.GraphNode): Node to inject or modify
+            dep_nodes (list(ramble.util.graph.GraphNode) | None): List of nodes
+                that are dependencies
+            internal_order (bool): True to process internal dependencies,
                                      False to skip
         """
 
@@ -107,7 +112,7 @@ class AttributeGraph:
         yield each node one by one.
 
         Yields:
-            node (GraphNode): Each node in the graph
+            node (ramble.util.graph.GraphNode): Each node in the graph
         """
         if not self._prepared:
             try:
@@ -127,8 +132,8 @@ class AttributeGraph:
                     exp_name = self._obj_inst.name
                 raise GraphCycleError(
                     f"In experiment {exp_name} a cycle was detected "
-                    f"when processing the {self.node_type} graph.\n" + str(e)
-                )
+                    f"when processing the {self.node_type} graph."
+                ) from e
             self._prepared = True
 
         yield from self._sorted
@@ -140,12 +145,12 @@ class AttributeGraph:
             key (str): Name of key to find in the graph
 
         Returns:
-            (GraphNode): Node representing the key requested. Returns None if
-                         the key isn't found.
+            ramble.util.graph.GraphNode | None: Node representing the key requested or
+            ``None`` if the key isn't found.
         """
-        for node in self.walk():
-            if node.key == key:
-                return node
+        node = self.node_definitions.get(key)
+        if node is not None and node in self.adj_list:
+            return node
         return None
 
 
@@ -163,7 +168,7 @@ class PhaseGraph(AttributeGraph):
         Args:
             phase_definitions (dict): Definitions of phases. Should be of the
                                       format {'phase_name': GraphNode}
-            obj_inst (obj): Object instance to extract phase functions from
+            obj_inst (object): Object instance to extract phase functions from
         """
 
         super().__init__(obj_inst)
@@ -186,11 +191,12 @@ class PhaseGraph(AttributeGraph):
     def add_node(self, node, obj_inst=None):
         """Add a new phase node to the graph
 
-        Extract the phase function from the object instance, and inject a new node into the graph.
+        Extract the phase function from the object instance, and inject a new
+        node into the graph.
 
         Args:
-            node (GraphNode): Phase node to add into graph
-            obj_inst (Object): Object that owns the phase
+            node (ramble.util.graph.GraphNode): Phase node to add into graph
+            obj_inst (object): Object that owns the phase
         """
 
         func_obj = obj_inst
@@ -210,10 +216,12 @@ class PhaseGraph(AttributeGraph):
 
         Args:
             phase_name (str): Name of the phase to inject or modify
-            dependencies (list(str) | None): List of phase names to inject dependencies on
-            internal_order (Boolean): True to process internal dependencies,
-                                      False to skip
-            obj_inst (object): Application or modifier instance to extract phase function from
+            dependencies (list(str) | None): List of phase names to inject
+                dependencies on
+            internal_order (bool): True to process internal dependencies,
+                False to skip
+            obj_inst (object): Application or modifier instance to extract
+                phase function from
         """
         if dependencies is None:
             dependencies = []
@@ -308,9 +316,6 @@ class ExecutableGraph(AttributeGraph):
                 head_node = node
             tail_node = node
 
-        tail_prepend_builtin = None
-        tail_append_builtin = None
-
         # Add (missing) required builtins
         for builtins in builtin_groups:
             for builtin, blt_conf in builtins.items():
@@ -318,23 +323,12 @@ class ExecutableGraph(AttributeGraph):
                     blt_node = self.node_definitions[builtin]
                     super().update_graph(blt_node)
 
-                    # TODO: This should include `depends_on` as well.
-                    relative = bool(blt_conf["dependents"])
-
-                    if not relative and blt_conf["injection_method"] == "prepend":
+                    if blt_conf["injection_method"] == "prepend":
                         if head_node is not None:
                             super().update_graph(head_node, [blt_node])
-
-                        if tail_prepend_builtin is not None:
-                            super().update_graph(blt_node, [tail_prepend_builtin])
-                        tail_prepend_builtin = blt_node
-                    elif not relative and blt_conf["injection_method"] == "append":
+                    elif blt_conf["injection_method"] == "append":
                         if tail_node is not None:
                             super().update_graph(blt_node, [tail_node])
-
-                        if tail_append_builtin is not None:
-                            super().update_graph(blt_node, [tail_append_builtin])
-                        tail_append_builtin = blt_node
 
                     if blt_conf["depends_on"]:
                         deps = []
@@ -372,9 +366,7 @@ class ExecutableGraph(AttributeGraph):
         # If `relative_to` is set, and the executable name is not found, raise a fatal error.
 
         exec_node = self.node_definitions[exec_name]
-        cur_exec_order = []
-        for node in self.walk():
-            cur_exec_order.append(node)
+        cur_exec_order = list(self.walk())
 
         exp_name = self._obj_inst.expander.experiment_namespace
         order = self.supported_injection_orders.after
@@ -451,7 +443,7 @@ class ExecutableGraph(AttributeGraph):
     def _resolve_builtin_node(self, builtin_name):
         if builtin_name in self.node_definitions:
             return self.node_definitions[builtin_name]
-        full_names = self._builtin_aliases.get(builtin_name, None)
+        full_names = self._builtin_aliases.get(builtin_name)
         if full_names is None:
             raise GraphNodeNotFoundError(f"builtin {builtin_name} does not exist")
         if len(full_names) > 1:
@@ -459,6 +451,45 @@ class ExecutableGraph(AttributeGraph):
                 f"builtin {builtin_name} matches more than one node ({full_names})"
             )
         return self.node_definitions[full_names[0]]
+
+
+class FormattedExecutableGraph(AttributeGraph):
+    """Graph that handles formatted executables"""
+
+    node_type = "formatted executable"
+
+    def __init__(self, formatted_execs: dict, obj_inst):
+        """Constructs a new FormattedExecutableGraph and evaluates dependencies"""
+        super().__init__(obj_inst)
+        self._formatted_executable_dependencies: DefaultDict[str, list] = defaultdict(list)
+
+        # Define all graph nodes
+        for exec_name, exec_def in formatted_execs.items():
+            exec_node = ramble.util.graph.GraphNode(exec_name, attribute=exec_def)
+            super().add_node(exec_node)
+
+        # Search for internal dependencies and define edges
+        for exec_node in self.node_definitions.values():
+            formatted_conf = exec_node.attribute
+
+            capture_group = r"(\w+)"
+            expansion_pattern = re.compile(
+                rf"{ramble.expander.Expander.expansion_str(capture_group)}"
+            )
+            expansion_strs = set()
+
+            if namespace.prefix in formatted_conf:
+                expansion_strs.update(expansion_pattern.findall(formatted_conf[namespace.prefix]))
+            if namespace.commands in formatted_conf:
+                for line in formatted_conf[namespace.commands]:
+                    expansion_strs.update(expansion_pattern.findall(line))
+            dep_nodes = []
+            for expansion_str in expansion_strs:
+                if expansion_str in self.node_definitions:
+                    dep_node = self.node_definitions[expansion_str]
+                    dep_nodes.append(dep_node)
+
+            super().define_edges(exec_node, dep_nodes)
 
 
 class GraphError(ramble.error.RambleError):

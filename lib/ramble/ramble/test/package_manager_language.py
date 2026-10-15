@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,19 +9,20 @@
 
 import pytest
 
-from ramble.pkgmankit import *  # noqa
+import ramble.repository
 
+UserManagedPackageManager = ramble.repository.get_obj_class(
+    "user-managed", ramble.repository.ObjectTypes.package_managers
+)
 
-pm_types = [
-    PackageManagerBase,  # noqa: F405
-]
+pm_types = [UserManagedPackageManager]
 
 
 @pytest.mark.parametrize("pm_class", pm_types)
 def test_pkg_man_type_features(pm_class):
     pm_path = "/path/to/pm"
     test_pm = pm_class(pm_path)
-    assert hasattr(test_pm, "package_manager_variable")
+    assert hasattr(test_pm, "object_variables")
     assert hasattr(test_pm, "maintainers")
 
 
@@ -46,9 +47,12 @@ def test_pkg_man_variables(pm_class):
 
     var_name = test_defs["name"]
 
-    assert hasattr(pm_inst, "package_manager_variables")
-    assert var_name in pm_inst.package_manager_variables
-    assert pm_inst.package_manager_variables[var_name].default is not None
-    assert pm_inst.package_manager_variables[var_name].default == test_defs["default"]
-    assert pm_inst.package_manager_variables[var_name].description is not None
-    assert pm_inst.package_manager_variables[var_name].description == test_defs["description"]
+    assert hasattr(pm_inst, "object_variables")
+
+    found = False
+    for var in pm_inst.object_variables[frozenset()]:
+        if var_name == var.name:
+            assert var.default == test_defs["default"]
+            assert var.description == test_defs["description"]
+            found = True
+    assert found

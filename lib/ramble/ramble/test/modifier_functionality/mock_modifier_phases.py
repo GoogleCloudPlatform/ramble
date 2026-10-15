@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,17 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
-import os
 import glob
+import os
+import re
 
 import pytest
 
-from ramble.test.dry_run_helpers import dry_run_config, search_files_for_string, SCOPES
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
-
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config, search_files_for_string
+from ramble.test.modifier_functionality import modifier_helpers
 
 workspace = RambleCommand("workspace")
 
@@ -31,10 +30,8 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_gromacs_dry_run_mock_mod_phase(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope, workspace_name
 ):
-    workspace_name = "test_gromacs_dry_run_mock_mod_phase"
-
     test_modifiers = [
         (scope, modifier_helpers.named_modifier("mod-phase")),
     ]
@@ -42,7 +39,7 @@ def test_gromacs_dry_run_mock_mod_phase(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
@@ -61,8 +58,8 @@ def test_gromacs_dry_run_mock_mod_phase(
         make_experiments_regex = re.compile("Executing phase make_experiments")
         after_make_experiments_regex = re.compile("Executing phase after_make_experiments")
 
-        with open(out_file) as f:
-            for line in f.readlines():
+        with open(out_file, encoding="utf-8") as f:
+            for line in f:
                 if mod_phase_regex.search(line):
                     found_mod_phase = True
 

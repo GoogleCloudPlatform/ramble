@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,11 +8,10 @@
 
 import os
 import re
+from enum import Enum
 
 from ramble.appkit import *
 from ramble.expander import Expander
-
-from enum import Enum
 
 
 class OsuMicroBenchmarks(ExecutableApplication):
@@ -22,18 +21,23 @@ class OsuMicroBenchmarks(ExecutableApplication):
 
     maintainers("rfbgo", "douglasjacobsen")
 
-    tags("synthetic-benchmarks")
-
-    define_compiler("gcc", pkg_spec="gcc", package_manager="spack*")
-    software_spec("openmpi", pkg_spec="openmpi", package_manager="spack*")
-    software_spec(
-        "osu-micro-benchmarks",
-        pkg_spec="osu-micro-benchmarks",
-        compiler="gcc",
-        package_manager="spack*",
+    tags(
+        "mpi-benchmark",
+        "micro-benchmark",
+        "network-benchmark",
+        "communication-benchmark",
     )
 
-    required_package("osu-micro-benchmarks", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc", pkg_spec="gcc")
+        software_spec("openmpi", pkg_spec="openmpi")
+        software_spec(
+            "osu-micro-benchmarks",
+            pkg_spec="osu-micro-benchmarks",
+            compiler="gcc",
+        )
+
+        required_package("osu-micro-benchmarks")
 
     all_workloads = [
         "osu_bibw",
@@ -126,10 +130,35 @@ class OsuMicroBenchmarks(ExecutableApplication):
 
     workload_variable(
         "additional_args",
-        default="",
+        # By default capture tail stats
+        default="-z",
         description="Additional arguments for benchmark",
         workloads=all_workloads,
     )
+
+    two_rank_workloads = [
+        "osu_bibw",
+        "osu_bw",
+        "osu_latency",
+        "osu_acc_latency",
+        "osu_cas_latency",
+        "osu_fop_latency",
+        "osu_get_acc_latency",
+        "osu_get_bw",
+        "osu_get_latency",
+        "osu_put_bibw",
+        "osu_put_bw",
+        "osu_put_latency",
+    ]
+
+    for two_rank_workload in two_rank_workloads:
+        with when(f"workload={two_rank_workload}"):
+            register_validator(
+                name="two-rank-workloads",
+                predicate="{n_ranks} == 2",
+                message="This workload requires 2 ranks.",
+                fail_on_invalid=True,
+            )
 
     data_type_regex = r"# Datatype: (?P<type>\S+)\."
     figure_of_merit(
@@ -233,7 +262,7 @@ class OsuMicroBenchmarks(ExecutableApplication):
 
         compiled = re.compile(regex)
 
-        for grp_name, _ in compiled.groupindex.items():
+        for grp_name in compiled.groupindex:
             if grp_name in self.group_mapping:
                 self.figure_of_merit(
                     self.group_mapping[grp_name]["name"],
@@ -252,8 +281,8 @@ class OsuMicroBenchmarks(ExecutableApplication):
         fom_type = None
         log_file = self.expander.expand_var_name("log_file")
         if os.path.isfile(log_file):
-            with open(log_file) as f:
-                for line in f.readlines():
+            with open(log_file, encoding="utf-8") as f:
+                for line in f:
                     for test_fom_type in self.fom_types:
                         if self.fom_regex_headers[test_fom_type].match(line):
                             fom_type = test_fom_type

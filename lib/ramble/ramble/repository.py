@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,200 +8,119 @@
 
 import abc
 import collections
-import os
-import sys
-import traceback
-import types
-import functools
 import contextlib
-import re
+import errno
+import functools
 import importlib
 import importlib.machinery
 import importlib.util
 import inspect
-import stat
+import os
+import re
 import shutil
-import errno
+import stat
+import sys
+import traceback
+import types
 
-try:
-    from collections.abc import Mapping  # novm
-except ImportError:
-    from collections.abc import Mapping
+from ruamel import yaml
 
-
-from enum import Enum
-
-import ruamel.yaml as yaml
-
-import llnl.util.lang
 import llnl.util.filesystem as fs
+import llnl.util.lang
+from llnl.util.compat import Mapping
 
 import ramble.caches
 import ramble.config
 import ramble.spec
-import ramble.util.path
-import ramble.util.naming as nm
-from ramble.util.logger import logger
-
-import spack.util.spack_json as sjson
 import ramble.util.imp
+import ramble.util.naming as nm
+import ramble.util.path
+from ramble.object_types import (
+    OBJECT_NAMES,
+    ObjectTypes,
+    default_type,
+    type_definitions,
+    unified_config,
+)
+from ramble.util import json_util
+from ramble.util.logger import logger
 
 global_namespace = "ramble"
 
 #: Guaranteed unused default value for some functions.
 NOT_PROVIDED = object()
 
+_NAMESPACE_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9_.]+$")
+
 
 ####
 # Implement type specific functionality between here, and
 #     END TYPE SPECIFIC FUNCTIONALITY
 ####
-ObjectTypes = Enum(
-    "ObjectTypes",
-    [
-        "applications",
-        "modifiers",
-        "package_managers",
-        "workflow_managers",
-        "base_applications",
-        "base_modifiers",
-        "base_package_managers",
-        "base_workflow_managers",
-    ],
-)
 
-OBJECT_NAMES = [obj.name for obj in ObjectTypes]
-
-default_type = ObjectTypes.applications
-
-unified_config = "repo.yaml"
-
-type_definitions = {
-    ObjectTypes.applications: {
-        "file_name": "application.py",
-        "dir_name": "applications",
-        "abbrev": "app",
-        "config_section": "repos",
-        "accepted_configs": ["application_repo.yaml", unified_config],
-        "singular": "application",
-    },
-    ObjectTypes.modifiers: {
-        "file_name": "modifier.py",
-        "dir_name": "modifiers",
-        "abbrev": "mod",
-        "config_section": "modifier_repos",
-        "accepted_configs": ["modifier_repo.yaml", unified_config],
-        "singular": "modifier",
-    },
-    ObjectTypes.package_managers: {
-        "file_name": "package_manager.py",
-        "dir_name": "package_managers",
-        "abbrev": "pkg_man",
-        "config_section": "package_manager_repos",
-        "accepted_configs": ["package_manager_repo.yaml", unified_config],
-        "singular": "package manager",
-    },
-    ObjectTypes.workflow_managers: {
-        "file_name": "workflow_manager.py",
-        "dir_name": "workflow_managers",
-        "abbrev": "wm",
-        "config_section": "workflow_manager_repos",
-        "accepted_configs": ["workflow_manager_repo.yaml", unified_config],
-        "singular": "workflow manager",
-    },
-    ObjectTypes.base_applications: {
-        "file_name": "base_application.py",
-        "dir_name": "base_applications",
-        "abbrev": "base_app",
-        "config_section": "base_application_repos",
-        "accepted_configs": ["base_application_repo.yaml", unified_config],
-        "singular": "base application",
-    },
-    ObjectTypes.base_modifiers: {
-        "file_name": "base_modifier.py",
-        "dir_name": "base_modifiers",
-        "abbrev": "base_mod",
-        "config_section": "base_modifier_repos",
-        "accepted_configs": ["base_modifier_repo.yaml", unified_config],
-        "singular": "base modifier",
-    },
-    ObjectTypes.base_package_managers: {
-        "file_name": "base_package_manager.py",
-        "dir_name": "base_package_managers",
-        "abbrev": "base_pkg_man",
-        "config_section": "base_package_manager_repos",
-        "accepted_configs": ["base_package_manager_repo.yaml", unified_config],
-        "singular": "base package manager",
-    },
-    ObjectTypes.base_workflow_managers: {
-        "file_name": "base_workflow_manager.py",
-        "dir_name": "base_workflow_managers",
-        "abbrev": "base_wm",
-        "config_section": "base_workflow_manager_repos",
-        "accepted_configs": ["base_workflow_manager_repo.yaml", unified_config],
-        "singular": "base workflow manager",
-    },
+_ALL_ACCEPTED_CONFIGS = {
+    cfg for obj_info in type_definitions.values() for cfg in obj_info["accepted_configs"]
 }
 
 
-def _apps(repo_dirs=None):
-    """Get the applications singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.applications)
+def _normalize_type_key(key):
+    return str(key).lower().replace("-", "_").replace(" ", "_")
 
 
-def _mods(repo_dirs=None):
-    """Get the modifiers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.modifiers)
+_TYPE_ALIASES = {}
+
+for _obj in ObjectTypes:
+    _tdef = type_definitions.get(_obj, {})
+    _candidates = [
+        _obj.name,
+        _tdef.get("singular"),
+        _tdef.get("abbrev"),
+        _tdef.get("dir_name"),
+        *_tdef.get("aliases", []),
+    ]
+    for _val in _candidates:
+        if isinstance(_val, str):
+            for _v in (_val, f"{_val}s"):
+                _norm = _normalize_type_key(_v)
+                _TYPE_ALIASES[_norm] = _obj
+                _TYPE_ALIASES[_norm.replace("_", "-")] = _obj
 
 
-def _package_managers(repo_dirs=None):
-    """Get the package managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.package_managers)
+def get_object_type_map():
+    """Returns a mapping from string representations of object types (singular,
+    plural, abbrev, hyphens/underscores) to their corresponding ObjectType enum."""
+    return _TYPE_ALIASES
 
 
-def _workflow_managers(repo_dirs=None):
-    """Get the workflow managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.workflow_managers)
+def simplify_object_type(type_name):
+    """Convert a type string or ObjectTypes member to an ObjectTypes enum member.
+
+    Args:
+        type_name (ramble.object_types.ObjectTypes | str): Object type to simplify / normalize.
+
+    Returns:
+        (ramble.object_types.ObjectTypes): The matching ObjectTypes enum member.
+
+    Raises:
+        UnknownObjectTypeError: If type_name does not match any valid object type.
+    """
+    if isinstance(type_name, ObjectTypes):
+        return type_name
+
+    if isinstance(type_name, str):
+        key = _normalize_type_key(type_name)
+        if key in _TYPE_ALIASES:
+            return _TYPE_ALIASES[key]
+
+    raise UnknownObjectTypeError(type_name)
 
 
-def _base_apps(repo_dirs=None):
-    """Get the base applications singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_applications)
-
-
-def _base_mods(repo_dirs=None):
-    """Get the base modifiers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_modifiers)
-
-
-def _base_package_managers(repo_dirs=None):
-    """Get the base package managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_package_managers)
-
-
-def _base_workflow_managers(repo_dirs=None):
-    """Get the base workflow managers singleton RepoPath instance for Ramble."""
-    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_workflow_managers)
-
-
-paths = {
-    ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
-    ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
-    ObjectTypes.package_managers: llnl.util.lang.Singleton(_package_managers),
-    ObjectTypes.workflow_managers: llnl.util.lang.Singleton(_workflow_managers),
-    ObjectTypes.base_applications: llnl.util.lang.Singleton(_base_apps),
-    ObjectTypes.base_modifiers: llnl.util.lang.Singleton(_base_mods),
-    ObjectTypes.base_package_managers: llnl.util.lang.Singleton(_base_package_managers),
-    ObjectTypes.base_workflow_managers: llnl.util.lang.Singleton(_base_workflow_managers),
-}
-
-#####################################
-#     END TYPE SPECIFIC FUNCTIONALITY
-#####################################
+get_object_type = simplify_object_type
 
 
 def _gen_path(repo_dirs=None, obj_type=default_type):
     """Create a RepoPath for a specific object, add it to sys.meta_path, and return it."""
+    obj_type = simplify_object_type(obj_type)
     section_name = type_definitions[obj_type]["config_section"]
     singular_name = type_definitions[obj_type]["singular"]
     repo_dirs = repo_dirs or ramble.config.get(section_name)
@@ -215,12 +134,28 @@ def _gen_path(repo_dirs=None, obj_type=default_type):
     return path
 
 
+paths = {
+    obj_type: llnl.util.lang.Singleton(functools.partial(_gen_path, obj_type=obj_type))
+    for obj_type in ObjectTypes
+}
+
+
+#####################################
+#     END TYPE SPECIFIC FUNCTIONALITY
+#####################################
+
+
+def _get_repo_namespace(repo_path, obj_name):
+    return repo_path.repo_for_obj(obj_name).namespace
+
+
 def list_object_files(obj_inst, object_type):
     """List object file paths of the given object along the inheritance chain.
 
     This is currently used by `ramble deployment` to copy relevant files
     to create a self-contained repo.
     """
+    object_type = simplify_object_type(object_type)
     type_def = type_definitions[object_type]
     base_type = ObjectTypes[f"base_{type_def['dir_name']}"]
     base_type_def = type_definitions[base_type]
@@ -228,9 +163,15 @@ def list_object_files(obj_inst, object_type):
     repo_path = paths[object_type]
     base_repo_path = paths[base_type]
     obj_file = obj_inst._file_path
-    result = []
-    if repo_path.in_path(obj_file) or base_repo_path.in_path(obj_file):
-        result = [(type_def["dir_name"], obj_file)]
+    obj_name = os.path.basename(os.path.dirname(obj_file))
+    if repo_path.in_path(obj_file):
+        result = [(type_def["dir_name"], obj_file, _get_repo_namespace(repo_path, obj_name))]
+    elif base_repo_path.in_path(obj_file):
+        result = [
+            (base_type_def["dir_name"], obj_file, _get_repo_namespace(base_repo_path, obj_name))
+        ]
+    else:
+        result = []
     base_chain = obj_inst.__class__.__mro__[1:]
 
     for cls in base_chain:
@@ -241,23 +182,39 @@ def list_object_files(obj_inst, object_type):
             break
 
         basename = os.path.basename(path)
+        cls_name = os.path.basename(os.path.dirname(path))
         if basename == type_def["file_name"]:
-            result.append((type_def["dir_name"], path))
+            result.append((type_def["dir_name"], path, _get_repo_namespace(repo_path, cls_name)))
         elif basename == base_type_def["file_name"]:
-            result.append((base_type_def["dir_name"], path))
+            result.append(
+                (base_type_def["dir_name"], path, _get_repo_namespace(base_repo_path, cls_name))
+            )
         else:
             break
     return result
 
 
 def all_object_names(object_type=default_type):
-    """Convenience wrapper around ``ramble.repository.all_object_names()``."""  # noqa: E501
+    """Convenience wrapper around ``ramble.repository.all_object_names()``."""
+    object_type = simplify_object_type(object_type)
     return paths[object_type].all_object_names()
 
 
 def get(spec, object_type=default_type):
     """Convenience wrapper around ``ramble.repository.get()``."""
+    object_type = simplify_object_type(object_type)
     return paths[object_type].get(spec)
+
+
+def get_base_class(spec):
+    """Convenience wrapper around ``ramble.repository.get_obj_class()`` for base classes."""
+    return paths[ObjectTypes.base_classes].get_obj_class(spec)
+
+
+def get_obj_class(spec, object_type=default_type):
+    """Convenience wrapper around ``ramble.repository.get_obj_class()``."""
+    object_type = simplify_object_type(object_type)
+    return paths[object_type].get_obj_class(spec)
 
 
 def set_path(repo, object_type=default_type):
@@ -266,7 +223,7 @@ def set_path(repo, object_type=default_type):
     Overwrite ``path`` and register it as an importer in
     ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.
     """
-    global paths
+    object_type = simplify_object_type(object_type)
     paths[object_type] = repo
 
     # make the new repo_path an importer if needed
@@ -274,18 +231,6 @@ def set_path(repo, object_type=default_type):
     if append:
         sys.meta_path.append(repo)
     return append
-
-
-@contextlib.contextmanager
-def additional_repository(repository, object_type=default_type):
-    """Adds temporarily a repository to the default one.
-
-    Args:
-        repository: repository to be added
-    """
-    paths[object_type].put_first(repository)
-    yield
-    paths[object_type].remove(repository)
 
 
 @contextlib.contextmanager
@@ -297,9 +242,9 @@ def use_repositories(*paths_and_repos, object_type=default_type):
             already constructed Repo objects
 
     Returns:
-        Corresponding RepoPath object
+        RepoPath: Corresponding RepoPath object
     """
-    global paths
+    object_type = simplify_object_type(object_type)
 
     # Construct a temporary RepoPath object from
     temporary_repositories = RepoPath(*paths_and_repos, object_type=object_type)
@@ -308,12 +253,13 @@ def use_repositories(*paths_and_repos, object_type=default_type):
     saved = paths[object_type]
     remove_from_meta = set_path(temporary_repositories, object_type=object_type)
 
-    yield temporary_repositories
-
-    # Restore _path and sys.meta_path
-    if remove_from_meta:
-        sys.meta_path.remove(temporary_repositories)
-    paths[object_type] = saved
+    try:
+        yield temporary_repositories
+    finally:
+        # Restore _path and sys.meta_path
+        if remove_from_meta and temporary_repositories in sys.meta_path:
+            sys.meta_path.remove(temporary_repositories)
+        paths[object_type] = saved
 
 
 def autospec(function):
@@ -324,13 +270,13 @@ def autospec(function):
     @functools.wraps(function)
     def converter(self, spec_like, *args, **kwargs):
         if not isinstance(spec_like, ramble.spec.Spec):
-            spec_like = ramble.spec.Spec(spec_like)
+            spec_like = ramble.spec.Spec(spec_like.partition("@")[0])
         return function(self, spec_like, *args, **kwargs)
 
     return converter
 
 
-class ObjectNamespace(types.ModuleType):
+class RambleNamespace(types.ModuleType):
     """Allow lazy loading of modules."""
 
     def __init__(self, namespace):
@@ -338,13 +284,16 @@ class ObjectNamespace(types.ModuleType):
         self.__file__ = "(ramble namespace)"
         self.__path__ = []
         self.__name__ = namespace
-        self.__application__ = namespace
         self.__modules = {}
 
     def __getattr__(self, name):
         """Getattr lazily loads modules if they're not already loaded."""
-        submodule = self.__application__ + "." + name
-        setattr(self, name, __import__(submodule))
+        submodule = f"{self.__name__}.{name}"
+        try:
+            setattr(self, name, importlib.import_module(submodule))
+        except ImportError:
+            msg = "'{0}' object has no attribute {1}"
+            raise AttributeError(msg.format(type(self), name)) from None
         return getattr(self, name)
 
 
@@ -357,28 +306,20 @@ class FastObjectChecker(Mapping):
     during instance initialization.
     """
 
-    #: Global cache, reused by every instance
-    _paths_cache = {}
-
     def __init__(self, objects_path, object_file_name, object_type):
         # The path of the repository managed by this instance
         self.objects_path = objects_path
         self.object_file_name = object_file_name
         self.object_type = object_type
 
-        # If the cache we need is not there yet, then build it appropriately
-        if objects_path not in self._paths_cache:
-            self._paths_cache[objects_path] = self._create_new_cache()
-
         #: Reference to the appropriate entry in the global cache
-        self._objects_to_stats = self._paths_cache[objects_path]
+        self._objects_to_stats = self._create_new_cache(
+            objects_path, object_file_name, object_type
+        )
 
-    def invalidate(self):
-        """Regenerate cache for this checker."""
-        self._paths_cache[self.objects_path] = self._create_new_cache()
-        self._objects_to_stats = self._paths_cache[self.objects_path]
-
-    def _create_new_cache(self):
+    @staticmethod
+    @functools.lru_cache()
+    def _create_new_cache(objects_path, object_file_name, object_type):
         """Create a new cache for objects in a repo.
 
         The implementation here should try to minimize filesystem
@@ -389,25 +330,24 @@ class FastObjectChecker(Mapping):
         # Create a dictionary that will store the mapping between a
         # object name and its stat info
         cache = {}
-        for obj_name in os.listdir(self.objects_path):
+        if not os.path.isdir(objects_path):
+            return cache
+        for obj_name in os.listdir(objects_path):
             # Skip non-directories in the object root.
-            obj_dir = os.path.join(self.objects_path, obj_name)
+            obj_dir = os.path.join(objects_path, obj_name)
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
-                if not obj_name.startswith(".") and not any(
-                    obj_name in obj_info["accepted_configs"]
-                    for obj_info in type_definitions.values()
-                ):
+                if not obj_name.startswith(".") and obj_name not in _ALL_ACCEPTED_CONFIGS:
                     logger.warn(
-                        f"Skipping {self.object_type} "
+                        f"Skipping {object_type} "
                         f'at {obj_dir}. "{obj_name}" is not '
                         "a valid Ramble module name."
                     )
                 continue
 
             # Construct the file name from the directory
-            obj_file = os.path.join(self.objects_path, obj_name, self.object_file_name)
+            obj_file = os.path.join(objects_path, obj_name, object_file_name)
 
             # Use stat here to avoid lots of calls to the filesystem.
             try:
@@ -417,7 +357,7 @@ class FastObjectChecker(Mapping):
                     # No application.py file here.
                     continue
                 elif e.errno == errno.EACCES:
-                    logger.warn(f"Can't read {self.object_type} file {obj_file}.")
+                    logger.warn(f"Can't read {object_type} file {obj_file}.")
                     continue
                 raise e
 
@@ -452,11 +392,11 @@ class TagIndex(Mapping):
         self._tag_dict = collections.defaultdict(list)
 
     def to_json(self, stream):
-        sjson.dump({"tags": self._tag_dict}, stream)
+        json_util.dump({"tags": self._tag_dict}, stream)
 
     @staticmethod
     def from_json(stream, object_type):
-        d = sjson.load(stream)
+        d = json_util.load(stream)
 
         r = TagIndex(object_type=object_type)
 
@@ -504,9 +444,6 @@ class Indexer(metaclass=abc.ABCMeta):
     def create(self):
         self.index = self._create()
 
-    def set_object_type(self, object_type):
-        self.object_type = object_type
-
     @abc.abstractmethod
     def _create(self):
         """Create an empty index and return it."""
@@ -515,8 +452,7 @@ class Indexer(metaclass=abc.ABCMeta):
         """Whether an update is needed when the application file hasn't changed.
 
         Returns:
-            (bool): ``True`` if this application needs its index
-                updated, ``False`` otherwise.
+            bool: ``True`` if this application needs its index updated, ``False`` otherwise.
 
         We already automatically update indexes when object files
         change, but other files (like patches) may change underneath the
@@ -597,7 +533,7 @@ class RepoIndex:
         """Get the index with the specified name, reindexing if needed."""
         indexer = self.indexers.get(name)
         if not indexer:
-            raise KeyError("no such index: %s" % name)
+            raise KeyError(f"no such index: {name}")
 
         if name not in self.indexes:
             self._build_all_indexes()
@@ -676,10 +612,10 @@ class RepoPath:
                 self.put_last(repo)
             except RepoError as e:
                 logger.warn(
-                    "Failed to initialize repository: '%s'." % repo,
+                    f"Failed to initialize repository: '{repo}'.",
                     e.message,
                     "To remove the bad repository, run this command:",
-                    "    ramble repo rm %s" % repo,
+                    f"    ramble repo rm {repo}",
                 )
 
     def put_first(self, repo):
@@ -737,6 +673,7 @@ class RepoPath:
             return default
         return self.by_namespace[full_namespace]
 
+    @property
     def first_repo(self):
         """Get the first repo in precedence order."""
         return self.repos[0] if self.repos else None
@@ -760,10 +697,6 @@ class RepoPath:
     def all_objects(self):
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def find_module(self, fullname, path=None):
         """Implements precedence for overlaid namespaces.
@@ -800,16 +733,24 @@ class RepoPath:
             return sys.modules[fullname]
 
         if not self.by_namespace.is_prefix(fullname):
-            raise ImportError("No such ramble repo: %s" % fullname)
+            raise ImportError(f"No such ramble repo: {fullname}")
 
-        module = ObjectNamespace(fullname)
+        module = RambleNamespace(fullname)
         module.__loader__ = self
         sys.modules[fullname] = module
         return module
 
     def last_mtime(self):
         """Time a object file in this repo was last updated."""
-        return max(repo.last_mtime() for repo in self.repos)
+        # Filter out repos that don't have any mtime values before calling max
+        mtimes = []
+        for repo in self.repos:
+            try:
+                mtimes.append(repo.last_mtime())
+            except ValueError:
+                # This repo has no objects, so just skip it.
+                pass
+        return max(mtimes) if mtimes else 0
 
     def repo_for_obj(self, spec):
         """Given a spec, get the repository for its object."""
@@ -842,7 +783,7 @@ class RepoPath:
         # If the object isn't in any repo, return the one with
         # highest precedence.  This is for commands like `ramble edit`
         # that can operate on objects that don't exist yet.
-        return self.first_repo()
+        return self.first_repo
 
     @autospec
     def get(self, spec):
@@ -850,7 +791,7 @@ class RepoPath:
         return self.repo_for_obj(spec).get(spec)
 
     def get_obj_class(self, obj_name):
-        """Find a class for the spec's object and return the class object."""  # noqa: E501
+        """Find a class for the spec's object and return the class object."""
         return self.repo_for_obj(obj_name).get_obj_class(obj_name)
 
     @autospec
@@ -877,26 +818,15 @@ class RepoPath:
 
     def in_path(self, maybe_obj_path):
         """Whether the path belongs to any of the repos."""
-        return any(os.path.commonprefix([maybe_obj_path, r.root]) == r.root for r in self.repos)
+        if not maybe_obj_path:
+            return False
 
-    # TODO: DWJ - Maybe we don't need this? Are we going to have virtual
-    #             objects
-    # def is_virtual(self, obj_name, use_index=True):
-    #     """True if the object with this name is virtual,
-    #        False otherwise.
-    #
-    #     Set `use_index` False when calling from a code block that could
-    #     be run during the computation of the provider index."""
-    #     have_name = obj_name is not None
-    #     if have_name and not isinstance(obj_name, str):
-    #         raise ValueError(
-    #             "is_virtual(): expected object name, got %s" %
-    #             type(obj_name))
-    #     if use_index:
-    #         return have_name and app_name in self.provider_index
-    #     else:
-    #         return have_name and (not self.exists(app_name) or
-    #                               self.get_app_class(app_name).virtual)
+        abs_obj_path = os.path.abspath(maybe_obj_path)
+        for r in self.repos:
+            abs_root = os.path.abspath(r.root)
+            if os.path.commonpath([abs_obj_path, abs_root]) == abs_root:
+                return True
+        return False
 
     def __contains__(self, obj_name):
         return self.exists(obj_name)
@@ -949,12 +879,12 @@ class Repo:
         config = self._read_config()
         check(
             "namespace" in config,
-            "%s must define a namespace." % os.path.join(root, self.config_name),
+            f"{os.path.join(root, self.config_name)} must define a namespace.",
         )
 
         self.namespace = config["namespace"]
         check(
-            re.match(r"[a-zA-Z][a-zA-Z0-9_.]+", self.namespace),
+            _NAMESPACE_RE.match(self.namespace),
             (f"Invalid namespace '{self.namespace}' in repo '{self.root}'. ")
             + "Namespaces must be valid python identifiers separated by '.'",
         )
@@ -966,10 +896,6 @@ class Repo:
         )
 
         self.objects_path = os.path.join(self.root, objects_dir)
-        check(
-            os.path.isdir(self.objects_path),
-            f"No directory '{objects_dir}' found in '{root}'",
-        )
 
         # Set up 'full_namespace' to include the super-namespace
         self.full_namespace = f"{self.base_namespace}.{self.namespace}"
@@ -1003,7 +929,7 @@ class Repo:
             ns = ".".join(self._names[:i])
 
             if ns not in sys.modules:
-                module = ObjectNamespace(ns)
+                module = RambleNamespace(ns)
                 module.__loader__ = self
                 sys.modules[ns] = module
 
@@ -1079,7 +1005,7 @@ class Repo:
         namespace, _, module_name = fullname.rpartition(".")
 
         if self.is_prefix(fullname):
-            module = ObjectNamespace(fullname)
+            module = RambleNamespace(fullname)
 
         elif namespace == self.full_namespace:
             real_name = self.real_name(module_name)
@@ -1102,8 +1028,8 @@ class Repo:
     def _read_config(self):
         """Check for a YAML config file in this db's root directory."""
         try:
-            with open(self.config_file) as reponame_file:
-                yaml_data = yaml.load(reponame_file)
+            with open(self.config_file, encoding="utf-8") as reponame_file:
+                yaml_data = yaml.safe_load(reponame_file)
 
                 if (
                     not yaml_data
@@ -1144,7 +1070,9 @@ class Repo:
             # handler by wrapping them
             if ramble.config.get("config:debug"):
                 sys.excepthook(*sys.exc_info())
-            raise FailedConstructorError(spec.fullname, *sys.exc_info())
+            raise FailedConstructorError(
+                spec.fullname, *sys.exc_info(), object_type=self.object_type
+            ) from e
 
     @autospec
     def dump_provenance(self, spec, path):
@@ -1162,10 +1090,6 @@ class Repo:
         # Install the object's .py file itself.
         fs.install(self.filename_for_object_name(spec.name), path)
 
-    def purge(self):
-        """Clear entire object instance cache."""
-        self._instances.clear()
-
     @property
     def index(self):
         """Construct the index for this repo lazily."""
@@ -1182,7 +1106,15 @@ class Repo:
     def dirname_for_object_name(self, obj_name):
         """Get the directory name for a particular object.  This is the
         directory that contains its object.py file."""
-        return os.path.join(self.objects_path, obj_name)
+        path_priorities = [
+            os.path.join(self.objects_path, obj_name),  # Default
+            os.path.join(self.objects_path, obj_name.replace("_", "-")),  # Hyphens
+            os.path.join(self.objects_path, obj_name.replace("-", "_")),  # Underscores
+        ]
+        for path in path_priorities:
+            if os.path.isdir(path):
+                return path
+        return path_priorities[0]
 
     def filename_for_object_name(self, obj_name):
         """Get the filename for the module we should load for a particular
@@ -1196,12 +1128,12 @@ class Repo:
         obj_dir = self.dirname_for_object_name(obj_name)
         return os.path.join(obj_dir, self.object_file_name)
 
-    @autospec
     def object_path(self, spec):
+        spec_name = spec.name if isinstance(spec, ramble.spec.Spec) else spec
         return os.path.join(
             self.objects_path,
-            self.dirname_for_object_name(spec.name),
-            self.filename_for_object_name(spec.name),
+            self.dirname_for_object_name(spec_name),
+            self.filename_for_object_name(spec_name),
         )
 
     @property
@@ -1235,14 +1167,6 @@ class Repo:
         """
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        """Iterator over all object *classes* in the repository.
-
-        Use this with care, because loading objects is slow.
-        """
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def exists(self, obj_name):
         """Whether a object with the supplied name exists."""
@@ -1292,7 +1216,7 @@ class Repo:
                 # manually construct the error message in order to give the
                 # user the correct .py where the syntax error is
                 # located
-                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}")
+                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}") from None
 
             module.__object__ = self.full_namespace
             module.__loader__ = self
@@ -1349,24 +1273,24 @@ def create_repo(
     if not namespace:
         namespace = os.path.basename(root)
 
-    if not re.match(r"\w[\.\w-]*", namespace):
-        raise InvalidNamespaceError("'%s' is not a valid namespace." % namespace)
+    if not _NAMESPACE_RE.match(namespace):
+        raise InvalidNamespaceError(f"'{namespace}' is not a valid namespace.")
 
     existed = False
     if os.path.exists(root):
         if os.path.isfile(root):
-            raise BadRepoError("File %s already exists and is not a directory" % root)
+            raise BadRepoError(f"File {root} already exists and is not a directory")
         elif os.path.isdir(root):
             if not os.access(root, os.R_OK | os.W_OK):
-                raise BadRepoError("Cannot create new repo in %s: cannot access directory." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: cannot access directory.")
             if os.listdir(root):
-                raise BadRepoError("Cannot create new repo in %s: directory is not empty." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: directory is not empty.")
         existed = True
 
     full_path = os.path.realpath(root)
     parent = os.path.dirname(full_path)
     if not os.access(parent, os.R_OK | os.W_OK):
-        raise BadRepoError("Cannot create repository in %s: can't access parent!" % root)
+        raise BadRepoError(f"Cannot create repository in {root}: can't access parent!")
 
     try:
         object_dirs = []
@@ -1391,7 +1315,7 @@ def create_repo(
             fs.mkdirp(objects_path)
 
         config_path = os.path.join(root, config_name)
-        with open(config_path, "w") as config:
+        with open(config_path, "w", encoding="utf-8") as config:
             config.write("repo:\n")
             config.write(f"  namespace: '{namespace}'\n")
             if subdir is not None:
@@ -1410,19 +1334,9 @@ def create_repo(
         else:
             shutil.rmtree(root, ignore_errors=True)
 
-        raise BadRepoError(
-            "Failed to create new repository in %s." % root, f"Caused by {type(e)}: {e}"
-        )
+        raise BadRepoError(f"Failed to create new repository in {root}.") from e
 
     return full_path, namespace
-
-
-def create_or_construct(path, namespace=None):
-    """Create a repository, or just return a Repo if it already exists."""
-    if not os.path.exists(path):
-        fs.mkdirp(path)
-        create_repo(path, namespace)
-    return Repo(path)
 
 
 def create(configuration, object_type=default_type):
@@ -1440,64 +1354,25 @@ def create(configuration, object_type=default_type):
     return RepoPath(*repo_dirs, object_type=object_type)
 
 
-class RepositoryNamespace(types.ModuleType):
-    """Allow lazy loading of modules."""
-
-    def __init__(self, namespace):
-        super().__init__(namespace)
-        self.__file__ = "(repository namespace)"
-        self.__path__ = []
-        self.__name__ = namespace
-        self.__package__ = namespace
-        self.__modules = {}
-
-    def __getattr__(self, name):
-        """Getattr lazily loads modules if they're not already loaded."""
-        submodule = self.__package__ + "." + name
-        try:
-            setattr(self, name, __import__(submodule))
-        except ImportError:
-            msg = "'{0}' object has no attribute {1}"
-            raise AttributeError(msg.format(type(self), name))
-        return getattr(self, name)
-
-
-class _PrependFileLoader(importlib.machinery.SourceFileLoader):
-    def __init__(self, fullname, path, prepend=None):
-        super().__init__(fullname, path)
-        self.prepend = prepend
-
-    def path_stats(self, path):
-        stats = super().path_stats(path)
-        if self.prepend:
-            stats["size"] += len(self.prepend) + 1
-        return stats
-
-    def get_data(self, path):
-        data = super().get_data(path)
-        if path != self.path or self.prepend is None:
-            return data
-        else:
-            return self.prepend.encode() + b"\n" + data
-
-
-class RepoLoader(_PrependFileLoader):
+class RepoLoader(importlib.machinery.SourceFileLoader):
     """Loads a Python module associated with a object in specific repository"""
-
-    #: Code in ``_object_prepend`` is prepended to imported objects.
-    _object_prepend = "from __future__ import absolute_import;"
 
     def __init__(self, fullname, repo, object_name):
         self.repo = repo
         self.object_name = object_name
         self.object_py = repo.filename_for_object_name(object_name)
         self.fullname = fullname
-        super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
+        super().__init__(self.fullname, self.object_py)
+
+    def is_package(self, fullname):
+        # Since every Ramble object already has a containing directory,
+        # we can treat all of them as python packages.
+        return True
 
 
-class RepositoryNamespaceLoader:
+class RambleNamespaceLoader:
     def create_module(self, spec):
-        return RepositoryNamespace(spec.name)
+        return RambleNamespace(spec.name)
 
     def exec_module(self, module):
         module.__loader__ = self
@@ -1540,14 +1415,14 @@ class ReposFinder:
                 if object_name:
                     return RepoLoader(fullname, repo, object_name)
 
-            # We are importing a full namespace like 'spack.pkg.builtin'
+            # We are importing a full namespace like 'ramble.app.builtin'
             if fullname == repo.full_namespace:
-                return RepositoryNamespaceLoader()
+                return RambleNamespaceLoader()
 
         # No repo provides the namespace, but it is a valid prefix of
         # something in the RepoPath.
         if paths[self.object_type].by_namespace.is_prefix(fullname):
-            return RepositoryNamespaceLoader()
+            return RambleNamespaceLoader()
 
         return None
 
@@ -1560,6 +1435,18 @@ for obj in ObjectTypes:
 
 class RepoError(ramble.error.RambleError):
     """Superclass for repository-related errors."""
+
+
+class UnknownObjectTypeError(RepoError):
+    """Raised when an unknown or invalid object type is specified."""
+
+    def __init__(self, type_name):
+        valid_types = ", ".join(OBJECT_NAMES)
+        super().__init__(
+            f"Unknown object type '{type_name}'.",
+            f"Allowed types are: {valid_types} "
+            "(singular, plural, and abbreviation forms are accepted).",
+        )
 
 
 class NoRepoConfiguredError(RepoError):
@@ -1612,15 +1499,21 @@ class UnknownNamespaceError(UnknownEntityError):
     """Raised when we encounter an unknown namespace"""
 
     def __init__(self, namespace):
-        super().__init__("Unknown namespace: %s" % namespace)
+        super().__init__(f"Unknown namespace: {namespace}")
 
 
 class FailedConstructorError(RepoError):
     """Raised when an object's class constructor fails."""
 
     def __init__(self, name, exc_type, exc_obj, exc_tb, object_type=None):
+        if object_type:
+            if object_type in type_definitions:
+                object_type = type_definitions[object_type]["singular"]
+            msg = f"Class constructor failed for {object_type} '{name}'."
+        else:
+            msg = f"Class constructor failed for '{name}'."
         super().__init__(
-            f"Class constructor failed for {object_type} '%s'." % name,
+            msg,
             "\nCaused by:\n"
             + (f"{exc_type.__name__}: {exc_obj}\n")
             + "".join(traceback.format_tb(exc_tb)),

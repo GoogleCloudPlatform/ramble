@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,18 +17,17 @@ class MdTest(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("synthetic-benchmarks", "IO")
+    tags("io-benchmark", "metadata-benchmark")
 
-    define_compiler("gcc", pkg_spec="gcc", package_manager="spack*")
-    software_spec("openmpi", pkg_spec="openmpi", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc", pkg_spec="gcc")
+        software_spec("openmpi", pkg_spec="openmpi")
 
-    # The IOR spack package also includes MDTest, but we implement it as a
-    # separate application in ramble
-    software_spec(
-        "ior", pkg_spec="ior", compiler="gcc", package_manager="spack*"
-    )
+        # The IOR spack package also includes MDTest, but we implement it as a
+        # separate application in ramble
+        software_spec("ior", pkg_spec="ior", compiler="gcc")
 
-    required_package("ior", package_manager="spack*")
+        required_package("ior")
 
     workload("multi-file", executable="ior")
 

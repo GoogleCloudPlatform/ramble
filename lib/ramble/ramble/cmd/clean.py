@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,16 +11,13 @@ import argparse
 import os
 import shutil
 
-import llnl.util.tty as tty
-import spack.util.spack_yaml as syaml
+from llnl.util import tty
 
 import ramble.caches
-import ramble.config
-import ramble.repository
-import ramble.reports
-import ramble.stage
-from ramble.util.logger import logger
 from ramble.paths import lib_path, var_path
+from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
 
 description = "remove temporary files and/or downloaded archives"
 section = "cleanup"
@@ -79,11 +76,10 @@ def clean(parser, args):
 
 
 def remove_python_caches():
-    logger.msg("Removing python cache files")
     for directory in [lib_path, var_path]:
         for root, dirs, files in os.walk(directory):
             for f in files:
-                if f.endswith(".pyc") or f.endswith(".pyo"):
+                if f.endswith((".pyc", ".pyo")):
                     fname = os.path.join(root, f)
                     logger.debug(f"Removing {fname}")
                     os.remove(fname)
@@ -95,6 +91,8 @@ def remove_python_caches():
 
 
 def remove_reports_files():
+    import ramble.reports
+
     reports_path = ramble.reports.get_reports_path()
     if reports_path:
 
@@ -109,7 +107,7 @@ def remove_reports_files():
             inventory_file = os.path.join(root, ramble.reports.INVENTORY_FILENAME)
 
             try:
-                with open(inventory_file) as f:
+                with open(inventory_file, encoding="utf-8") as f:
                     inventory = syaml.load(f)
             except FileNotFoundError:
                 continue

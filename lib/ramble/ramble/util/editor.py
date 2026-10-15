@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,13 +15,14 @@ specified editor fails (e.g. no DISPLAY for a graphical editor). If
 neither variable is set, we fall back to one of several common editors,
 raising an EnvironmentError if we are unable to find one.
 """
+
 import os
 import shlex
 
 import ramble.config
 from ramble.util.logger import logger
-from spack.util.executable import which_string
 
+from spack.util.executable import which_string
 
 #: editors to try if VISUAL and EDITOR are not set
 _default_editors = ["vim", "vi", "emacs", "nano"]
@@ -34,7 +35,7 @@ def _find_exe_from_env_var(var):
         var (str): environment variable name
 
     Returns:
-        (str or None, list): executable string (or None if not found) and
+        (str | None, list): executable string (or None if not found) and
             arguments parsed from the env var
     """
     # try to get the environment variable
@@ -124,7 +125,7 @@ def editor(*args, **kwargs):
     # trying them all -- if we get here and one fails, something is
     # probably much more deeply wrong with the environment.
     exe = which_string(*_default_editors)
-    if try_exec(exe, [exe] + list(args)):
+    if exe and try_exec(exe, [exe] + list(args)):
         return
 
     # Fail if nothing could be found

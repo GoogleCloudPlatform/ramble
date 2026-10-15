@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,13 +14,12 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.config
-import ramble.workspace
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
+
 import spack.util.url
 
 mirror = RambleCommand("mirror")
-workspace = RambleCommand("workspace")
 
 pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 
@@ -57,6 +56,12 @@ def test_mirror_nonexisting(tmp_scope):
 
     with pytest.raises(RambleCommandError):
         mirror("set-url", "--scope", tmp_scope, "not-a-mirror", "http://ramble.io")
+
+
+def test_mirror_list_empty(tmp_scope):
+    out = mirror("list", "--scope", tmp_scope)
+    assert mirror.returncode == 0
+    assert "No mirrors configured." in out
 
 
 def test_mirror_add(tmp_scope):

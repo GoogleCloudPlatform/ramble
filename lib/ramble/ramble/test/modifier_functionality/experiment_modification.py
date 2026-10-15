@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,10 +15,8 @@ workspace = RambleCommand("workspace")
 
 
 def test_experiment_modification(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, request
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, workspace_name
 ):
-    workspace_name = request.node.name
-
     test_config = """
 ramble:
   variables:
@@ -44,9 +42,9 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws1._re_read()
@@ -66,6 +64,7 @@ ramble:
 
             assert os.path.exists(exp_script)
 
-            with open(exp_script) as f:
+            with open(exp_script, encoding="utf-8") as f:
                 data = f.read()
+                assert "gmx_mpi --version" in data
                 assert f"mpirun -n {n_ranks}" in data

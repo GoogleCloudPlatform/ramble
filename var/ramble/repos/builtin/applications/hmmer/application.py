@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -26,35 +27,36 @@ class Hmmer(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("molecular-dynamics", "hidden-markov-models", "bio-molecule")
+    tags("bioinformatics", "molecular-simulation", "hidden-markov-models")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    version("3.3.2", "Version 3.3.2 of Hmmer", preferred=True)
 
-    software_spec(
-        "impi_2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "hmmer",
-        pkg_spec="hmmer@3.3.2",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.1")
+
+        software_spec(
+            "hmmer-{application::hmmer::version}",
+            pkg_spec="hmmer@{application::hmmer::version}",
+            compiler="gcc9",
+        )
 
     # This would ideally not use the current_release, as the package will need to be manually updated per release
-    # Here current_release == 'Pfam36.0'
+    # Here current_release == 'Pfam37.4'
     input_file(
         "Pfam_A",
         url="http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz",
-        sha256="8779125bd2ed533886c559a5808903800f5c262798e5b086d276c2b829566b3a",
+        sha256="8f7b1d916f1d0addd5c268acd4bd2504528a7be58978082eaa04226535cefbd5",
         description="The Pfam database is a large collection of protein families, "
         + "each represented by multiple sequence alignments and hidden Markov models (HMMs).",
     )
 
+    # UniProt Release 2025_03. This file is not hosted within the `previous_releases` and is only distributed for current release
     input_file(
         "uniprot_sprot_fasta",
         url="https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz",
-        sha256="b0cacbf62fbf02f410dfd5e7963099762e53ed9f6fb123ba655583a9f7f0adab",
+        sha256="56d04b58ea8f65f7a2e4644cc91f289ee10ff073136171517711fe2ef11e684e",
         description="Uniprot Swiss Prot fasta search input",
     )
 
@@ -97,7 +99,7 @@ class Hmmer(ExecutableApplication):
 
     figure_of_merit(
         "Elapsed time",
-        fom_regex=r"# CPU.*Elapsed:\s+(?P<elapsed_time>[0-9]+:[0-9]+:[0-9]+\.*[0-9]*)\s*$",
+        fom_regex=r"# CPU.*?Elapsed:\s+(?P<elapsed_time>[0-9]+:[0-9]+:[0-9]+\.*[0-9]*)\s*$",
         group_name="elapsed_time",
         log_file=out_file,
         units="hms",

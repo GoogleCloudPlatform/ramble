@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -145,7 +145,7 @@ class ConditionalPsm3(BasicModifier):
 
         return pre_cmds, post_cmds
 
-    psm3_build_info_regex = r".*\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$"
+    psm3_build_info_regex = r".*?\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$"
 
     figure_of_merit(
         "PSM3 version",

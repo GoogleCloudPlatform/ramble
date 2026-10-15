@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,15 +7,13 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
-from ramble.main import RambleCommand
 from ramble.expander import RambleSyntaxError
-
+from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -24,7 +22,9 @@ config = ramble.main.RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_passthrough_variables(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_passthrough_variables(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -48,13 +48,12 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_config_section_env_vars"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -64,20 +63,18 @@ ramble:
         exp1_dir = os.path.join(experiment_root, "basic", "test_wl2", "simple_test")
         exp1_script = os.path.join(exp1_dir, "execute_experiment")
 
-        import re
-
         undefined_regex = re.compile(r"{undefined_var}")
 
         # Assert undefined variable is found
-        with open(exp1_script) as f:
+        with open(exp1_script, encoding="utf-8") as f:
             undefined_found = False
-            for line in f.readlines():
+            for line in f:
                 if undefined_regex.search(line):
                     undefined_found = True
             assert undefined_found
 
 
-def test_disable_passthrough(mutable_config, mutable_mock_workspace_path):
+def test_disable_passthrough(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -96,13 +93,12 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_disable_passthrough"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -113,7 +109,8 @@ ramble:
 
         config("add", "config:disable_passthrough:true")
 
-        with pytest.raises(RambleSyntaxError):
-            captured = workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-
-            assert "Encountered a passthrough error while expanding {mpi_command}" in captured
+        with pytest.raises(
+            RambleSyntaxError,
+            match="Encountered a passthrough error while expanding {mpi_command}",
+        ):
+            workspace("setup", "--dry-run", global_args=["-w", workspace_name])

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,16 +11,13 @@ import re
 
 import pytest
 
-import spack.util.spack_yaml as syaml
-import spack.util.spack_json as sjson
-
 import ramble.filters
 import ramble.pipeline
 import ramble.workspace
-import ramble.config
-import ramble.software_environments
 from ramble.main import RambleCommand
+from ramble.util import json_util
 
+import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -28,8 +25,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.maybeslow
 @pytest.mark.filterwarnings("ignore:invalid decimal literal")
-def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
+def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = r"""
 ramble:
   variants:
@@ -86,8 +84,8 @@ ramble:
     packages:
       gcc:
         pkg_spec: gcc@9.3.0 target=x86_64
-      impi2018:
-        pkg_spec: intel-mpi@2018.4.274
+      intel-mpi:
+        pkg_spec: intel-oneapi-mpi@2021.13.1
         compiler: gcc
       imb:
         pkg_spec: intel-mpi-benchmarks
@@ -99,11 +97,11 @@ ramble:
       intel-mpi-benchmarks:
         packages:
         - imb
-        - impi2018
+        - intel-mpi
       gromacs:
         packages:
         - gromacs
-        - impi2018
+        - intel-mpi
 """
 
     mock_output_data = """
@@ -120,13 +118,12 @@ ramble:
 
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_chained_experiments"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -143,14 +140,14 @@ ramble:
         assert os.path.exists(script)
 
         # Check all chained experiments are referenced
-        with open(script) as f:
+        with open(script, encoding="utf-8") as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
             chained_script = os.path.join(
                 parent_dir,
                 "chained_experiments",
-                f"{chain_idx}" + r".intel-mpi-benchmarks.collective.collective_chain",
+                rf"chain.{chain_idx}.intel-mpi-benchmarks.collective.collective_chain",
                 "execute_experiment",
             )
             assert os.path.exists(chained_script)
@@ -158,7 +155,7 @@ ramble:
 
             # Check that experiment 1 has n_ranks = 4 instead of 2
             if chain_idx == 3:
-                with open(chained_script) as f:
+                with open(chained_script, encoding="utf-8") as f:
                     assert "mpirun -n 4" in f.read()
 
         expected_order = [
@@ -171,22 +168,22 @@ ramble:
         ]
 
         # Check prepend / append order is correct
-        with open(script) as f:
+        with open(script, encoding="utf-8") as f:
 
-            for line in f.readlines():
+            for line in f:
                 if expected_order[0].match(line):
                     expected_order.pop(0)
 
         # Ensure results contain chain information, and properly extract figures of merit
-        chain_exp_name = r"3.intel-mpi-benchmarks.collective.collective_chain"
+        chain_exp_name = r"chain.3.intel-mpi-benchmarks.collective.collective_chain"
         output_path_3 = os.path.join(
             parent_dir,
             "chained_experiments",
             chain_exp_name,
-            f"gromacs.water_bare.parent_test.chain.{chain_exp_name}.out",
+            f"gromacs.water_bare.parent_test.{chain_exp_name}.out",
         )
 
-        with open(output_path_3, "w+") as f:
+        with open(output_path_3, "w+", encoding="utf-8") as f:
             f.write(mock_output_data)
 
         analyze_pipeline = analyze_cls(ws, filters, output_formats=["json", "yaml"])
@@ -207,9 +204,9 @@ ramble:
         ]
 
         names = ["results.latest.json", "results.latest.yaml"]
-        loaders = [sjson.load, syaml.load]
+        loaders = [json_util.load, syaml.load]
         for name, loader in zip(names, loaders):
-            with open(os.path.join(ws.root, name)) as f:
+            with open(os.path.join(ws.root, name), encoding="utf-8") as f:
                 data = loader(f)
 
                 assert "experiments" in data

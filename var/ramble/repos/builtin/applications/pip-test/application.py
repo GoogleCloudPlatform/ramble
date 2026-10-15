@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,21 +14,20 @@ class PipTest(ExecutableApplication):
 
     name = "pip-test"
 
-    tags("test-app")
+    tags("python", "test-app")
 
-    software_spec(
-        "requests",
-        pkg_spec="requests>=2.31.0",
-        package_manager="pip",
-    )
+    with when("package_manager_family=pip"):
+        software_spec(
+            "requests",
+            pkg_spec="requests>=2.31.0",
+        )
 
-    software_spec(
-        "semver",
-        pkg_spec="semver",
-        package_manager="pip",
-    )
+        software_spec(
+            "semver",
+            pkg_spec="semver",
+        )
 
-    required_package("semver", package_manager="pip")
+        required_package("semver")
 
     executable(
         "import",
@@ -40,7 +39,7 @@ class PipTest(ExecutableApplication):
 
     figure_of_merit(
         "return_code",
-        fom_regex=r"return code is (?P<code>[0-9]+)\s*",
+        fom_regex=r"return code is (?P<code>[0-9]+)",
         group_name="code",
         units="",
     )

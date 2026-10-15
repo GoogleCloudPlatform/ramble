@@ -1,4 +1,4 @@
-# Config file for Ramble's object files (apps and mods)
+# Config file for Ramble's builtin object files
 
 [tool.black]
 line-length = 79

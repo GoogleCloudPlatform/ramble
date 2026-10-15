@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,8 +7,12 @@
 # except according to those terms.
 
 import os
+import re
+
 from ramble.appkit import *
 from ramble.expander import Expander
+
+from spack.util.executable import Executable, ProcessError
 
 
 class Wrfv4(ExecutableApplication):
@@ -18,25 +22,51 @@ class Wrfv4(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("nwp", "weather")
+    tags("weather", "nwp", "climate-modeling")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-    software_spec(
-        "intel-mpi",
-        pkg_spec="intel-mpi@2018.4.274",
-        compiler="gcc9",
-        package_manager="spack*",
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
+
+        software_spec(
+            "wrfv4",
+            pkg_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
+            compiler="gcc14",
+        )
+
+        required_package("wrf")
+
+    variant(
+        "wrf_tiles",
+        default=False,
+        values=[True, False],
+        description="Whether to define tiles for WRF or not",
     )
 
-    software_spec(
-        "wrfv4",
-        pkg_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
-        compiler="gcc9",
-        package_manager="spack*",
+    variant(
+        "wrf_explicit_x",
+        default=False,
+        values=[True, False],
+        description="Whether to set explicit nproc_x in the namelist or not",
     )
 
-    required_package("wrf", package_manager="spack*")
+    variant(
+        "wrf_explicit_y",
+        default=False,
+        values=[True, False],
+        description="Whether to set explicit nproc_y in the namelist or not",
+    )
+
+    variant(
+        "wrf_clean_after_run",
+        default=False,
+        values=[True, False],
+        description="Whether to clean execution artifacts after completion or not",
+    )
 
     input_file(
         "CONUS_2p5km",
@@ -52,56 +82,186 @@ class Wrfv4(ExecutableApplication):
         description="12 km resolution mesh of the continental United States.",
     )
 
+    input_file(
+        "Maria_1km",
+        url="https://www2.mmm.ucar.edu/wrf/users/benchmark/v44/v4.4_bench_maria1km.tar.gz",
+        sha256="8a64d45fe53b13a810af8137fab3188c6aad6dc0948e4aa1a84c62bf3afaa102",
+        description="1 km Maria workload input",
+    )
+
+    stage_files(
+        stages=[
+            ("{wrf_path}/run/*", "{experiment_run_dir}/."),
+            ("{input_path}/*", "{experiment_run_dir}/."),
+        ]
+    )
+
+    stage_files(
+        name="stage-namelist",
+        src="{input_path}/namelist.*",
+        dst="{experiment_run_dir}/.",
+        method="cp",
+    )
+
     executable(
         "cleanup",
-        "rm -f rsl.* wrfout*",
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
-    )
-    executable(
-        "copy",
         template=[
-            "cp -R {input_path}/* {experiment_run_dir}/.",
-            "ln -s {wrf_path}/run/* {experiment_run_dir}/.",
+            "rm -f rsl.* wrfout*",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
-    executable(
-        "fix_12km",
-        template=[
-            "sed -i -e 's/ start_hour.*/ start_hour                          = 23,/g' namelist.input",
-            "sed -i -e 's/ restart .*/ restart                             = .true.,/g' namelist.input",
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
+
+    edit_file(
+        "fix_12km_start_hour",
+        file_path="namelist.input",
+        match=r" start_hour.*",
+        replace=" start_hour                          = 23,",
     )
+
+    edit_file(
+        "fix_12km_restart",
+        file_path="namelist.input",
+        match=r" restart .*",
+        replace=" restart                             = .true.,",
+    )
+
+    edit_file(
+        "define_nproc_x",
+        file_path="namelist.input",
+        match=r"(e_sn.*=.*)",
+        replace=r"\g<1>\n nproc_x                            = {nproc_x},",
+        when="+wrf_explicit_x",
+    )
+
+    edit_file(
+        "define_nproc_y",
+        file_path="namelist.input",
+        match=r"(e_sn.*=.*)",
+        replace=r"\g<1>\n nproc_y                            = {nproc_y},",
+        when="+wrf_explicit_y",
+    )
+
     executable("execute", "wrf.exe", use_mpi=True)
+
+    executable(
+        "copy-logs",
+        template=[
+            'RSL_LOG=`ls -1 {experiment_run_dir} | grep "rsl\\.out\\.[0]\\+" | sort -n | head -n 1`',
+            "cp $RSL_LOG {experiment_run_dir}/rsl.out.base",
+            'RSL_LOG=`ls -1 {experiment_run_dir} | grep "rsl\\.error\\.[0]\\+" | sort -n | head -n 1`',
+            "cp $RSL_LOG {experiment_run_dir}/rsl.error.base",
+            "tar czf rsl_logs.tgz rsl.out.* rsl.error.*",
+            "rm -f rsl.out.* rsl.error.*",
+            "tar xzf rsl_logs.tgz rsl.out.base rsl.error.base",
+        ],
+        redirect="",
+        output_capture="",
+    )
+
+    executable(
+        "post-exec-clean",
+        template=[
+            "rm -f {experiment_run_dir}/*.dat ",
+            "rm -f {experiment_run_dir}/wrfout*",
+            "rm -f {experiment_run_dir}/wrfrst*",
+            "rm -f {experiment_run_dir}/wrfinput*",
+        ],
+        when=["+wrf_clean_after_run"],
+    )
 
     workload(
         "CONUS_2p5km",
-        executables=["cleanup", "copy", "execute"],
+        executables=[
+            "stage-files",
+            "stage-namelist",
+            "cleanup",
+            "define_nproc_y",
+            "define_nproc_x",
+            "execute",
+            "copy-logs",
+            "post-exec-clean",
+        ],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["cleanup", "copy", "fix_12km", "execute"],
+        executables=[
+            "stage-files",
+            "stage-namelist",
+            "cleanup",
+            "define_nproc_y",
+            "define_nproc_x",
+            "fix_12km_start_hour",
+            "fix_12km_restart",
+            "execute",
+            "copy-logs",
+            "post-exec-clean",
+        ],
         input="CONUS_12km",
     )
 
+    workload(
+        "Maria_1km",
+        executables=[
+            "stage-files",
+            "stage-namelist",
+            "cleanup",
+            "define_nproc_y",
+            "define_nproc_x",
+            "execute",
+            "copy-logs",
+            "post-exec-clean",
+        ],
+        input="Maria_1km",
+    )
+
+    workload_group(
+        "all_workloads", workloads=["CONUS_2p5km", "CONUS_12km", "Maria_1km"]
+    )
+
+    with when("+wrf_tiles"):
+        workload_variable(
+            "num_tiles",
+            environment_variable_name="WRF_NUM_TILES",
+            default="1",
+            description="Number of tiles to use in WRF domain",
+            workload_group="all_workloads",
+        )
+
     workload_variable(
-        "input_path",
-        default="{CONUS_12km}",
-        description="Path for CONUS 12km inputs.",
-        workloads=["CONUS_12km"],
+        "nproc_x",
+        default="{n_ranks}",
+        description="Number of process in the x dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_x"],
+    )
+
+    workload_variable(
+        "nproc_y",
+        default="{n_ranks}",
+        description="Number of process in the y dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_y", "~wrf_explicit_x"],
+    )
+
+    workload_variable(
+        "nproc_y",
+        default="1",
+        description="Number of process in the y dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_y", "+wrf_explicit_x"],
     )
 
     workload_variable(
         "input_path",
-        default="{CONUS_2p5km}",
-        description="Path for CONUS 2.5km inputs.",
-        workloads=["CONUS_2p5km"],
+        description="Path for workload inputs.",
+        workload_defaults={
+            "CONUS_12km": "{CONUS_12km}",
+            "CONUS_2p5km": "{CONUS_2p5km}",
+            "Maria_1km": "{Maria_1km}",
+        },
     )
 
     log_str = os.path.join(
@@ -111,7 +271,7 @@ class Wrfv4(ExecutableApplication):
     figure_of_merit(
         "Average Timestep Time",
         log_file=log_str,
-        fom_regex=r"Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*)",
         group_name="avg_time",
         units="s",
         fom_type=FomType.TIME,
@@ -120,7 +280,7 @@ class Wrfv4(ExecutableApplication):
     figure_of_merit(
         "Cumulative Timestep Time",
         log_file=log_str,
-        fom_regex=r"Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*)",
         group_name="total_time",
         units="s",
         fom_type=FomType.TIME,
@@ -129,7 +289,7 @@ class Wrfv4(ExecutableApplication):
     figure_of_merit(
         "Minimum Timestep Time",
         log_file=log_str,
-        fom_regex=r"Min time:\s+(?P<min_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Min time:\s+(?P<min_time>[0-9]+\.[0-9]*)",
         group_name="min_time",
         units="s",
         fom_type=FomType.TIME,
@@ -138,7 +298,7 @@ class Wrfv4(ExecutableApplication):
     figure_of_merit(
         "Maximum Timestep Time",
         log_file=log_str,
-        fom_regex=r"Max time:\s+(?P<max_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Max time:\s+(?P<max_time>[0-9]+\.[0-9]*)",
         group_name="max_time",
         units="s",
         fom_type=FomType.TIME,
@@ -156,7 +316,7 @@ class Wrfv4(ExecutableApplication):
     figure_of_merit(
         "Avg. Max Ratio Time",
         log_file=log_str,
-        fom_regex=r"Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*)",
         group_name="avg_max_ratio",
         units="",
         fom_type=FomType.MEASURE,
@@ -165,27 +325,29 @@ class Wrfv4(ExecutableApplication):
     success_criteria(
         "Complete",
         mode="string",
-        match=r".*wrf: SUCCESS COMPLETE WRF.*",
-        file="{experiment_run_dir}/rsl.out.0000",
+        match=r".*?wrf: SUCCESS COMPLETE WRF",
+        file="{experiment_run_dir}/rsl.out.base",
     )
 
-    archive_pattern("{experiment_run_dir}/rsl.out.*")
-    archive_pattern("{experiment_run_dir}/rsl.error.*")
+    archive_pattern("{experiment_run_dir}/rsl_logs.tgz")
+    archive_pattern("{experiment_run_dir}/rsl.out.base")
+    archive_pattern("{experiment_run_dir}/rsl.error.base")
 
     def _analyze_experiments(self, workspace, app_inst=None):
-        import glob
-        import re
+        experiment_dir = self.expander.expand_var_name("experiment_run_dir")
 
-        # Generate stats file
+        tar_file = os.path.join(experiment_dir, "rsl_logs.tgz")
+        out_file = os.path.join(experiment_dir, "rsl.out.base")
 
-        file_list = glob.glob(
-            os.path.join(
-                self.expander.expand_var_name("experiment_run_dir"),
-                "rsl.out.*",
-            )
-        )
+        if os.path.isfile(tar_file) and not os.path.isfile(out_file):
+            tar = Executable("tar")
+            args = ["xzf", tar_file, "-C", experiment_dir, out_file]
+            try:
+                tar(*args)
+            except ProcessError:
+                pass
 
-        if file_list:
+        if os.path.isfile(out_file):
             timing_regex = re.compile(
                 r"Timing for main.*:\s+(?P<main_time>[0-9]+\.[0-9]*).*"
             )
@@ -194,16 +356,15 @@ class Wrfv4(ExecutableApplication):
             max_time = float("-inf")
             sum_time = 0.0
             count = 0
-            for out_file in file_list:
-                with open(out_file) as f:
-                    for line in f.readlines():
-                        m = timing_regex.match(line)
-                        if m:
-                            time = float(m.group("main_time"))
-                            count += 1
-                            sum_time += time
-                            min_time = min(min_time, time)
-                            max_time = max(max_time, time)
+            with open(out_file, encoding="utf-8") as f:
+                for line in f:
+                    m = timing_regex.match(line)
+                    if m:
+                        time = float(m.group("main_time"))
+                        count += 1
+                        sum_time += time
+                        min_time = min(min_time, time)
+                        max_time = max(max_time, time)
 
             avg_time = sum_time / max(count, 1)
 
@@ -211,7 +372,7 @@ class Wrfv4(ExecutableApplication):
                 self.expander.expand_var_name("experiment_run_dir"),
                 "stats.out",
             )
-            with open(stats_path, "w+") as f:
+            with open(stats_path, "w+", encoding="utf-8") as f:
                 f.write("Average time: %s s\n" % (avg_time))
                 f.write("Cumulative time: %s s\n" % (sum_time))
                 f.write("Min time: %s s\n" % (min_time))

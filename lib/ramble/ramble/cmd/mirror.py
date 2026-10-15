@@ -1,21 +1,17 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.spec
-import ramble.workspace
 import ramble.mirror
-import ramble.repository
+import ramble.util.web as web_util
+from ramble.cmd.common import arguments
 from ramble.util.logger import logger
-from ramble.error import RambleError
 
 import spack.util.url as url_util
-import spack.util.web as web_util
 from spack.util.spack_yaml import syaml_dict
 
 description = "manage mirrors (inputs)"
@@ -69,7 +65,7 @@ def setup_parser(subparser):
         "--scope",
         choices=scopes,
         metavar=scopes_metavar,
-        default=ramble.config.default_modify_scope(),
+        default=ramble.config.default_list_scope(),
         help="configuration scope to modify",
     )
 
@@ -168,26 +164,11 @@ def mirror_list(args):
 
     mirrors = ramble.mirror.MirrorCollection(scope=args.scope)
     if not mirrors:
-        logger.msg("No mirrors configured.")
-        return
+        logger.warn("No mirrors configured.")
+        return 0
 
     mirrors.display()
-
-
-def _read_specs_from_file(filename):
-    specs = []
-    with open(filename) as stream:
-        for i, string in enumerate(stream):
-            try:
-                s = ramble.Spec(string)
-                s.application
-                specs.append(s)
-            except RambleError as e:
-                logger.debug(e)
-                logger.die(
-                    "Parse error in %s, line %d:" % (filename, i + 1), ">>> " + string, str(e)
-                )
-    return specs
+    return 0
 
 
 def mirror_destroy(args):
@@ -216,4 +197,4 @@ def mirror(parser, args):
     if args.no_checksum:
         ramble.config.set("config:checksum", False, scope="command_line")
 
-    action[args.mirror_command](args)
+    return action[args.mirror_command](args)

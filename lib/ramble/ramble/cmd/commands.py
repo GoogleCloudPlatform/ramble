@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,17 +12,20 @@ import copy
 import os
 import re
 import sys
+from typing import Callable, Dict
 
 import llnl.util.filesystem as fs
-from llnl.util.argparsewriter import ArgparseWriter, ArgparseRstWriter, ArgparseCompletionWriter
+from llnl.util.argparsewriter import ArgparseCompletionWriter, ArgparseRstWriter, ArgparseWriter
 from llnl.util.tty.colify import colify
 
 import ramble.cmd
+import ramble.config
 import ramble.main
 import ramble.paths
-from ramble.util.logger import logger
 from ramble.main import section_descriptions
+from ramble.util.logger import logger
 
+_CMD_HEADER_RE = re.compile(r"\.\. _cmd-(ramble-.*):")
 
 description = "list available ramble commands"
 section = "developer"
@@ -30,17 +33,27 @@ level = "long"
 
 
 #: list of command formatters
-formatters = {}
+formatters: Dict[str, Callable] = {}
 
 
 #: standard arguments for updating completion scripts
 #: we iterate through these when called with --update-completion
 update_completion_args = {
-    "bash": {
-        "aliases": True,
+    # Default one included in source control
+    # Disable aliases to avoid custom configs leaking into it
+    "bash_no_aliases": {
+        "aliases": False,
         "format": "bash",
         "header": os.path.join(ramble.paths.share_path, "bash", "ramble-completion.in"),
         "update": os.path.join(ramble.paths.share_path, "ramble-completion.bash"),
+    },
+    # Generate a version that supports aliases (including ones defined in `config:aliases`)
+    # This one is not included in source control as it is user-specific
+    "base_with_aliases": {
+        "aliases": True,
+        "format": "bash",
+        "header": os.path.join(ramble.paths.share_path, "bash", "ramble-completion.in"),
+        "update": os.path.join(ramble.paths.share_path, "custom-ramble-completion.bash"),
     },
 }
 
@@ -132,7 +145,7 @@ _positional_to_subroutine = {
     "keys": "_keys",
     "help_command": "_subcommands",
     "namespace": "_repos",
-    "pytest": "_tests",
+    "pytest": "_unit_tests",
 }
 
 
@@ -141,33 +154,27 @@ class BashCompletionWriter(ArgparseCompletionWriter):
 
     def body(self, positionals, optionals, subcommands):
         if positionals:
-            return """
+            return f"""
     if $list_options
     then
-        {}
+        {self.optionals(optionals)}
     else
-        {}
+        {self.positionals(positionals)}
     fi
-""".format(
-                self.optionals(optionals), self.positionals(positionals)
-            )
+"""
         elif subcommands:
-            return """
+            return f"""
     if $list_options
     then
-        {}
+        {self.optionals(optionals)}
     else
-        {}
+        {self.subcommands(subcommands)}
     fi
-""".format(
-                self.optionals(optionals), self.subcommands(subcommands)
-            )
+"""
         else:
-            return """
-    {}
-""".format(
-                self.optionals(optionals)
-            )
+            return f"""
+    {self.optionals(optionals)}
+"""
 
     def positionals(self, positionals):
         # If match found, return function name
@@ -177,18 +184,18 @@ class BashCompletionWriter(ArgparseCompletionWriter):
                     return value
 
         # If no matches found, return empty list
-        return 'RAMBLE_COMREPLY=""'
+        return 'RAMBLE_COMPREPLY=""'
 
     def optionals(self, optionals):
-        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(optionals))
+        return f"RAMBLE_COMPREPLY=\"{' '.join(optionals)}\""
 
     def subcommands(self, subcommands):
-        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(subcommands))
+        return f"RAMBLE_COMPREPLY=\"{' '.join(subcommands)}\""
 
 
 @formatter
 def subcommands(args, out):
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
     writer = SubcommandWriter(parser.prog, out, args.aliases)
     writer.write(parser)
@@ -201,9 +208,9 @@ def rst_index(out):
     sections = index["long"]
 
     dmax = max(len(section_descriptions.get(s, s)) for s in sections) + 2
-    cmax = max(len(c) for _, c in sections.items()) + 60
+    cmax = max(len(c) for c in sections.values()) + 60
 
-    row = "{}  {}\n".format("=" * dmax, "=" * cmax)
+    row = f"{'=' * dmax}  {'=' * cmax}\n"
     line = "%%-%ds  %%s\n" % dmax
 
     out.write(row)
@@ -224,15 +231,15 @@ def rst_index(out):
 @formatter
 def rst(args, out):
     # create a parser with all commands
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
 
     # extract cross-refs of the form `_cmd-ramble-<cmd>:` from rst files
     documented_commands = set()
     for filename in args.rst_files:
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             for line in f:
-                match = re.match(r"\.\. _cmd-(ramble-.*):", line)
+                match = _CMD_HEADER_RE.match(line)
                 if match:
                     documented_commands.add(match.group(1).strip())
 
@@ -250,14 +257,16 @@ def names(args, out):
     commands = copy.copy(ramble.cmd.all_commands())
 
     if args.aliases:
-        commands.extend(ramble.main.aliases.keys())
+        aliases = ramble.config.get("config:aliases")
+        if aliases:
+            commands.extend(aliases.keys())
 
     colify(commands, output=out)
 
 
 @formatter
 def bash(args, out):
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
 
     writer = BashCompletionWriter(parser.prog, out, args.aliases)
@@ -268,7 +277,7 @@ def prepend_header(args, out):
     if not args.header:
         return
 
-    with open(args.header) as header:
+    with open(args.header, encoding="utf-8") as header:
         out.write(header.read())
 
 
@@ -287,7 +296,7 @@ def _commands(parser, args):
     # or the header is newer than the file.
     if args.update:
         logger.msg(f"Generating file: {args.update}")
-        with open(args.update, "w+") as f:
+        with open(args.update, "w+", encoding="utf-8") as f:
             prepend_header(args, f)
             formatter(args, f)
 

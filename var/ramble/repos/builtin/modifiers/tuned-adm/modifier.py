@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,9 +9,6 @@
 import os
 
 from ramble.modkit import *
-
-
-SUCCESS_STRING = "Status: SUCCESS"
 
 
 class TunedAdm(BasicModifier):
@@ -29,7 +26,9 @@ class TunedAdm(BasicModifier):
 
     mode("standard", description="Standard execution mode for tuned-adm")
 
-    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+    software_spec(
+        "pdsh", pkg_spec="pdsh", when=["package_manager_family=spack"]
+    )
 
     required_variable("hostlist")
 
@@ -56,33 +55,24 @@ class TunedAdm(BasicModifier):
             return
 
         profiles = set()
-        with open(read_profile_path) as f:
-
-            for line in f.readlines():
+        with open(read_profile_path, encoding="utf-8") as f:
+            for line in f:
                 if "active profile:" in line:
                     profiles.add(line.split(":")[-1].strip())
-            profiles_str = ",".join(profiles)
 
         if profiles:
-            expected_profile = self.expander.expand_var("{tuned-profile}")
-            write_profile_path = os.path.join(run_dir, "all_tuning_profiles")
-            with open(write_profile_path, "w+") as f:
-                profiles_str = ",".join(profiles)
-                f.write(f"Applied profiles: {profiles_str}\n")
-                if len(profiles) == 1 and profiles_str == expected_profile:
-                    f.write(SUCCESS_STRING)
+            profiles_str = ",".join(sorted(profiles))
+            self.add_inmem_fom_value("tuned_adm_profiles", profiles_str)
 
     figure_of_merit(
         "Tuning Profile",
-        fom_regex=r"Applied profiles:\s*(?P<profile>.*)",
-        log_file="{experiment_run_dir}/all_tuning_profiles",
-        group_name="profile",
+        fom_map_key="tuned_adm_profiles",
         units="",
     )
 
     success_criteria(
         "Expected tuning profile applied",
-        mode="string",
-        match=SUCCESS_STRING,
-        file="{experiment_run_dir}/all_tuning_profiles",
+        mode="fom_comparison",
+        fom_name="Tuning Profile",
+        formula="'{value}' == '{tuned-profile}'",
     )

@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,7 +6,7 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 
-.. _modifying_an_experiment_tutorial:
+.. _modifying_a_gromacs_experiment_tutorial:
 
 =======================================
 3) Modifying A GROMACS Experiment
@@ -38,19 +38,19 @@ might contain the following information:
 
 .. code-block:: console
 
-    Experiments:
-      Application: gromacs
-        Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.pme_single_rank
-      Application: gromacs
-        Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.rf_single_rank
-      Application: gromacs
-        Workload: water_bare
-          Experiment: gromacs.water_bare.pme_single_rank
-      Application: gromacs
-        Workload: water_bare
-          Experiment: gromacs.water_bare.rf_single_rank
+  Experiments:
+    Application: gromacs@2025.3
+      Workload: water_gmx50
+        Experiment 1: gromacs@2025.3.water_gmx50.pme_single_rank
+    Application: gromacs@2025.3
+      Workload: water_gmx50
+        Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
+    Application: gromacs@2025.3
+      Workload: water_bare
+        Experiment 3: gromacs@2025.3.water_bare.pme_single_rank
+    Application: gromacs@2025.3
+      Workload: water_bare
+        Experiment 4: gromacs@2025.3.water_bare.rf_single_rank
 
 To get detailed information about where variable definitions come from, you can use:
 
@@ -62,55 +62,55 @@ The experiments section of this command's output might contain the following:
 
 .. code-block:: console
 
-    Experiments:
-      Application: gromacs
-        Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.pme_single_rank
-            Variables from Workspace:
-              processes_per_node = 16 ==> 16
-              mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
-              batch_submit = {execute_experiment} ==> {execute_experiment}
-            Variables from Experiment:
-              n_ranks = 1 ==> 1
-              n_threads = 1 ==> 1
-              size = 0003 ==> 0003
-              type = pme ==> pme
-      Application: gromacs
-        Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.rf_single_rank
-            Variables from Workspace:
-              processes_per_node = 16 ==> 16
-              mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
-              batch_submit = {execute_experiment} ==> {execute_experiment}
-            Variables from Experiment:
-              n_ranks = 1 ==> 1
-              n_threads = 1 ==> 1
-              size = 0003 ==> 0003
-              type = rf ==> rf
-      Application: gromacs
-        Workload: water_bare
-          Experiment: gromacs.water_bare.pme_single_rank
-            Variables from Workspace:
-              processes_per_node = 16 ==> 16
-              mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
-              batch_submit = {execute_experiment} ==> {execute_experiment}
-            Variables from Experiment:
-              n_ranks = 1 ==> 1
-              n_threads = 1 ==> 1
-              size = 0003 ==> 0003
-              type = pme ==> pme
-      Application: gromacs
-        Workload: water_bare
-          Experiment: gromacs.water_bare.rf_single_rank
-            Variables from Workspace:
-              processes_per_node = 16 ==> 16
-              mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
-              batch_submit = {execute_experiment} ==> {execute_experiment}
-            Variables from Experiment:
-              n_ranks = 1 ==> 1
-              n_threads = 1 ==> 1
-              size = 0003 ==> 0003
-              type = rf ==> rf
+  Experiments:
+    Application: gromacs@2025.3
+      Workload: water_gmx50
+        Experiment 1: gromacs@2025.3.water_gmx50.pme_single_rank
+          Variables from Workspace:
+            processes_per_node = 16 ==> 16
+            mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
+            batch_submit = {execute_experiment} ==> {execute_experiment}
+          Variables from Experiment:
+            n_ranks = 1 ==> 1
+            n_threads = 1 ==> 1
+            size = 0003 ==> 0003
+            type = pme ==> pme
+    Application: gromacs@2025.3
+      Workload: water_gmx50
+        Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
+          Variables from Workspace:
+            processes_per_node = 16 ==> 16
+            mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
+            batch_submit = {execute_experiment} ==> {execute_experiment}
+          Variables from Experiment:
+            n_ranks = 1 ==> 1
+            n_threads = 1 ==> 1
+            size = 0003 ==> 0003
+            type = rf ==> rf
+    Application: gromacs@2025.3
+      Workload: water_bare
+        Experiment 3: gromacs@2025.3.water_bare.pme_single_rank
+          Variables from Workspace:
+            processes_per_node = 16 ==> 16
+            mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
+            batch_submit = {execute_experiment} ==> {execute_experiment}
+          Variables from Experiment:
+            n_ranks = 1 ==> 1
+            n_threads = 1 ==> 1
+            size = 0003 ==> 0003
+            type = pme ==> pme
+    Application: gromacs@2025.3
+      Workload: water_bare
+        Experiment 4: gromacs@2025.3.water_bare.rf_single_rank
+          Variables from Workspace:
+            processes_per_node = 16 ==> 16
+            mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
+            batch_submit = {execute_experiment} ==> {execute_experiment}
+          Variables from Experiment:
+            n_ranks = 1 ==> 1
+            n_threads = 1 ==> 1
+            size = 0003 ==> 0003
+            type = rf ==> rf
 
 The variables ``mpi_command``, ``processes_per_node``, and ``batch_submit``
 come from the workspace scope towards the top of the YAML file. Each experiment
@@ -135,37 +135,41 @@ Which should contain the following information:
 .. code-block:: console
 
     Workload: water_gmx50
-        Executables: ['pre-process', 'execute-gen']
+        Executables: ['print-binary-info', 'pre-process', 'execute-gen']
         Inputs: ['water_gmx50_bare']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water GMX50
-                Default: {water_gmx50_bare}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for workload
+                    Default: {water_gmx50_bare}/{size}
+                    Suggested Values: [None]
     Workload: water_bare
-        Executables: ['pre-process', 'execute-gen']
+        Executables: ['print-binary-info', 'pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water bare hbonds
-                Default: {water_bare_hbonds}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for workload
+                    Default: {water_bare_hbonds}/{size}
+                    Suggested Values: [None]
 
 
 Within each of the workloads your workspace has experiments for, you can see
@@ -203,7 +207,7 @@ This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
 the workspace's ``configs`` directory. The root directory of the workspace can
 be seen in the ``Location`` attribute output from:
 
-.. code-blocks:: console
+.. code-block:: console
 
     $ ramble workspace info
 

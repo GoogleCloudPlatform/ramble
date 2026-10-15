@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.repository
 import ramble.cmd.common.list
 
 description = "list and search available objects"
@@ -19,4 +18,4 @@ def setup_parser(subparser):
 
 
 def list(parser, args):
-    ramble.cmd.common.list.perform_list(args)
+    return ramble.cmd.common.list.perform_list(args)

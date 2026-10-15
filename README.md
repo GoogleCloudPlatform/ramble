@@ -15,11 +15,19 @@ Python, and Ramble’s dependencies are installed as per the dependency section
 below.
 Then:
 
-    git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    git clone -c feature.manyFiles=true https://github.com/Ramble-Project/ramble.git
     python3 -m venv ramble/env
     . ramble/env/bin/activate
     pip install -r ramble/requirements.txt
     ./ramble/bin/ramble workspace create -d test_workspace -c ramble/examples/basic_hostname_config.yaml
+
+Alternatively, you can also use `uv` ([link to uv installation](https://docs.astral.sh/uv/getting-started/installation/#installing-uv)) to install Ramble:
+
+    git clone -c feature.manyFiles=true https://github.com/Ramble-Project/ramble.git
+    uv venv # or uv venv --python <python_version> for using specific Python version
+    . .venv/bin/activate
+    uv pip install -r ramble/requirements.txt
+    ramble/bin/ramble workspace create -d test_workspace -c ramble/examples/basic_hostname_config.yaml
 
 Dependencies
 ------------
@@ -31,7 +39,7 @@ e.g.
     pip install -r requirements.txt
 
 We recommend Python >= 3.7 for Ramble, but a best effort attempt is made to
-support Python 3.6 as it is used by older operating systems such as Centos7.
+support Python 3.6 as it is used by older operating systems.
 Specifically, you might need to update `pip` and downgrade `protobuf` when
 using Python 3.6.
 
@@ -67,7 +75,7 @@ packages to bugfixes, documentation, or even new core features.
 
 Resources:
 
-* [**Github Discussions**](https://github.com/GoogleCloudPlatform/ramble/discussions): not just for discussions, also Q&A.
+* [**Github Discussions**](https://github.com/Ramble-Project/ramble/discussions): not just for discussions, also Q&A.
 
 Contributing
 ------------------------
@@ -78,11 +86,15 @@ e.g.
 
     pip install -r requirements-dev.txt
 
+Ramble's CI tests use a pinned set of dependencies. These can be installed
+using:
+
+    pip install -r requirements-pinned.txt
 
 Contributing to Ramble is relatively easy.  Just send us a
 [pull request](https://help.github.com/articles/using-pull-requests/).
 When you send your request, make ``develop`` the destination branch on the
-[Ramble repository](https://github.com/GoogleCloudPlatform/ramble).
+[Ramble repository](https://github.com/Ramble-Project/ramble).
 
 Your PR must pass Ramble's unit tests and documentation tests, and must be
 [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant.  We enforce
@@ -93,7 +105,7 @@ directory. Alternatively, [pre-commit](https://pre-commit.com/#install) can be
 used to manage our git hooks. To install the hooks, simply run:
 - pre-commit install
 
- For additional requirements about contributing, including Google’s CLA, see our
+ For additional requirements about contributing, see our
  [Contribution Guide](.github/CONTRIBUTING.md).
 
 
@@ -123,7 +135,7 @@ the Ramble community, you agree to abide by its rules.
 
 Authors
 ----------------
-Many thanks go to Ramble's [contributors](https://github.com/GoogleCloudPlatform/ramble/graphs/contributors).
+Many thanks go to Ramble's [contributors](https://github.com/Ramble-Project/ramble/graphs/contributors).
 
 Ramble was created by Doug Jacobsen, dwjacobsen@google.com.
 

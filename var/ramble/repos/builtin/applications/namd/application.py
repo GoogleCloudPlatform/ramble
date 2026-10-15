@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
 import os
+import re
+
 from ramble.appkit import *
 from ramble.expander import Expander
 from ramble.keywords import keywords
@@ -20,31 +21,31 @@ class Namd(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("molecular-dynamics", "charm++", "task-parallelism")
+    tags("molecular-dynamics", "hpc-benchmark", "charmpp")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    version("2.14", description="Version 2.14 of NAMD", preferred=True)
 
-    software_spec(
-        "impi2021p8",
-        pkg_spec="intel-oneapi-mpi@2021.8.0",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    software_spec(
-        "charmpp",
-        pkg_spec="charmpp backend=mpi build-target=charm++",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "impi2021p8",
+            pkg_spec="intel-oneapi-mpi@2021.8.0",
+        )
 
-    software_spec(
-        "namd",
-        pkg_spec="namd@2.14 interface=tcl",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "charmpp",
+            pkg_spec="charmpp backend=mpi build-target=charm++",
+            compiler="gcc12",
+        )
 
-    required_package("namd", package_manager="spack*")
+        software_spec(
+            "namd-{application::namd::version}",
+            pkg_spec="namd@{application::namd::version} interface=tcl",
+            compiler="gcc12",
+        )
+
+        required_package("namd")
 
     input_file(
         "stmv",
@@ -109,10 +110,10 @@ class Namd(ExecutableApplication):
         description="Tcl forces (decalanin)",
     )
 
-    executable(
-        "copy_inputs",
-        "cp {input_path}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
     )
     executable("execute", "namd2 {namd_flags} {input_file}", use_mpi=True)
 
@@ -132,25 +133,13 @@ class Namd(ExecutableApplication):
         ("decalanin", ["alanin.namd"]),
         ("tcl-forces", ["tclforces.namd"]),
     ]
+    all_benchmark_workloads = [wl[0] for wl in benchmark_workloads]
+
     for wl_def in benchmark_workloads:
         workload(
             wl_def[0],
-            executables=["copy_inputs", "execute"],
+            executables=["stage-input", "execute"],
             inputs=[wl_def[0]],
-        )
-
-        workload_variable(
-            "namd_flags",
-            default="+ppn {processes_per_node} +setcpuaffinity",
-            description="Flags for running NAMD",
-            workloads=[wl_def[0]],
-        )
-
-        workload_variable(
-            "input_path",
-            default=Expander.expansion_str(wl_def[0]),
-            description=f"Path to the {wl_def[0]} inputs",
-            workloads=[wl_def[0]],
         )
 
         workload_variable(
@@ -161,12 +150,37 @@ class Namd(ExecutableApplication):
             workloads=[wl_def[0]],
         )
 
+    workload_group("all_benchmarks", workloads=all_benchmark_workloads)
+
+    workload_variable(
+        "namd_flags",
+        default="+ppn {processes_per_node} +setcpuaffinity",
+        description="Flags for running NAMD",
+        workload_group="all_benchmarks",
+    )
+
+    workload_variable(
+        "input_path",
+        description="Path to the workload inputs",
+        workload_defaults={
+            "stmv": "{stmv}",
+            "ApoA1": "{ApoA1}",
+            "ATPase": "{ATPase}",
+            "20STMV": "{20STMV}",
+            "tiny": "{tiny}",
+            "interactive_BPTI": "{interactive_BPTI}",
+            "ER-GRE": "{ER-GRE}",
+            "decalanin": "{decalanin}",
+            "tcl-forces": "{tcl-forces}",
+        },
+    )
+
     log_file_str = Expander.expansion_str(keywords.log_file)
 
     success_criteria(
         "Completion",
         mode="string",
-        match=r".*End of program.*",
+        match=r".*?End of program",
         file=log_file_str,
     )
 
@@ -174,7 +188,7 @@ class Namd(ExecutableApplication):
     timing_regex = (
         r"TIMING:\s+(?P<itr>[0-9]+)\s+CPU:\s+(?P<cpu>[0-9]+\.[0-9]+),\s+(?P<cpu_per_step>[0-9]+\.[0-9]+)/step\s+"
         + r"Wall:\s+(?P<wall>[0-9]+\.[0-9]+),\s+(?P<wall_per_step>[0-9]+\.[0-9]+)/step,\s+(?P<remaining>[0-9]+\.*[0-9]*)\s+"
-        + r"hours\s+remaining,\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB.*"
+        + r"hours\s+remaining,\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB"
     )
     figure_of_merit_context(
         "Perf iteration",
@@ -388,8 +402,8 @@ class Namd(ExecutableApplication):
         dpns = None
 
         if os.path.isfile(log_path):
-            with open(log_path) as f:
-                for line in f.readlines():
+            with open(log_path, encoding="utf-8") as f:
+                for line in f:
                     match = ns_regex.match(line)
                     if match:
                         dpns = float(match.group("days_per_ns"))
@@ -402,7 +416,7 @@ class Namd(ExecutableApplication):
                 ),
                 "namd_nspd_stat.out",
             )
-            with open(nspd_file_path, "w+") as f:
+            with open(nspd_file_path, "w+", encoding="utf-8") as f:
                 f.write(f"{nspd} ns/day\n")
 
         super()._analyze_experiments(workspace)

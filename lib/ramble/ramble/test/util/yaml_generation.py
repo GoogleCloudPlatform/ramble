@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,11 +7,12 @@
 # except according to those terms.
 
 import pytest
+from ruamel import yaml
 
-import ruamel.yaml as yaml
+import ramble.expander
 import ramble.util.yaml_generation
+
 import spack.util.spack_yaml as syaml
-import ramble.repository
 
 
 @pytest.fixture(scope="session")
@@ -32,7 +33,7 @@ def yaml_config(tmpdir_factory):
     test_data["baz"]["baz2"] = "baz"
 
     path = str(tmpdir_factory.mktemp("config.yaml").join("config"))
-    with open(path, "w+") as f:
+    with open(path, "w+", encoding="utf-8") as f:
         yaml.dump(
             test_data,
             default_flow_style=False,
@@ -106,3 +107,21 @@ def test_remove_config_value(yaml_config):
     ramble.util.yaml_generation.remove_config_value(read_data, "bar.bar_str")
     assert "bar_str" not in read_data["bar"]
     assert "bar2" in read_data["bar"]
+
+
+def test_apply_default_config_values(mutable_mock_apps_repo):
+    config_data = {"foo": {"bar": "baz"}}
+    default_config_string = "{default_config_value}"
+    app_inst = mutable_mock_apps_repo.get("basic")
+    app_inst.variables = {"foo.bar": ""}
+    expansion_vars = {
+        "workload_name": "test_wl",
+        "foo.bar": default_config_string,
+    }
+    app_inst.expander = ramble.expander.Expander(expansion_vars, None)
+
+    assert app_inst.variables["foo.bar"] == ""
+    ramble.util.yaml_generation.apply_default_config_values(
+        config_data, app_inst, default_config_string
+    )
+    assert app_inst.variables["foo.bar"] == "baz"

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -37,4 +37,20 @@ class ExpandedFoms(ExecutableApplication):
         units="{unit}",
     )
 
+    figure_of_merit(
+        "test_inmem_{my_var}",
+        units="",
+        fom_map_key="test_inmem",
+    )
+
     success_criteria("Run", mode="string", match=r"Collect", file="{log_file}")
+
+    success_criteria(
+        "Inmem FOM matched",
+        mode="fom_comparison",
+        fom_name="test_inmem_{my_var}",
+        formula="{value} == 'inmem_val'",
+    )
+
+    def _prepare_analysis(self, workspace, app_inst):
+        self.add_inmem_fom_value("test_inmem", "inmem_val")

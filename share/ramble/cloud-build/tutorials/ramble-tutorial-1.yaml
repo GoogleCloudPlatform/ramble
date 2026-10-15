@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ steps:
 
         spack load py-pip ^python
 
-        pip install -r /workspace/requirements-dev.txt
+        pip install -r /workspace/requirements-pinned.txt
 
         export SPACK_PYTHON=`which python3`
 
@@ -67,9 +67,9 @@ steps:
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6
-  _BASE_IMG: centos
-  _BASE_VER: '7'
+  _BASE_IMG: rockylinux
+  _BASE_VER: '8'
   _CI_CACHE: gs://spack/latest
 timeout: 1500s
 options:
-  machineType: N1_HIGHCPU_8
+  machineType: E2_HIGHCPU_8

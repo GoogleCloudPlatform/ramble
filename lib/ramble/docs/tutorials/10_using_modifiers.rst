@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -71,8 +71,11 @@ Which might output the following:
 
 .. code-block:: console
 
-    ==> 4 modifiers
-    conditional-psm3  gcp-metadata  intel-aps  lscpu
+    ==> 33 modifiers
+    amd-uprof          darshan             execution-date     hpctoolkit      intel-vtune  nccl-tcpxo      pre-post-capture  sys-stat   wait-for-bg-jobs
+    apptainer          docker              exit-code          install-ramble  lscpu        nvidia-smi      pyxis-enroot      tunables
+    collection-daemon  env-var-aggregator  gcp-cloud-logging  install-spack   nccl-env     perf            run-directory     tuned-adm
+    conditional-psm3   ethtool             gcp-metadata       intel-aps       nccl-gib     pre-exec-print  status-markers    turbostat
 
 This shows there are four modifiers in this installation of Ramble. Two very
 general modifiers in this list are ``lscpu`` and ``intel-aps``. Modifiers are
@@ -83,6 +86,8 @@ about the ``lscpu`` modifier, execute:
 .. code-block:: console
 
     $ ramble info --type modifiers lscpu
+    or;
+    $ ramble info builtin.mod.lscpu
 
 This modifier adds the execution of ``lscpu`` to each experiment in a workspace
 (to capture additional platform level details, such as the CPU model), and
@@ -145,7 +150,7 @@ experiment run directories to see what changed after applying the ``lscpu``
 modifier.
 
 Advanced Modifiers
------------------
+------------------
 
 Some modifiers have additional functionality, which can include requiring
 specific software packages to be present. An example of this is the
@@ -158,6 +163,8 @@ To get information about the ``intel-aps`` modifier, execute:
 .. code-block:: console
 
     $ ramble info --type modifiers intel-aps
+    or;
+    $ ramble info builtin.mod.intel-aps
 
 In the output from this command, you should see a ``mode`` named ``mpi``. One
 additional difference relateive to ``lscpu`` is that the ``Software Specs:``
@@ -197,7 +204,7 @@ command proceeds too far, you should see the following error message:
 
 .. code-block:: console
 
-    ==> Error: Software spec intel-oneapi-vtune is not defined in environment wrfv4, but is required by the intel-aps modifier definition
+    ==> Error: Software spec intel-oneapi-vtune is not defined in environment wrf@4.2, but is required by the intel-aps modifier definition
 
 As mentioned earlier, this is because the ``intel-aps`` modifier requires
 additional software to function properly. In this case, it requires the
@@ -211,7 +218,7 @@ To remedy this issue, again edit your workspace configuration file using:
     $ ramble workspace edit
 
 And write a Spack package definition for ``intel-oneapi-vtune``. After the
-package is defined, add the package to the ``wrfv4`` environment. The resulting
+package is defined, add the package to the ``wrf@4.2`` environment. The resulting
 configuration file should look like the following:
 
 .. literalinclude:: ../../../../examples/tutorial_10_aps_final_config.yaml

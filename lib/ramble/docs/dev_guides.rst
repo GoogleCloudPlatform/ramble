@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,4 +21,5 @@ Below is a list of developer guides for various aspects of Ramble.
     dev_guides/application_dev_guide
     dev_guides/modifier_dev_guide
     dev_guides/package_manager_dev_guide
+    dev_guides/utility_dev_guide
     dev_guides/advanced_topics

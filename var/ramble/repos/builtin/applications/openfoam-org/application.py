@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-
 from ramble.base_app.builtin.openfoam import Openfoam as OpenfoamBase
 
 
@@ -18,35 +17,23 @@ class OpenfoamOrg(OpenfoamBase):
 
     maintainers("douglasjacobsen")
 
-    tags("cfd", "fluid", "dynamics")
+    version("10", "Version 10 of Openfoam-org", preferred=True)
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+        )
 
-    software_spec(
-        "openfoam-org",
-        pkg_spec="openfoam-org@10",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "openfoam-org-{application::openfoam-org::version}",
+            pkg_spec="openfoam-org@{application::openfoam-org::version}",
+            compiler="gcc14",
+        )
 
-    required_package("openfoam-org", package_manager="spack*")
-
-    executable(
-        "get_inputs",
-        template=[
-            "cp -Lr {input_path}/* {experiment_run_dir}/.",
-            "mkdir -p constant/triSurface",
-            "mkdir -p constant/geometry",
-            "cp {geometry_path} constant/triSurface/.",
-            "cp {geometry_path} constant/geometry/.",
-            "ln -sf {experiment_run_dir}0/U.orig {experiment_run_dir}/0/U",
-        ],
-        use_mpi=False,
-    )
+        required_package("openfoam-org")
 
     workload_variable(
         "dict_delim",

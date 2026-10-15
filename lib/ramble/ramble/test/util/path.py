@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,9 +9,9 @@
 
 import os
 
-import ramble.util.path
-
 import pytest
+
+import ramble.util.path
 
 
 @pytest.mark.parametrize(
@@ -24,7 +24,31 @@ import pytest
         ("gs://my-bucket", "gs://my-bucket"),
         ("gs://my-bucket/", "gs://my-bucket"),
         ("gs://my-bucket///", "gs://my-bucket"),
+        ("/", "/"),
+        ("///", "/"),
+        ("", ""),
     ],
 )
 def test_normalize_path_or_url(path, expect):
     assert ramble.util.path.normalize_path_or_url(path) == expect
+
+
+def test_substitute_config_variables():
+    # Non-variable strings should return unchanged
+    assert ramble.util.path.substitute_config_variables("simple/path", {}) == "simple/path"
+    assert ramble.util.path.substitute_config_variables("", {}) == ""
+
+    # Test variable substitutions
+    local = {"custom": "/my/custom/path"}
+    assert (
+        ramble.util.path.substitute_config_variables("$custom/file", local)
+        == "/my/custom/path/file"
+    )
+    assert (
+        ramble.util.path.substitute_config_variables("${custom}/file", local)
+        == "/my/custom/path/file"
+    )
+    assert (
+        ramble.util.path.substitute_config_variables("$tempdir/foo", {})
+        == f"{ramble.util.path.replacements['tempdir']}/foo"
+    )

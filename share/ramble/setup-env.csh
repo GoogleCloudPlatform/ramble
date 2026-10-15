@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -61,20 +61,32 @@ alias ramble          'set _rmb_args = (\!*); source $_ramble_share_dir/csh/ramb
 alias _ramble_pathadd 'set _pa_args = (\!*) && source $_ramble_share_dir/csh/pathadd.csh'
 
 # Identify and lock the python interpreter
+if ($?RAMBLE_PYTHON) then
+    echo "The RAMBLE_PYTHON environment variable is set to $RAMBLE_PYTHON"
+    echo "Will pin the python binary ramble uses to this value".
+endif
+
 if (! $?RAMBLE_PYTHON) then
     setenv RAMBLE_PYTHON ""
 endif
-foreach cmd ("$RAMBLE_PYTHON" python3 python python2)
+
+if ($?_RAMBLE_PYTHON && "$RAMBLE_PYTHON" != "$_RAMBLE_PYTHON") then
+    echo "WARNING: Ramble was previously pinned to use $_RAMBLE_PYTHON"
+    echo "         If this is not what you want, set the correct python"
+    echo "         in RAMBLE_PYTHON and re-source this file"
+endif
+
+foreach cmd ("$RAMBLE_PYTHON" python3 python)
     command -v "$cmd" >& /dev/null
     if ($status == 0) then
-        setenv RAMBLE_PYTHON `command -v "$cmd"`
+        setenv _RAMBLE_PYTHON `command -v "$cmd"`
         break
     endif
 end
 
 # Set variables needed by this script
 _ramble_pathadd PATH "$RAMBLE_ROOT/bin"
-eval `ramble --print-shell-vars csh`
+eval `ramble csh`
 
 # done: unset sentinel variable as we're no longer initializing
 unsetenv _rmb_initializing

@@ -1,3 +1,0 @@
-# Tests that Spack can handle targets in subninja files
-
-subninja subninja.ninja

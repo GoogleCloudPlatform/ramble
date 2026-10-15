@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,29 +7,20 @@
 # except according to those terms.
 
 import os
+from typing import Callable, Dict
 
 import llnl.util.filesystem as fs
 
-import spack.util.spack_json as sjson
-import spack.util.url as surl
-
-import ramble.cmd
-import ramble.cmd.common.arguments as arguments
-
-import ramble.fetch_strategy
+import ramble.cmd.common
 import ramble.config
-import ramble.stage
-import ramble.workspace
-import ramble.workspace.shell
-import ramble.pipeline
-import ramble.filters
+from ramble.cmd.common import arguments
 from ramble.main import RambleCommand
-import ramble.util.path
-
+from ramble.util import json_util
 from ramble.util.logger import logger
 
+import spack.util.url as surl
 
-description = "(experimental) manage workspace deployments"
+description = "manage workspace deployments"
 section = "workspaces"
 level = "short"
 
@@ -67,13 +58,27 @@ def deployment_push_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "filter_tags",
+            "filter_group",
+            "exclude_filter_group",
+        ],
     )
 
 
 def deployment_push(args):
+    import ramble.cmd
+    import ramble.filters
+    import ramble.pipeline
+
     current_pipeline = ramble.pipeline.pipelines.pushdeployment
     ws = ramble.cmd.require_active_workspace(cmd_name="deployment push")
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -101,6 +106,7 @@ def deployment_pull_setup_parser(subparser):
     subparser.add_argument(
         "--deployment-path",
         "-p",
+        "-u",
         dest="deployment_path",
         help="Path to deployment that should be pulled",
         required=True,
@@ -108,6 +114,12 @@ def deployment_pull_setup_parser(subparser):
 
 
 def deployment_pull(args):
+    import ramble.cmd
+    import ramble.fetch_strategy
+    import ramble.pipeline
+    import ramble.stage
+    import ramble.util.path
+
     def pull_file(src, dest):
         fetcher = ramble.fetch_strategy.URLFetchStrategy(url=src)
         stage_dir = os.path.dirname(dest)
@@ -138,8 +150,8 @@ def deployment_pull(args):
                 "`ramble deployment push` before pulling it."
             )
 
-        with open(local_index_path) as f:
-            index_data = sjson.load(f)
+        with open(local_index_path, encoding="utf-8") as f:
+            index_data = json_util.load(f)
 
         for file in index_data[push_cls.index_namespace]:
             src = surl.join(deployment_path, file)
@@ -155,12 +167,23 @@ def deployment_pull(args):
                     "Deployment may be corrupt or incomplete."
                 )
 
-        obj_repo_path = os.path.join(
-            ws.root, ramble.pipeline.PushDeploymentPipeline.object_repo_name
+        legacy_obj_repo_path = os.path.join(
+            ws.root, ramble.pipeline.PushDeploymentPipeline.legacy_object_repo_name
         )
-        if os.path.exists(obj_repo_path):
+        # Read in legacy deployment repo if it exists
+        if os.path.exists(legacy_obj_repo_path):
             repo_cmd = RambleCommand("repo")
-            repo_cmd("add", obj_repo_path, global_args=["-D", ws.root])
+            repo_cmd("add", legacy_obj_repo_path, global_args=["-D", ws.root])
+
+        ramble_repos_path = os.path.join(ws.root, "object_repos", "ramble")
+        if os.path.exists(ramble_repos_path):
+            repo_cmd = RambleCommand("repo")
+            for maybe_repo in os.listdir(ramble_repos_path):
+                maybe_repo_dir = os.path.join(ramble_repos_path, maybe_repo)
+                if os.path.isdir(maybe_repo_dir) and os.path.exists(
+                    os.path.join(maybe_repo_dir, ramble.repository.unified_config)
+                ):
+                    repo_cmd("add", maybe_repo_dir, global_args=["-D", ws.root])
 
 
 def deployment_run_pipeline(args, pipeline):
@@ -173,42 +196,18 @@ def deployment_run_pipeline(args, pipeline):
 
 
 #: Dictionary mapping subcommand names and aliases to functions
-subcommand_functions = {}
-
-
-def sanitize_arg_name(base_name):
-    """Allow function names to be remapped (eg `-` to `_`)"""
-    formatted_name = base_name.replace("-", "_")
-    return formatted_name
+subcommand_functions: Dict[str, Callable] = {}
 
 
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="deployment_command")
-
-    for name in subcommands:
-        if isinstance(name, (list, tuple)):
-            name, aliases = name[0], name[1:]
-        else:
-            aliases = []
-
-        # add commands to subcommands dict
-        function_name = sanitize_arg_name("deployment_%s" % name)
-
-        function = globals()[function_name]
-        for alias in [name] + aliases:
-            subcommand_functions[alias] = function
-
-        # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("deployment_%s_setup_parser" % name)
-        setup_parser_cmd = globals()[setup_parser_cmd_name]
-
-        subsubparser = sp.add_parser(
-            name,
-            aliases=aliases,
-            help=setup_parser_cmd.__doc__,
-            description=setup_parser_cmd.__doc__,
-        )
-        setup_parser_cmd(subsubparser)
+    ramble.cmd.common.setup_subcommands_from_prefix(
+        subparser=subparser,
+        dest="deployment_command",
+        subcommands=subcommands,
+        prefix="deployment",
+        globals_dict=globals(),
+        subcommand_functions=subcommand_functions,
+    )
 
 
 def deployment(parser, args):

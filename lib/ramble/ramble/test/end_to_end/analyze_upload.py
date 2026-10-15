@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
@@ -22,7 +21,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_analyze_upload():
+def test_analyze_upload(make_workspace_from_config):
     test_config = """
 ramble:
   config:
@@ -33,6 +32,7 @@ ramble:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '1'
+    n_ranks: '{n_nodes}*{processes_per_node}'
   applications:
     hostname:
       workloads:
@@ -45,27 +45,18 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_analyze_upload"
-    ws = ramble.workspace.create(ws_name)
-    ws.write()
-
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
     exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
-    with open(exp_out, "w") as f:
+    with open(exp_out, "w", encoding="utf-8") as f:
         f.write("test-user.c.googlers.com\n")
 
     workspace("analyze", "--upload", global_args=["-w", ws_name])
 
     analyze_log = os.path.join(ws.log_dir, "analyze.latest.out")
 
-    with open(analyze_log) as f:
+    with open(analyze_log, encoding="utf-8") as f:
         content = f.read()
         assert "Uploading results to fake-dataset" in content
         assert "The PrintOnly uploader only logs" in content

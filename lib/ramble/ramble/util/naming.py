@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,22 +7,22 @@
 # except according to those terms.
 
 # Need this because of ramble.util.string
+import fnmatch
+import functools
 import io
-import string
 import itertools
 import re
+import string
 
 import ramble.error
 
 __all__ = [
     "mod_to_class",
-    "ramble_module_to_python_module",
     "valid_module_name",
-    "valid_fully_qualified_module_name",
-    "validate_fully_qualified_module_name",
     "validate_module_name",
     "possible_ramble_module_names",
     "simplify_name",
+    "match_pattern",
     "NamespaceTrie",
     "NS_SEPARATOR",
 ]
@@ -30,12 +30,15 @@ __all__ = [
 NS_SEPARATOR = "::"
 
 # Valid module names can contain '-' but can't start with it.
-_valid_module_re = r"^\w[\w-]*$"
+_VALID_MODULE_RE = re.compile(r"^\w[\w-]*$")
+_DASH_UNDERSCORE_RE = re.compile(r"[-_]+")
+_NUM_PREFIX_RE = re.compile(r"^num(\d)")
+_UNDERSCORE_SPLIT_RE = re.compile(r"(_)")
+_LUA_PREFIX_RE = re.compile(r"^(lua)([^-])")
+_BPP_PREFIX_RE = re.compile(r"^(bpp)([^-])")
 
-# Valid module names can contain '-' but can't start with it.
-_valid_fully_qualified_module_re = r"^(\w[\w-]*)(\.\w[\w-]*)*$"
 
-
+@functools.lru_cache(maxsize=512)
 def mod_to_class(mod_name):
     """Convert a name from module style to class name style.  Ramble mostly
     follows `PEP-8 <http://legacy.python.org/dev/peps/pep-0008/>`_:
@@ -57,34 +60,24 @@ def mod_to_class(mod_name):
     """
     validate_module_name(mod_name)
 
-    class_name = re.sub(r"[-_]+", "-", mod_name)
+    class_name = _DASH_UNDERSCORE_RE.sub("-", mod_name)
     class_name = string.capwords(class_name, "-")
     class_name = class_name.replace("-", "")
 
     # If a class starts with a number, prefix it with Number_ to make it
     # a valid Python class name.
-    if re.match(r"^[0-9]", class_name):
-        class_name = "_%s" % class_name
+    if class_name and class_name[0].isdigit():
+        class_name = f"_{class_name}"
 
     return class_name
-
-
-def ramble_module_to_python_module(mod_name):
-    """Given a Ramble module name, returns the name by which it can be
-    imported in Python.
-    """
-    if re.match(r"[0-9]", mod_name):
-        mod_name = "num" + mod_name
-
-    return mod_name.replace("-", "_")
 
 
 def possible_ramble_module_names(python_mod_name):
     """Given a Python module name, return a list of all possible ramble module
     names that could correspond to it."""
-    mod_name = re.sub(r"^num(\d)", r"\1", python_mod_name)
+    mod_name = _NUM_PREFIX_RE.sub(r"\1", python_mod_name)
 
-    parts = re.split(r"(_)", mod_name)
+    parts = _UNDERSCORE_SPLIT_RE.split(mod_name)
     options = [["_", "-"]] * mod_name.count("_")
 
     results = []
@@ -96,6 +89,7 @@ def possible_ramble_module_names(python_mod_name):
     return results
 
 
+@functools.lru_cache(maxsize=1024)
 def simplify_name(name):
     """Simplify package name to only lowercase, digits, and dashes.
 
@@ -136,22 +130,17 @@ def simplify_name(name):
 
     # Simplify Lua package names
     # We don't want "lua" to occur multiple times in the name
-    name = re.sub("^(lua)([^-])", r"\1-\2", name)
+    name = _LUA_PREFIX_RE.sub(r"\1-\2", name)
 
     # Simplify Bio++ package names
-    name = re.sub("^(bpp)([^-])", r"\1-\2", name)
+    name = _BPP_PREFIX_RE.sub(r"\1-\2", name)
 
     return name
 
 
 def valid_module_name(mod_name):
     """Return whether mod_name is valid for use in Ramble."""
-    return bool(re.match(_valid_module_re, mod_name))
-
-
-def valid_fully_qualified_module_name(mod_name):
-    """Return whether mod_name is a valid namespaced module name."""
-    return bool(re.match(_valid_fully_qualified_module_re, mod_name))
+    return bool(_VALID_MODULE_RE.match(mod_name))
 
 
 def validate_module_name(mod_name):
@@ -160,25 +149,11 @@ def validate_module_name(mod_name):
         raise InvalidModuleNameError(mod_name)
 
 
-def validate_fully_qualified_module_name(mod_name):
-    """Raise an exception if mod_name is not a valid namespaced module name."""
-    if not valid_fully_qualified_module_name(mod_name):
-        raise InvalidFullyQualifiedModuleNameError(mod_name)
-
-
 class InvalidModuleNameError(ramble.error.RambleError):
     """Raised when we encounter a bad module name."""
 
     def __init__(self, name):
         super().__init__("Invalid module name: " + name)
-        self.name = name
-
-
-class InvalidFullyQualifiedModuleNameError(ramble.error.RambleError):
-    """Raised when we encounter a bad full package name."""
-
-    def __init__(self, name):
-        super().__init__("Invalid fully qualified package name: " + name)
         self.name = name
 
 
@@ -210,10 +185,10 @@ class NamespaceTrie:
         first, _, rest = namespace.partition(self._sep)
         if not first:
             if not self._value:
-                raise KeyError("Can't find namespace '%s' in trie" % full_name)
+                raise KeyError(f"Can't find namespace '{full_name}' in trie")
             return self._value.value
         elif first not in self._subspaces:
-            raise KeyError("Can't find namespace '%s' in trie" % full_name)
+            raise KeyError(f"Can't find namespace '{full_name}' in trie")
         else:
             return self._subspaces[first]._get_helper(rest, full_name)
 
@@ -235,7 +210,7 @@ class NamespaceTrie:
         """True if this namespace has no children in the trie."""
         first, _, rest = namespace.partition(self._sep)
         if not first:
-            return bool(self._subspaces)
+            return not self._subspaces
         elif first not in self._subspaces:
             return False
         else:
@@ -267,3 +242,49 @@ class NamespaceTrie:
         stream = io.StringIO()
         self._str_helper(stream)
         return stream.getvalue()
+
+
+def match_pattern(pattern, string):
+    """Match a string against a pattern (regex or glob)
+
+    Args:
+        pattern (str): pattern to match against
+        string (str): string to match
+
+    Returns:
+        (tuple): (bool: matched, dict: captured groups)
+    """
+    if pattern is None:
+        return True, {}
+
+    # If the pattern contains characters that strongly suggest a regex,
+    # try regex matching first.
+    # Common regex-only characters: (, ), [, ], ^, $, |
+    # Note: * and ? are common to both. . is also common but more regex-y.
+    is_regex = any(c in pattern for c in "()[]^$|") or "(?P<" in pattern
+
+    if is_regex:
+        try:
+            regex = re.compile(pattern)
+            match = regex.fullmatch(string)
+            if match:
+                return True, match.groupdict()
+            return False, {}
+        except re.error:
+            pass
+
+    # Try globbing
+    if fnmatch.fnmatch(string, pattern):
+        return True, {}
+
+    # Final attempt: try as regex even if it didn't look like one
+    if not is_regex:
+        try:
+            regex = re.compile(pattern)
+            match = regex.fullmatch(string)
+            if match:
+                return True, match.groupdict()
+        except re.error:
+            pass
+
+    return False, {}

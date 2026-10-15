@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,9 @@
 # except according to those terms.
 
 import os
+import re
+
+import ramble.util.stats
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -14,71 +17,44 @@ from ramble.expander import Expander
 class Openfoam(ExecutableApplication):
     """Base application definition for OpenFoam"""
 
-    name = "openfoamorg"
+    name = "openfoam"
 
     maintainers("douglasjacobsen")
 
-    tags("cfd", "fluid", "dynamics")
+    tags("cfd")
 
-    workload(
+    motorbike_workloads = [
         "motorbike",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
-
-    workload(
         "motorbike_20m",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
-
-    workload(
         "motorbike_42m",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
+        "motorbike_100m",
+        "motorbike_200m",
+    ]
+
+    for wl in motorbike_workloads:
+        workload(
+            wl,
+            executables=[
+                "clean",
+                "stage_input",
+                "stage_trisurface",
+                "stage_geometry",
+                "stage_0",
+                "configure_mesh",
+                "surfaceFeatures",
+                "blockMesh",
+                "decomposePar1",
+                "snappyHexMesh",
+                "configure_simplefoam",
+                "redistributePar",
+                "decomposePar2",
+                "patchSummary",
+                "potentialFoam",
+                "checkMesh",
+                "simpleFoam",
+                "post-exec-clean",
+            ],
+        )
 
     workload_variable(
         "input_path",
@@ -115,6 +91,19 @@ class Openfoam(ExecutableApplication):
         default="system/snappyHexMeshDict",
         description="Path to hexh mesh file",
         workloads=["motorbike*"],
+    )
+    workload_variable(
+        "decomposition_method",
+        default="",
+        description="Set the decomposition method. Empty string means no change",
+        workloads=["motorbike*"],
+    )
+    workload_variable(
+        "file_handler",
+        default="uncollated",
+        description="Control how processes write output",
+        values=["uncollated", "collated", "masterUncollated"],
+        workloads=["*"],
     )
 
     workload_variable(
@@ -154,6 +143,18 @@ class Openfoam(ExecutableApplication):
         workload="motorbike_42m",
     )
     workload_variable(
+        "mesh_size",
+        default="(180 72 72)",
+        description="Mesh size for simulation",
+        workload="motorbike_100m",
+    )
+    workload_variable(
+        "mesh_size",
+        default="(226 90 90)",
+        description="Mesh size for simulation",
+        workload="motorbike_200m",
+    )
+    workload_variable(
         "max_local_cells",
         default="100000",
         description="Max local cells for simulation",
@@ -161,7 +162,7 @@ class Openfoam(ExecutableApplication):
     )
     workload_variable(
         "max_global_cells",
-        default="50000000",
+        default="300000000",
         description="Max global cells for simulation",
         workloads=["motorbike*"],
     )
@@ -205,20 +206,35 @@ class Openfoam(ExecutableApplication):
         workloads=["motorbike*"],
     )
 
-    executable("clean", template=["rm -rf processor* constant system log.*"])
+    variant(
+        "openfoam_clean_after_run",
+        default=False,
+        values=[True, False],
+        description="Whether to clean execution artifacts (processor* dirs) after completion or not",
+    )
 
     executable(
-        "get_inputs",
+        "post-exec-clean",
         template=[
-            "cp -Lr {input_path}/* {experiment_run_dir}/.",
-            "mkdir -p constant/triSurface",
-            "mkdir -p constant/geometry",
-            "cp {geometry_path} constant/triSurface/.",
-            "cp {geometry_path} constant/geometry/.",
-            "ln -sf {experiment_run_dir}0/U.orig {experiment_run_dir}/0/U",
+            "rm -rf {experiment_run_dir}/processor*",
         ],
-        use_mpi=False,
+        when=["+openfoam_clean_after_run"],
     )
+
+    executable("clean", template=["rm -rf processor* constant system log.*"])
+
+    stage_files(
+        name="stage_input", src="{input_path}/*", dst="{experiment_run_dir}/."
+    )
+    stage_files(
+        name="stage_trisurface",
+        src="{geometry_path}",
+        dst="constant/triSurface/.",
+    )
+    stage_files(
+        name="stage_geometry", src="{geometry_path}", dst="constant/geometry/."
+    )
+    stage_files(name="stage_0", src="0/U", dst="0/U.orig")
 
     executable(
         "configure_mesh",
@@ -226,6 +242,8 @@ class Openfoam(ExecutableApplication):
             ". $WM_PROJECT_DIR/bin/tools/RunFunctions",
             'foamDictionary -entry "numberOfSubdomains" -set "{n_ranks_hex}" {decomposition_path}',
             'foamDictionary -entry "{coeffs_dict}{dict_delim}n" -set "({min({n_ranks_hex}, {processes_per_node})} {ceil({n_ranks_hex}/{processes_per_node})} 1)" {decomposition_path}',
+            # Only set if the user explicitly gives us a value
+            'if [ -n "{decomposition_method}" ]; then foamDictionary -entry "method" -set "{decomposition_method}" {decomposition_path}; fi',
             'foamDictionary -entry "castellatedMeshControls{dict_delim}maxLocalCells" -set "{max_local_cells}" {hex_mesh_path}',
             'foamDictionary -entry "castellatedMeshControls{dict_delim}maxGlobalCells" -set "{max_global_cells}" {hex_mesh_path}',
             'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
@@ -242,6 +260,7 @@ class Openfoam(ExecutableApplication):
             'foamDictionary -entry "endTime" -set "{end_time}" {control_path}',
             'foamDictionary -entry "writeInterval" -set "{write_interval}" {control_path}',
             'foamDictionary -entry "startFrom" -set "{start_from}" {control_path}',
+            # 'foamDictionary -entry "OptimizationSwitches{dict_delim}fileHandler" -set "{file_handler}" {control_path}',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields -add "{}"',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields{dict_delim}p -set "0.3"',
             'foamDictionary system/fvSolution -entry solvers{dict_delim}p{dict_delim}nPreSweeps -set "0"',
@@ -364,7 +383,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "Number of cells",
         log_file=(log_prefix + "snappyHexMesh"),
-        fom_regex=r"Layer mesh\s+:\s+cells:(?P<ncells>[0-9]+)\s+.*",
+        fom_regex=r"Layer mesh\s+:\s+cells:(?P<ncells>[0-9]+)\s+",
         group_name="ncells",
         units="",
     )
@@ -372,56 +391,45 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "snappyHexMesh Time",
         log_file=(log_prefix + "snappyHexMesh"),
-        fom_regex=r"Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*)",
         group_name="mesh_time",
         units="s",
     )
 
     figure_of_merit(
         "snappyHexMesh Ranks",
-        log_file=config_file,
-        fom_regex=r"snappyHexMesh ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="snappy-hex-ranks",
         units="",
     )
 
-    figure_of_merit(
-        "simpleFoam Time",
-        log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
-        group_name="foam_time",
-        units="s",
+    simple_foam_exec_regex = (
+        r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)"
     )
-
     figure_of_merit(
         "simpleFoam Time",
         log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=simple_foam_exec_regex,
         group_name="foam_time",
         units="s",
     )
 
     figure_of_merit(
         "simpleFoam Ranks",
-        log_file=config_file,
-        fom_regex=r"simpleFoam ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="simple-foam-ranks",
         units="",
     )
 
     figure_of_merit(
         "potentialFoam Time",
         log_file=(log_prefix + "potentialFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
         group_name="foam_time",
         units="s",
     )
 
     figure_of_merit(
         "potentialFoam Ranks",
-        log_file=config_file,
-        fom_regex=r"potentialFoam ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="potential-foam-ranks",
         units="",
     )
 
@@ -439,28 +447,74 @@ class Openfoam(ExecutableApplication):
         file="{experiment_run_dir}/log.simpleFoam",
     )
 
+    success_criteria(
+        "nan",
+        mode="string",
+        anti_match=r".*?[+-=\s]nan",
+        file="{experiment_run_dir}/log.simpleFoam",
+    )
+
+    figure_of_merit(
+        "simpleFoam Number of Timesteps",
+        fom_map_key="simple-foam-time-n-timesteps",
+        units="",
+    )
+    for stat in ramble.util.stats.all_stats:
+        figure_of_merit(
+            f"simpleFoam Timestep {stat.name}",
+            fom_map_key=f"simple-foam-time-{stat.name}",
+            units=stat.get_unit("s"),
+        )
+
     def _prepare_analysis(self, workspace, app_inst=None):
-        conf_path = self.expander.expand_var(self.config_file)
+        hex_ranks = self.expander.expand_var("{n_ranks_hex}")
+        simple_ranks = self.expander.expand_var("{n_ranks}")
+        self.add_inmem_fom_value("snappy-hex-ranks", hex_ranks)
+        self.add_inmem_fom_value("simple-foam-ranks", simple_ranks)
+        self.add_inmem_fom_value("potential-foam-ranks", simple_ranks)
 
-        with open(conf_path, "w+") as f:
-            hex_ranks = self.expander.expand_var("{n_ranks_hex}")
-            simple_ranks = self.expander.expand_var("{n_ranks}")
-            f.write(f"snappyHexMesh ranks: {hex_ranks}\n")
-            f.write(f"simpleFoam ranks: {simple_ranks}\n")
-            f.write(f"potentialFoam ranks: {simple_ranks}\n")
+        sf_log = self.expander.expand_var(
+            "{experiment_run_dir}" + os.sep + "log.simpleFoam"
+        )
+        if os.path.isfile(sf_log):
+            exec_times = []
+            exec_regex = re.compile(self.simple_foam_exec_regex)
+            with open(sf_log, encoding="utf-8") as f:
+                for line in f:
+                    m = exec_regex.match(line)
+                    if m:
+                        exec_times.append(float(m.group("foam_time")))
 
-    def _define_commands(self, exec_graph, success_list):
+            self.add_inmem_fom_value(
+                "simple-foam-time-n-timesteps", len(exec_times)
+            )
+
+            # Drop first time, to avoid init time
+            if len(exec_times) > 1:
+                timestep_times = [
+                    exec_times[i + 1] - exec_times[i]
+                    for i in range(len(exec_times) - 1)
+                ]
+
+                # Compute statistics from other times
+                for stat in ramble.util.stats.all_stats:
+                    self.add_inmem_fom_value(
+                        f"simple-foam-time-{stat.name}",
+                        stat.compute(timestep_times),
+                    )
+
+    register_phase(
+        "define_exports", pipeline="setup", run_before=["make_experiments"]
+    )
+
+    def _define_exports(self, workspace, app_inst=None):
         export_prefix = self.expander.expand_var_name("export_prefix")
         export_vars = self.expander.expand_var_name("export_variables").split(
             ","
         )
 
-        export_args = []
-        for var in export_vars:
-            export_args.append(f"{export_prefix} {var}")
+        export_args = [f"{export_prefix} {var}" for var in export_vars]
 
         export_str = " ".join(export_args)
 
         self.define_variable("workload_exports", export_str)
-
-        super()._define_commands(exec_graph, success_list)
