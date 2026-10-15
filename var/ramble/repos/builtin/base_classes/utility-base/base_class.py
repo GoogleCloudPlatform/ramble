@@ -42,6 +42,7 @@ class UtilityBase(ObjectMixin, metaclass=DirectiveMeta):
             self.object_variants.default_variant(**var_args)
 
         self._file_path = file_path
+        self.workspace = None
         self.keywords = None
 
         self.object_variants.default_variant(
@@ -50,6 +51,7 @@ class UtilityBase(ObjectMixin, metaclass=DirectiveMeta):
             description="Name of external dependency for an experiment",
         )
 
+    @ObjectMixin.workspace_cache
     def _check_exact_match_via_vcs(self, exec_path, exact_version):
         """Check if the provided executable matches the exact version via VCS history."""
         import os
@@ -121,6 +123,7 @@ class UtilityBase(ObjectMixin, metaclass=DirectiveMeta):
 
         return False
 
+    @ObjectMixin.workspace_cache
     def get_version(self, env=None, path=None, return_output=False):
         """Discover the version of this utility.
         Uses the provided environment or the system environment if None.
@@ -321,6 +324,7 @@ class UtilityBase(ObjectMixin, metaclass=DirectiveMeta):
         """Check if the external dependency is already available on the system.
         If this returns True, Ramble will skip bootstrapping the external dependency.
         """
+        self.workspace = workspace
         return self.validate_versions(
             min_version=min_version,
             max_version=max_version,
@@ -341,6 +345,7 @@ class UtilityBase(ObjectMixin, metaclass=DirectiveMeta):
             EnvironmentModification: A reference to the environment modifications that should be
                                      applied for this utility.
         """
+        self.workspace = workspace
         if hasattr(obj_inst, "_get_app_inst"):
             app_inst = obj_inst._get_app_inst()
         else:
