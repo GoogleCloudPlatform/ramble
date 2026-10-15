@@ -77,7 +77,7 @@ Which might output the following:
     collection-daemon  env-var-aggregator  gcp-cloud-logging  install-spack   nccl-env     perf            run-directory     tuned-adm
     conditional-psm3   ethtool             gcp-metadata       intel-aps       nccl-gib     pre-exec-print  status-markers    turbostat
 
-This shows there are four modifiers in this installation of Ramble. Two very
+This shows all of the modifiers in this installation of Ramble. Two very
 general modifiers in this list are ``lscpu`` and ``intel-aps``. Modifiers are
 allowed to behave in different ways. Their functionality should be documented
 at a high-level through the ``ramble info --type modifiers`` command. To get information
