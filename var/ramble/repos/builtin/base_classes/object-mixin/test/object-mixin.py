@@ -7,8 +7,6 @@
 # except according to those terms.
 from unittest import mock
 
-import pytest
-
 from ramble.repository import get_base_class
 
 ObjectMixin = get_base_class("object-mixin")
@@ -57,6 +55,13 @@ def test_workspace_cache():
     # Verify cache contents
     assert len(workspace.object_command_cache) == 3
 
-    # The caching assumes workspace= argument is present
-    with pytest.raises(KeyError, match="'workspace'"):
-        obj.cached_method(1, 2)
+    # Without workspace= or obj.workspace, the method executes without caching
+    result5 = obj.cached_method(1, 2)
+    assert result5 == 4
+    assert obj.call_count == 4
+
+    # With obj.workspace set, caching works without passing workspace=
+    obj.workspace = workspace
+    assert obj.cached_method(1, 2, env={"PATH": "/bin"}) == 5
+    assert obj.cached_method(1, 2, env={"PATH": "/bin"}) == 5
+    assert obj.call_count == 5

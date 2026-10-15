@@ -363,17 +363,27 @@ class ObjectMixin(metaclass=SharedMeta):
 
         @functools.wraps(method)
         def wrapper(obj, *args, **kwargs):
-            # Precondition: the method should be called with a `workspace=` argument.
-            ws = kwargs["workspace"]
+            ws = kwargs.get("workspace") or getattr(obj, "workspace", None)
+            cache = getattr(ws, "object_command_cache", None)
+            if cache is None:
+                return method(obj, *args, **kwargs)
+
+            def _make_hashable(val):
+                if isinstance(val, dict):
+                    return frozenset(
+                        (k, _make_hashable(v)) for k, v in val.items()
+                    )
+                return val
+
             key = (
                 obj.origin_type,
                 obj.name,
                 method.__name__,
-                args,
-                frozenset(kwargs.items()),
+                tuple(_make_hashable(a) for a in args),
+                frozenset((k, _make_hashable(v)) for k, v in kwargs.items()),
             )
-            if key not in ws.object_command_cache:
-                ws.object_command_cache[key] = method(obj, *args, **kwargs)
-            return ws.object_command_cache[key]
+            if key not in cache:
+                cache[key] = method(obj, *args, **kwargs)
+            return cache[key]
 
         return wrapper
