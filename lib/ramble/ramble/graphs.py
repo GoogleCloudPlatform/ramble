@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import copy
 import enum
 import graphlib
 import itertools
@@ -89,20 +90,21 @@ class AttributeGraph:
 
         if dep_nodes is None:
             dep_nodes = []
+        graph_node = self.node_definitions.get(node.key, node)
         for dep in dep_nodes:
             if dep.key not in self.node_definitions:
                 self.node_definitions[dep.key] = dep
                 self.adj_list[dep] = set()
-            self.adj_list[node].add(dep)
+            self.adj_list[graph_node].add(self.node_definitions[dep.key])
 
         if internal_order:
             for dep in node._order_after:
                 dep_node = self.node_definitions[dep]
-                self.adj_list[node].add(dep_node)
+                self.adj_list[graph_node].add(dep_node)
 
             for dep in node._order_before:
                 dep_node = self.node_definitions[dep]
-                self.adj_list[dep_node].add(node)
+                self.adj_list[dep_node].add(graph_node)
 
     def walk(self):
         """Walk the graph in topological ordering and yield each node.
@@ -174,14 +176,7 @@ class PhaseGraph(AttributeGraph):
 
         # Define all graph nodes
         for phase_node in phase_definitions.values():
-            if phase_node.obj_inst is None:
-                phase_node.obj_inst = obj_inst
-
-            if phase_node.attribute is None:
-                phase_func = getattr(obj_inst, f"_{phase_node.key}")
-                phase_node.set_attribute(phase_func)
-
-            self.add_node(phase_node)
+            self.add_node(phase_node, obj_inst=obj_inst)
 
         # Define graph edges
         for phase_node in phase_definitions.values():
@@ -201,6 +196,10 @@ class PhaseGraph(AttributeGraph):
         func_obj = obj_inst
         if func_obj is None:
             func_obj = self._obj_inst
+
+        node = copy.copy(node)
+        if node.obj_inst is None:
+            node.obj_inst = func_obj
 
         phase_func = getattr(func_obj, f"_{node.key}")
         node.set_attribute(phase_func)

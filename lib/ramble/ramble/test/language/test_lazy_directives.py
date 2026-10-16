@@ -116,11 +116,12 @@ def test_lazy_directive_inheritance_and_mro():
 
 
 def test_instance_attribute_isolation():
-    """Verify copy-on-first-access isolates instance attributes from class descriptors."""
+    """Verify copy-on-write isolates instance directive mutations from class descriptors."""
 
     class IsolatedApp(metaclass=ramble.language.application_language.ApplicationMeta):
         name = "isolated_app"
         __module__ = "ramble.app"
+        _language_types = ["application", "shared"]
 
         ramble.language.application_language.workload("base_wl", executables=["base_exe"])
 
@@ -131,12 +132,16 @@ def test_instance_attribute_isolation():
     assert "workloads" not in inst2.__dict__
     assert IsolatedApp._workloads is _UNSET
 
+    # Read access shares the class-level dictionary without copying into instance __dict__
     inst_wl = inst.workloads
-    assert "workloads" in inst.__dict__
+    assert "workloads" not in inst.__dict__
     assert "workloads" not in inst2.__dict__
     assert "base_wl" in inst_wl[frozenset()]
 
-    inst.workloads[frozenset()]["inst_wl"] = {"executables": ["inst_exe"]}
+    # Mutating via an instance directive performs copy-on-write into inst.__dict__
+    inst.workload("inst_wl", executables=["inst_exe"])
+    assert "workloads" in inst.__dict__
+    assert "workloads" not in inst2.__dict__
 
     assert "inst_wl" not in IsolatedApp.workloads[frozenset()]
     assert "base_wl" in IsolatedApp.workloads[frozenset()]
@@ -249,9 +254,12 @@ def test_application_clone_preserves_evaluated_directives(mutable_mock_apps_repo
 
 
 def test_generic_object_copy_preserves_evaluated_directives(mutable_mock_mods_repo):
-    """Verify generic Ramble object copy (e.g. modifier) preserves evaluated directives."""
+    """Verify generic Ramble object copy (e.g. modifier) preserves dynamically added directives."""
     mod = mutable_mock_mods_repo.get("spack-mod")
     _ = mod.modes
+    assert "modes" not in mod.__dict__
+
+    mod.mode("dyn_mode", description="Dynamic mode")
     assert "modes" in mod.__dict__
 
     mod_copy = mod.copy()
@@ -393,17 +401,17 @@ def test_clone_nested_directive_isolation(mutable_mock_apps_repo):
     """
     app = mutable_mock_apps_repo.get("basic")
     app.set_variables_and_variants({"workload_name": "test_wl"}, {}, None, None)
-    _ = app.inputs
-    _ = app.executables
+    app.input_file("dyn_in", url="file:///tmp/orig.log", description="orig")
+    app.executable("dyn_exe", template=["orig_cmd"])
 
     clone = app.clone()
     # Mutate clone's inputs
-    clone.inputs[frozenset()]["input"]["url"] = "file:///tmp/mutated.log"
-    assert app.inputs[frozenset()]["input"]["url"] != "file:///tmp/mutated.log"
+    clone.inputs[frozenset()]["dyn_in"]["url"] = "file:///tmp/mutated.log"
+    assert app.inputs[frozenset()]["dyn_in"]["url"] != "file:///tmp/mutated.log"
 
     # Mutate clone's executables
-    clone.executables[frozenset()]["foo"].template = ["mutated_cmd"]
-    assert app.executables[frozenset()]["foo"].template != ["mutated_cmd"]
+    clone.executables[frozenset()]["dyn_exe"].template = ["mutated_cmd"]
+    assert app.executables[frozenset()]["dyn_exe"].template != ["mutated_cmd"]
 
 
 def test_same_name_subclass_preferred_version_override():
@@ -695,3 +703,31 @@ def test_utility_base_lazy_initialization():
         "provided_executables",
     ]:
         assert attr not in util.__dict__
+
+
+def test_phase_graph_does_not_mutate_class_phase_definitions(mutable_mock_apps_repo):
+    """Verify building phase graphs on multiple instances does not mutate class-level
+    phase_definitions or overwrite bound phase methods on previously built instances.
+    """
+    app1 = mutable_mock_apps_repo.get("basic")
+    app2 = app1.copy()
+    app_cls = type(app1)
+
+    orig_pipelines = set(app_cls.phase_definitions.keys())
+
+    app1.build_phase_order()
+    app2.build_phase_order()
+
+    assert set(app_cls.phase_definitions.keys()) == orig_pipelines
+    for pipeline_nodes in app_cls.phase_definitions.values():
+        for node in pipeline_nodes.values():
+            assert node.obj_inst is None
+            assert node.attribute is None
+
+    node1 = app1._pipeline_graphs["setup"].get_node("make_experiments")
+    node2 = app2._pipeline_graphs["setup"].get_node("make_experiments")
+    assert node1 is not node2
+    assert node1.obj_inst is app1
+    assert node2.obj_inst is app2
+    assert node1.attribute.__self__ is app1
+    assert node2.attribute.__self__ is app2

@@ -61,6 +61,12 @@ def _copy_directive_value(val: Any) -> Any:
     return copy.deepcopy(val)
 
 
+def ensure_instance_directive_copy(obj: Any, dict_name: str) -> None:
+    """Ensure an instance has its own copy of a directive dictionary before mutation."""
+    if dict_name not in obj.__dict__ and hasattr(obj, dict_name):
+        obj.__dict__[dict_name] = _copy_directive_value(getattr(obj, dict_name))
+
+
 class DirectiveDictDescriptor:
     """A descriptor that lazily executes directives on first access."""
 
@@ -99,16 +105,10 @@ class DirectiveDictDescriptor:
         return res if res is not _UNSET else None
 
     def __get__(self, obj: Any, objtype: Optional[type] = None) -> Any:
-        if obj is None:
-            if objtype is None:
-                return self
-            return self._evaluate_class(objtype)
-
+        if obj is None and objtype is None:
+            return self
         target_cls = objtype if objtype is not None else type(obj)
-        cls_val = self._evaluate_class(target_cls)
-        inst_val = _copy_directive_value(cls_val)
-        obj.__dict__[self.name] = inst_val
-        return inst_val
+        return self._evaluate_class(target_cls)
 
 
 class DirectiveMeta(abc.ABCMeta):
