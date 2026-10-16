@@ -669,11 +669,8 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
         self._pipeline_graphs = {}
         for pipeline in self.pipelines:
-            if pipeline not in self.phase_definitions:
-                self.phase_definitions[pipeline] = {}
-
             self._pipeline_graphs[pipeline] = ramble.graphs.PhaseGraph(
-                self.phase_definitions[pipeline], self
+                self.phase_definitions.get(pipeline, {}), self
             )
 
             for mod_inst in self._modifier_instances:

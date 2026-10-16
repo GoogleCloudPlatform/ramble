@@ -65,6 +65,11 @@ class ObjectMixin(metaclass=SharedMeta):
     def preferred_version(self, value: Optional[Any]):
         if not hasattr(self, "known_versions"):
             return
+        from ramble.language.language_base import (
+            ensure_instance_directive_copy,
+        )
+
+        ensure_instance_directive_copy(self, "known_versions")
         for ver in self.known_versions.values():
             if hasattr(ver, "preferred"):
                 ver.preferred = False
@@ -81,7 +86,7 @@ class ObjectMixin(metaclass=SharedMeta):
             self.known_versions[ver_key] = value
 
     def _copy_evaluated_directives(self, target):
-        """Copy all evaluated directive dictionaries from self to target."""
+        """Copy instance-modified directive dictionaries from self to target."""
         from ramble.language.language_base import _UNSET, _copy_directive_value
 
         directive_dicts = getattr(self, "_directive_dict_names", set())

@@ -30,12 +30,16 @@ def wrap_named_directive_class_level(name):
     """
 
     def _execute_directive(self, *args, directive_name=name, **kwargs):
-        import ramble.language.language_base
+        import ramble.language.language_base as lb
 
-        ramble.language.language_base.DirectiveMeta._executing_directives_depth += 1
+        if not isinstance(self, type):
+            for dict_name in lb.DirectiveMeta._directive_to_dicts.get(directive_name, ()):
+                lb.ensure_instance_directive_copy(self, dict_name)
+
+        lb.DirectiveMeta._executing_directives_depth += 1
         try:
             self._directive_functions[directive_name](*args, **kwargs)(self)
         finally:
-            ramble.language.language_base.DirectiveMeta._executing_directives_depth -= 1
+            lb.DirectiveMeta._executing_directives_depth -= 1
 
     return _execute_directive

@@ -581,6 +581,13 @@ class PackageManagerBase(ObjectMixin, metaclass=DirectiveMeta):
             )
 
             aux_files = getattr(obj, "auxiliary_software_files", {})
+            if aux_files:
+                from ramble.language.language_base import (
+                    ensure_instance_directive_copy,
+                )
+
+                ensure_instance_directive_copy(obj, "auxiliary_software_files")
+                aux_files = obj.auxiliary_software_files
             for when_set, files_info in aux_files.items():
                 if app_inst.expander.satisfies(
                     when_set, variant_set=obj_variants
