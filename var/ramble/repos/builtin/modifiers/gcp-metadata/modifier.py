@@ -121,9 +121,9 @@ class GcpMetadata(BasicModifier):
                 ).strip()
 
                 if prefix:
-                    if prefix.endswith("'") and not prefix.endswith(" '"):
-                        prefix = prefix[:-1].rstrip() + " '"
-                    elif not prefix.endswith(" '"):
+                    if not prefix.endswith(" '"):
+                        if prefix.endswith("'"):
+                            prefix = prefix[:-1].rstrip()
                         prefix += " '"
 
                     if not suffix.startswith("'"):
