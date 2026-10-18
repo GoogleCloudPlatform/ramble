@@ -27,11 +27,10 @@ from ramble.util import naming
 from ramble.util.logger import logger
 from ramble.util.path import substitute_config_variables
 
-# Regex for detecting math operators or keywords
-# We check for: + - * / % ^ & | ~ < > = ( ) [ ] { } , ' "
-# And keywords: and, or, in, is, not
-_math_regex = re.compile(r"[+\-*/%^&|~<>=()\[\]{},'\"]|\b(?:and|or|in|is|not)\b")
-_MATH_CONSTANTS = frozenset(("True", "False", "None"))
+# Regex for detecting expressions that may be evaluated by perform_math_eval:
+# digits, quotes, parens/brackets, comparisons (<, >, ==, !=), or boolean/constant keywords.
+_math_regex = re.compile(r"[0-9'\"\[\(<>]|==|!=|\b(?:and|or|in|is|not|True|False|None)\b")
+_MATH_CONSTANTS = {"True": True, "False": False, "None": None}
 
 # Define a dummy type so that it doesn't match any real types
 # These type defs are used to handle compatibility among Python versions
@@ -1075,18 +1074,20 @@ class Expander:
             unmodified (if unsuccessful)
 
         """
-        # Fast path for things that are likely paths
-        if in_str.startswith(("/", "./")):
+        # Fast path for empty strings, paths, constants, integers, and non-math strings
+        if not in_str or in_str.startswith(("/", "./")):
             return in_str
 
-        # Heuristic: if no math operators/keywords, it's probably a string. Skip parsing.
-        if not _math_regex.search(in_str):
-            # If it doesn't match the regex, it's only math-relevant if it's:
-            # 1. A number (like 123)
-            # 2. A constant (True, False, None)
-            # If it has a space, or is a valid identifier (excluding constants), it's not math.
-            if " " in in_str or (in_str.isidentifier() and in_str not in _MATH_CONSTANTS):
-                return in_str
+        if in_str in _MATH_CONSTANTS:
+            return _MATH_CONSTANTS[in_str]
+
+        if in_str.isdecimal():
+            if len(in_str) == 1 or not in_str.startswith("0"):
+                return int(in_str)
+            return in_str
+
+        if in_str.isidentifier() or not _math_regex.search(in_str):
+            return in_str
 
         math_ast = _ast_parse(in_str)
         if math_ast is None:
