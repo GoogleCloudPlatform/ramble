@@ -44,7 +44,7 @@ def _get_env_append_commands(var_conf, expander, var_set, shell="sh"):
         "paths": env_mods.append_path,
     }
 
-    var_set_orig = var_set.copy()
+    defined_vars = set()
 
     for append_group in var_conf:
         sep = " "
@@ -55,14 +55,14 @@ def _get_env_append_commands(var_conf, expander, var_set, shell="sh"):
             if group in append_group:
                 for var, val in append_group[group].items():
                     expanded_var = expander.expand_var(var)
-                    if expanded_var not in var_set:
+                    if expanded_var not in defined_vars:
                         env_mods.set(expanded_var, "${%s}" % expanded_var)
-                        var_set.add(expanded_var)
+                        defined_vars.add(expanded_var)
                     func(expanded_var, val, sep=sep)  # type: ignore[operator]
 
     env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-    return (env_cmds_arr.split("\n"), var_set_orig)
+    return (env_cmds_arr.split("\n"), var_set)
 
 
 def _get_env_prepend_commands(var_conf, expander, var_set, shell="sh"):
@@ -72,20 +72,21 @@ def _get_env_prepend_commands(var_conf, expander, var_set, shell="sh"):
         "paths": env_mods.prepend_path,
     }
 
-    var_set_orig = var_set.copy()
+    defined_vars = set()
 
     for prepend_group in var_conf:
-        for group, group_vars in prepend_group.items():
-            for var, val in group_vars.items():
-                expanded_var = expander.expand_var(var)
-                if expanded_var not in var_set:
-                    env_mods.set(expanded_var, "${%s}" % expanded_var)
-                    var_set.add(expanded_var)
-                prepend_funcs[group](expanded_var, val)
+        for group, func in prepend_funcs.items():
+            if group in prepend_group:
+                for var, val in prepend_group[group].items():
+                    expanded_var = expander.expand_var(var)
+                    if expanded_var not in defined_vars:
+                        env_mods.set(expanded_var, "${%s}" % expanded_var)
+                        defined_vars.add(expanded_var)
+                    func(expanded_var, val)
 
     env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
-    return (env_cmds_arr.split("\n"), var_set_orig)
+    return (env_cmds_arr.split("\n"), var_set)
 
 
 action_funcs = {

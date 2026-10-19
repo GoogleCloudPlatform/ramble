@@ -49,14 +49,20 @@ def test_env_var_append_command_gen(mutable_mock_apps_repo):
     exp_vars = {"test_exp": "foo"}
     expander = Expander(exp_vars, None)
 
-    out_cmds, _ = ramble.util.env.action_funcs["append"](tests, expander, set())
+    var_set = {"existing"}
+    out_cmds, returned_set = ramble.util.env.action_funcs["append"](tests, expander, var_set)
+    assert var_set == {"existing"}
+    assert returned_set == {"existing"}
     for cmd in answer:
         assert cmd in out_cmds
 
 
 def test_env_var_prepend_command_gen(mutable_mock_apps_repo):
     tests = [
-        {"paths": {"path1": "path1", "path2": "path2", "{test_exp}": "bar"}},
+        {
+            "var-separator": ":",
+            "paths": {"path1": "path1", "path2": "path2", "{test_exp}": "bar"},
+        },
         {"paths": {"path1": "path2", "path2": "path1", "{test_exp}": "bar"}},
     ]
 
@@ -70,7 +76,10 @@ def test_env_var_prepend_command_gen(mutable_mock_apps_repo):
 
     expander = Expander(exp_vars, None)
 
-    out_cmds, _ = ramble.util.env.action_funcs["prepend"](tests, expander, set())
+    var_set = {"existing"}
+    out_cmds, returned_set = ramble.util.env.action_funcs["prepend"](tests, expander, var_set)
+    assert var_set == {"existing"}
+    assert returned_set == {"existing"}
     for cmd in answer:
         assert cmd in out_cmds
 
@@ -87,3 +96,36 @@ def test_env_var_unset_command_gen(mutable_mock_apps_repo):
     out_cmds, _ = ramble.util.env.action_funcs["unset"](tests, expander, set())
     for cmd in answer:
         assert cmd in out_cmds
+
+
+def test_env_var_set_then_append_and_prepend(mutable_mock_apps_repo):
+    expander = Expander({"test_exp": "foo"}, None)
+    var_set = set()
+
+    set_cmds, var_set = ramble.util.env.action_funcs["set"](
+        {"var1": "initial_val", "path1": "/initial/path"}, expander, var_set
+    )
+    assert "export var1=initial_val;" in set_cmds
+    assert "export path1=/initial/path;" in set_cmds
+    assert var_set == {"var1", "path1"}
+
+    append_cmds, var_set = ramble.util.env.action_funcs["append"](
+        [
+            {
+                "var-separator": ",",
+                "vars": {"var1": "appended_val"},
+                "paths": {"path1": "/appended/path"},
+            }
+        ],
+        expander,
+        var_set,
+    )
+    assert 'export var1="${var1},appended_val";' in append_cmds
+    assert 'export path1="${path1}:/appended/path";' in append_cmds
+
+    prepend_cmds, var_set = ramble.util.env.action_funcs["prepend"](
+        [{"paths": {"path1": "/prepended/path"}}],
+        expander,
+        var_set,
+    )
+    assert 'export path1="/prepended/path:${path1}";' in prepend_cmds
