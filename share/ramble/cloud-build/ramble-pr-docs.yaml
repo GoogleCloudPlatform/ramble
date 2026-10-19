@@ -34,6 +34,14 @@ steps:
         set -e
         . /workspace/share/ramble/cloud-build/setup-ci-env.sh
 
+        # Isolate doc build from pre-installed dev dependencies in the CI image
+        python -m venv /tmp/docs-venv
+        . /tmp/docs-venv/bin/activate
+        unset PYTHONPATH
+        export RAMBLE_PYTHON="$(which python3)"
+        unset _RAMBLE_PYTHON _rmb_initializing
+        . /workspace/share/ramble/setup-env.sh
+
         cd lib/ramble/docs
 
         python -m pip install --upgrade --no-cache-dir pip setuptools
