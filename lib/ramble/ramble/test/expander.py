@@ -485,3 +485,33 @@ def test_referenced_variables():
     # Used-variable tracking is not affected
     assert expander._used_variables == set()
     assert expander._used_variable_stage == set()
+
+
+@pytest.mark.parametrize(
+    "non_math_str",
+    [
+        "",
+        "plain_identifier",
+        "/workspace/inputs/foo",
+        "./local/script.sh",
+        "user-managed",
+        "spack-lightweight",
+        "-notunepme",
+        "+validate_platform",
+        "--version",
+        "ns/day",
+        "hours/ns",
+        "gromacs +blas ~mpi",
+        "gromacs.water_bare",
+        "package_manager=spack",
+        "{}",
+    ],
+)
+def test_perform_math_eval_short_circuits_non_math(monkeypatch, non_math_str):
+    expander = ramble.expander.Expander(exp_dict(), None)
+
+    def fail_ast_parse(*args, **kwargs):
+        pytest.fail(f"_ast_parse should not be called for non-math string: {non_math_str!r}")
+
+    monkeypatch.setattr(ramble.expander, "_ast_parse", fail_ast_parse)
+    assert expander.perform_math_eval(non_math_str) == non_math_str
