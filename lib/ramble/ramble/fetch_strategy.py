@@ -993,7 +993,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         with working_dir(self.stage.source_path):
             co_args = ["checkout", "."]
             clean_args = ["clean", "-f"]
-            if ramble.config.get("config:debug"):
+            if not ramble.config.get("config:debug"):
                 co_args.insert(1, "--quiet")
                 clean_args.insert(1, "--quiet")
 
@@ -1084,10 +1084,10 @@ class CvsFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            logger.debug("Already fetched {self.stage.source_path}")
+            logger.debug(f"Already fetched {self.stage.source_path}")
             return
 
-        logger.debug("Checking out CVS repository: {self.url}")
+        logger.debug(f"Checking out CVS repository: {self.url}")
 
         with temp_cwd():
             url, module = self.url.split("%module=")
@@ -1198,7 +1198,6 @@ class SvnFetchStrategy(VCSFetchStrategy):
         """Removes untracked files in an svn repository."""
         with working_dir(self.stage.source_path):
             status = self.svn("status", "--no-ignore", output=str)
-            self.svn("status", "--no-ignore")
             for line in status.split("\n"):
                 if not line.startswith(("I", "?")):
                     continue
