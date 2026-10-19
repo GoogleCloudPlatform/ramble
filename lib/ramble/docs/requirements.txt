@@ -6,3 +6,4 @@ sphinxcontrib-programoutput
 sphinxcontrib-jquery
 sphinx-copybutton
 pytest
+pyyaml
