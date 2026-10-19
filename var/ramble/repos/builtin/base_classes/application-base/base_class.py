@@ -1079,7 +1079,6 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         if modifiers:
             self.modifiers = modifiers.copy()
         self.build_modifier_instances()
-        self.clear_variant_cache()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -1193,11 +1192,6 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
         self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
-
-        ########################
-        # Define extra variables
-        ########################
-        self.define_missing_variables()
 
         ##########################################
         # Expand used variables to track all usage
@@ -1679,9 +1673,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
         # Define any missing modifier variables
-        if self.modifiers:
+        if self._modifier_instances:
             self.clear_variant_cache()
-        self.define_missing_variables()
+            self.define_missing_variables()
 
     @property
     def inventory_file(self):

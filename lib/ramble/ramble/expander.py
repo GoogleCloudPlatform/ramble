@@ -721,8 +721,7 @@ class Expander:
     @property
     def env_path(self):
         if not self._env_path:
-            var = self.expansion_str(self._keywords.env_path)
-            self._env_path = self.expand_var(var)
+            self._env_path = self.expand_var_name(self._keywords.env_path)
 
         return self._env_path
 
@@ -837,6 +836,20 @@ class Expander:
             replace_escaped_braces (bool): Whether escaped curly braces are replaced
                                            as part of expansion or not.
         """
+        expansions = (
+            collections.ChainMap(extra_vars, self._variables) if extra_vars else self._variables
+        )
+        if var_name in expansions and var_name not in self._no_expand_vars:
+            self._used_variable_stage.add(var_name)
+            return self.expand_var(
+                expansions[var_name],
+                extra_vars=extra_vars,
+                allow_passthrough=allow_passthrough,
+                typed=typed,
+                merge_used_stage=merge_used_stage,
+                replace_escaped_braces=replace_escaped_braces,
+            )
+
         return self.expand_var(
             self.expansion_str(var_name),
             extra_vars=extra_vars,
@@ -873,9 +886,13 @@ class Expander:
         """
 
         if var is None or var == "None":
+            if merge_used_stage:
+                self.merge_used_variable_stage()
             return None if typed else "None"
 
         if isinstance(var, (int, float, bool)):
+            if merge_used_stage:
+                self.merge_used_variable_stage()
             return var if typed else str(var)
 
         passthrough_setting = allow_passthrough
@@ -1046,14 +1063,15 @@ class Expander:
                 return str(self.perform_math_eval(in_str, expansion_vars=expansion_vars))
 
             str_graph = ExpansionGraph(in_str)
+            evaluation_func = functools.partial(
+                self.perform_math_eval, expansion_vars=expansion_vars
+            )
             for node in str_graph.walk():
                 node.define_value(
                     expansion_vars,
                     allow_passthrough=allow_passthrough,
                     expansion_func=self._partial_expand,
-                    evaluation_func=functools.partial(
-                        self.perform_math_eval, expansion_vars=expansion_vars
-                    ),
+                    evaluation_func=evaluation_func,
                     no_expand_vars=self._no_expand_vars,
                     used_vars=self._used_variable_stage,
                     replace_escaped_braces=replace_escaped_braces,

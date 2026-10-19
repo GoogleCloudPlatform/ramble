@@ -515,3 +515,17 @@ def test_perform_math_eval_short_circuits_non_math(monkeypatch, non_math_str):
 
     monkeypatch.setattr(ramble.expander, "_ast_parse", fail_ast_parse)
     assert expander.perform_math_eval(non_math_str) == non_math_str
+
+
+def test_expand_var_name_bypasses_expansion_graph(monkeypatch):
+    expander = ramble.expander.Expander(exp_dict(), None, no_expand_vars={"size"})
+
+    def fail_expansion_graph(*args, **kwargs):
+        pytest.fail("ExpansionGraph should not be constructed for expand_var_name on plain values")
+
+    monkeypatch.setattr(ramble.expander, "ExpansionGraph", fail_expansion_graph)
+
+    assert expander.expand_var_name("application_name") == "foo"
+    assert expander.expand_var_name("experiment_index") == "5"
+    assert expander.expand_var_name("experiment_index", typed=True) == 5
+    assert {"application_name", "experiment_index"}.issubset(expander._used_variables)
