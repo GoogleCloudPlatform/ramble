@@ -349,6 +349,26 @@ class TestGitFetchStrategy:
 
         assert os.path.isdir(fetcher.stage.source_path)
 
+    def test_reset_quiet_respects_debug(self, fetcher, mock_git, mock_config):
+        """Test that reset passes --quiet when debug is False and omits it when debug is True."""
+        os.makedirs(fetcher.stage.source_path, exist_ok=True)
+        _, config = mock_config
+
+        config["config:debug"] = False
+        fetcher.reset()
+        assert mock_git.call_args_list == [
+            mock.call("checkout", "--quiet", "."),
+            mock.call("clean", "--quiet", "-f"),
+        ]
+
+        mock_git.reset_mock()
+        config["config:debug"] = True
+        fetcher.reset()
+        assert mock_git.call_args_list == [
+            mock.call("checkout", "."),
+            mock.call("clean", "-f"),
+        ]
+
 
 class TestVCSFetchStrategy:
     @pytest.fixture
@@ -694,6 +714,23 @@ class TestSvnFetchStrategy:
 
         mock_remove_untracked.assert_called_once()
         mock_svn.assert_called_once_with("revert", ".", "-R")
+
+    def test_remove_untracked_files(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_svn = mock_vcs_executables["svn"]
+        mock_svn.return_value = "?       untracked.txt\nI       ignored_dir"
+
+        mock_unlink = mock.Mock()
+        mock_rmtree = mock.Mock()
+        monkeypatch.setattr(os, "unlink", mock_unlink)
+        monkeypatch.setattr(shutil, "rmtree", mock_rmtree)
+        monkeypatch.setattr(os.path, "isfile", lambda p: p == "untracked.txt")
+        monkeypatch.setattr(os.path, "isdir", lambda p: p == "ignored_dir")
+
+        fetcher._remove_untracked_files()
+
+        mock_svn.assert_called_once_with("status", "--no-ignore", output=str)
+        mock_unlink.assert_called_once_with("untracked.txt")
+        mock_rmtree.assert_called_once_with("ignored_dir", ignore_errors=True)
 
     def test_str(self):
         fetcher = fetch_strategy.SvnFetchStrategy(svn="url")
