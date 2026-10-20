@@ -290,7 +290,7 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
     def experiment_lock(self):
         """Create a lock for the experiment directory, and return it"""
         lock_path = os.path.join(
-            self.expander.expand_var("{experiment_run_dir}"),
+            self.expander.expand_var_name(self.keywords.experiment_run_dir),
             ".ramble-experiment",
         )
         return lk.Lock(lock_path)
@@ -1079,7 +1079,6 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         if modifiers:
             self.modifiers = modifiers.copy()
         self.build_modifier_instances()
-        self.clear_variant_cache()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -1168,8 +1167,7 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
         color.cprint(f"{indent}{header}:")
         for var, val in print_vars.items():
-            expansion_var = self.expander.expansion_str(var)
-            expanded = self.expander.expand_var(expansion_var)
+            expanded = self.expander.expand_var_name(var)
             color.cprint(f"{indent}  {var} = {val} ==> {expanded}")
 
     def build_used_variables(self):
@@ -1193,11 +1191,6 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
         self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
-
-        ########################
-        # Define extra variables
-        ########################
-        self.define_missing_variables()
 
         ##########################################
         # Expand used variables to track all usage
@@ -1376,8 +1369,8 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                     )
                 chain_stack.append((exp_name, exp.copy()))
 
-        parent_run_dir = self.expander.expand_var(
-            self.expander.expansion_str(self.keywords.experiment_run_dir)
+        parent_run_dir = self.expander.expand_var_name(
+            self.keywords.experiment_run_dir
         )
 
         # Continue until the stack is empty
@@ -1679,9 +1672,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
         # Define any missing modifier variables
-        if self.modifiers:
+        if self._modifier_instances:
             self.clear_variant_cache()
-        self.define_missing_variables()
+            self.define_missing_variables()
 
     @property
     def inventory_file(self):
@@ -2376,8 +2369,8 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                     for cmd_conf in command_configs:
                         mpi_cmd = ""
                         if cmd_conf.mpi:
-                            raw_mpi_cmd = self.expander.expand_var(
-                                "{mpi_command}",
+                            raw_mpi_cmd = self.expander.expand_var_name(
+                                self.keywords.mpi_command,
                                 exec_vars,
                             ).strip()
                             n_nodes = self.expander.expand_var_name(
@@ -2559,7 +2552,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         if workspace:
             for template_name, _ in workspace.all_templates():
                 expand_path = os.path.join(
-                    self.expander.expand_var("{experiment_run_dir}"),
+                    self.expander.expand_var_name(
+                        self.keywords.experiment_run_dir
+                    ),
                     template_name,
                 )
                 self.variables[template_name] = expand_path
@@ -2775,8 +2770,8 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                                     var_name = var_info.name
                                     if hasattr(self, "expander"):
                                         expanded_val = (
-                                            self.expander.expand_var(
-                                                f"{{{var_name}}}"
+                                            self.expander.expand_var_name(
+                                                var_name
                                             )
                                         )
                                         if expanded_val != f"{{{var_name}}}":

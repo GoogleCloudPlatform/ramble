@@ -1011,16 +1011,17 @@ def workspace_info(args):
                     if (
                         args.software or args.all_software
                     ) and app_inst.package_manager is not None:
+                        env_name = app_inst.expander.expand_var_name(
+                            ramble.keywords.keywords.env_name
+                        )
                         software_environments.render_environment(
-                            app_inst.expander.expand_var("{env_name}"),
+                            env_name,
                             app_inst.expander,
                             app_inst.package_manager,
                             require=app_inst.package_manager.requires_software_environment,
                         )
                         # Track this env as used, for printing purposes
-                        software_environments.use_environment(
-                            app_inst.package_manager, app_inst.expander.expand_var("{env_name}")
-                        )
+                        software_environments.use_environment(app_inst.package_manager, env_name)
 
                     if print_header:
                         color.cprint(

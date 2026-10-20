@@ -297,6 +297,9 @@ def test_analyze_experiments_skips_none_fom(mutable_mock_apps_repo, monkeypatch,
                 return str(tmpdir)
             return val
 
+        def expand_var_name(self, var_name, extra_vars=None):
+            return self.expand_var(f"{{{var_name}}}", extra_vars=extra_vars)
+
     app_inst.expander = MockExpander()
 
     class MockCriteriaList:
