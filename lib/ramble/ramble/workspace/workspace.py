@@ -1507,8 +1507,7 @@ ramble:
         force_prefix = force_prefix or len(pkgman_prefixes) > 1
 
         for _, app_inst, _ in experiment_set.all_experiments():
-            env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
-            env_name = app_inst.expander.expand_var(env_name_str)
+            env_name = app_inst.expander.expand_var_name(ramble.keywords.keywords.env_name)
 
             if app_inst.package_manager is None:
                 continue

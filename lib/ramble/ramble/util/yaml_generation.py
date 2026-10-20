@@ -215,7 +215,7 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
     # Set all '{default_config_value}' values to value from the base config
     for var_name in app_inst.selected_variables:
         if len(var_name.split(".")) > 1:
-            var_val = app_inst.expander.expand_var(app_inst.expander.expansion_str(var_name))
+            var_val = app_inst.expander.expand_var_name(var_name)
 
             if var_val == default_config_string:
                 var_val = get_config_value(config_data, var_name)

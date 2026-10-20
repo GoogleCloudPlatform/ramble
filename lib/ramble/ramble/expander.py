@@ -841,14 +841,17 @@ class Expander:
         )
         if var_name in expansions and var_name not in self._no_expand_vars:
             self._used_variable_stage.add(var_name)
-            return self.expand_var(
-                expansions[var_name],
-                extra_vars=extra_vars,
-                allow_passthrough=allow_passthrough,
-                typed=typed,
-                merge_used_stage=merge_used_stage,
-                replace_escaped_braces=replace_escaped_braces,
-            )
+            try:
+                return self.expand_var(
+                    expansions[var_name],
+                    extra_vars=extra_vars,
+                    allow_passthrough=allow_passthrough,
+                    typed=typed,
+                    merge_used_stage=merge_used_stage,
+                    replace_escaped_braces=replace_escaped_braces,
+                )
+            except RambleSyntaxError:
+                pass
 
         return self.expand_var(
             self.expansion_str(var_name),
