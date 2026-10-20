@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import functools
 import hashlib
+import os
 from typing import Any
 
 from ramble.util import json_util
@@ -14,15 +16,21 @@ from ramble.util import json_util
 BLOCK_SIZE = 1024 * 1024
 
 
-def hash_file(file_path):
+@functools.lru_cache(maxsize=1024)
+def _hash_file_cached(file_path: str, mtime_ns: int, size: int) -> str:
     file_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
         while True:
-            bytes = f.read(BLOCK_SIZE)
-            if not bytes:
+            data = f.read(BLOCK_SIZE)
+            if not data:
                 break
-            file_hash.update(bytes)
+            file_hash.update(data)
     return file_hash.hexdigest()
+
+
+def hash_file(file_path):
+    st = os.stat(file_path)
+    return _hash_file_cached(str(file_path), st.st_mtime_ns, st.st_size)
 
 
 def hash_string(string):
