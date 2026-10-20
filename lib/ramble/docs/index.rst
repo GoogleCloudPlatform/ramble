@@ -12,6 +12,12 @@ Ramble
 
 If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
+For questions, interactive discussions, and community support, join the
+`Ramble Slack workspace <https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ>`_
+or visit `GitHub Discussions <https://github.com/Ramble-Project/ramble/discussions>`_.
+Design proposals and architecture documents can be found in the
+`Ramble Design Docs repository <https://github.com/Ramble-Project/ramble-design-docs>`_.
+
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
@@ -56,6 +62,14 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    base_package_manager_list
    base_utility_list
    base_workflow_manager_list
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Community
+
+   Slack <https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ>
+   GitHub Discussions <https://github.com/Ramble-Project/ramble/discussions>
+   Design Docs <https://github.com/Ramble-Project/ramble-design-docs>
 
 .. toctree::
    :maxdepth: 2

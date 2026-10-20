@@ -76,6 +76,8 @@ packages to bugfixes, documentation, or even new core features.
 Resources:
 
 * [**Github Discussions**](https://github.com/Ramble-Project/ramble/discussions): not just for discussions, also Q&A.
+* [**Slack**](https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ): join the Ramble Slack workspace for interactive discussions, questions, and community support.
+* [**Design Documents**](https://github.com/Ramble-Project/ramble-design-docs): proposals and design documents for Ramble features and architecture.
 
 Contributing
 ------------------------
