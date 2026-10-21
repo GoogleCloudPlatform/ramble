@@ -3607,3 +3607,37 @@ def test_workspace_manage_no_active_workspace_dry_run(tmpdir):
         assert "pkg1@1.0" in soft_out
 
         assert os.listdir(str(tmpdir)) == []
+
+
+def test_workspace_create_no_comments(tmpdir, mutable_mock_workspace_path):
+    # Default includes boilerplate comments
+    workspace("create", "ws_default")
+    ws_default = ramble.workspace.read("ws_default")
+    with open(ws_default.config_file_path, encoding="utf-8") as f:
+        default_content = f.read()
+    assert "# This is a ramble workspace config file." in default_content
+
+    # --no-comments on named workspace omits boilerplate comments
+    workspace("create", "--no-comments", "ws_no_comments")
+    ws_no_comments = ramble.workspace.read("ws_no_comments")
+    with open(ws_no_comments.config_file_path, encoding="utf-8") as f:
+        no_comments_content = f.read()
+    assert "# This is a ramble workspace config file." not in no_comments_content
+    assert no_comments_content.startswith("ramble:\n")
+
+    # -n short alias on directory workspace omits boilerplate comments
+    dir_ws_path = str(tmpdir.join("dir_ws"))
+    workspace("create", "-d", "-n", dir_ws_path)
+    with open(os.path.join(dir_ws_path, "configs", "ramble.yaml"), encoding="utf-8") as f:
+        dir_no_comments_content = f.read()
+    assert "# This is a ramble workspace config file." not in dir_no_comments_content
+    assert dir_no_comments_content.startswith("ramble:\n")
+
+    # config:include_workspace_comments = False omits boilerplate comments by default
+    with ramble.config.override("config:include_workspace_comments", False):
+        workspace("create", "ws_cfg_no_comments")
+    ws_cfg = ramble.workspace.read("ws_cfg_no_comments")
+    with open(ws_cfg.config_file_path, encoding="utf-8") as f:
+        cfg_no_comments_content = f.read()
+    assert "# This is a ramble workspace config file." not in cfg_no_comments_content
+    assert cfg_no_comments_content.startswith("ramble:\n")

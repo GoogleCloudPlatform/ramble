@@ -92,6 +92,27 @@ Additionally, these directories do not need to be part of any workspace, and
 could instead be external directories used to have a common storage location
 for software environments and input files.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Omitting Boilerplate Comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, newly created workspaces include explanatory boilerplate comments
+at the top of the generated ``ramble.yaml`` configuration file. To omit these
+comments when creating a workspace, pass ``-n`` / ``--no-comments`` to
+``ramble workspace create``:
+
+.. code-block:: console
+
+    $ ramble workspace create -n <name_of_workspace>
+
+Alternatively, the ``include_workspace_comments`` configuration option can be
+set to ``false`` to omit boilerplate comments in newly created workspaces by
+default:
+
+.. code-block:: console
+
+    $ ramble config add 'config:include_workspace_comments:false'
+
 .. _workspace-structure:
 
 -------------------

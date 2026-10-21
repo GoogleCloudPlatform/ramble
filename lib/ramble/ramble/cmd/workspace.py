@@ -297,6 +297,13 @@ def workspace_create_setup_parser(subparser):
         action="store_true",
         help="activate the created workspace, if specified. Default is false",
     )
+    subparser.add_argument(
+        "-n",
+        "--no-comments",
+        action="store_true",
+        default=False,
+        help="omit boilerplate comments in generated ramble.yaml",
+    )
 
 
 def workspace_create(args):
@@ -309,6 +316,7 @@ def workspace_create(args):
         inputs_dir=args.inputs_dir,
         activate=args.activate,
         parent_dir=args.parent_dir,
+        no_comments=args.no_comments,
     )
 
 
@@ -321,6 +329,7 @@ def _workspace_create(
     inputs_dir=None,
     activate=False,
     parent_dir=None,
+    no_comments=False,
 ):
     """Create a new workspace
 
@@ -338,6 +347,8 @@ def _workspace_create(
         inputs_dir (str): Path to inputs dir that should be linked
                           instead of creating a new directory.
         activate (bool): if True, activate the created workspace. Default is False.
+        parent_dir (str): parent directory for the new named workspace.
+        no_comments (bool): if True, omit boilerplate comments in ramble.yaml.
     """
 
     # Sanity check file paths, to avoid half-creating an incomplete workspace
@@ -346,6 +357,7 @@ def _workspace_create(
             logger.die(f"{filepath} file path invalid")
 
     read_default_template = True
+    include_comments = False if no_comments else None
 
     # Disallow generation of default template when both a config and a template
     # are specified
@@ -354,13 +366,18 @@ def _workspace_create(
 
     if dir:
         workspace = ramble.workspace.Workspace(
-            name_or_path, read_default_template=read_default_template
+            name_or_path,
+            read_default_template=read_default_template,
+            include_comments=include_comments,
         )
         ws_loc = workspace.path
 
     else:
         workspace = ramble.workspace.create(
-            name_or_path, read_default_template=read_default_template, parent_dir=parent_dir
+            name_or_path,
+            read_default_template=read_default_template,
+            parent_dir=parent_dir,
+            include_comments=include_comments,
         )
 
         workspace.read_default_template = read_default_template

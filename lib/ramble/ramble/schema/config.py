@@ -209,6 +209,8 @@ config_props["bootstrap_utilities"] = {"type": "boolean", "default": True}
 
 config_props["include_phase_dependencies"] = {"type": "boolean", "default": False}
 
+config_props["include_workspace_comments"] = {"type": "boolean", "default": True}
+
 config_props["resolve_variables_in_subprocesses"] = {"type": "boolean", "default": False}
 
 config_props["archive_url"] = {"type": "string", "default": ""}
