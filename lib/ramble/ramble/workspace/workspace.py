@@ -343,7 +343,7 @@ def is_workspace_dir(path):
     return ret_val
 
 
-def create(name, read_default_template=True, parent_dir=None):
+def create(name, read_default_template=True, parent_dir=None, include_comments=None):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
     if exists(name, parent_dir=parent_dir):
@@ -351,7 +351,9 @@ def create(name, read_default_template=True, parent_dir=None):
 
     ws_root = root(name, parent_dir=parent_dir)
 
-    return Workspace(ws_root, read_default_template=read_default_template)
+    return Workspace(
+        ws_root, read_default_template=read_default_template, include_comments=include_comments
+    )
 
 
 def config_dict(yaml_data):
@@ -451,7 +453,7 @@ class Workspace:
     inventory_file_name = INVENTORY_FILE_NAME
     hash_file_name = "workspace_hash.sha256"
 
-    def __init__(self, root, dry_run=False, read_default_template=True):
+    def __init__(self, root, dry_run=False, read_default_template=True, include_comments=None):
         logger.debug(f"In workspace init. Root = {root}")
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
@@ -459,6 +461,7 @@ class Workspace:
         self.repeat_success_strict = True
 
         self.read_default_template = read_default_template
+        self.include_comments = include_comments
         self.configs = ramble.config.ConfigScope(namespace.workspace, self.config_dir)
         self._templates = {}
         self._auxiliary_software_files = {}
@@ -564,7 +567,10 @@ class Workspace:
 
             read_default = not os.path.exists(self.config_file_path)
             if read_default:
-                self.read_config(CONFIG_SECTION, self._default_config_yaml())
+                self.read_config(
+                    CONFIG_SECTION,
+                    self._default_config_yaml(include_comments=self.include_comments),
+                )
             else:
                 with open(self.config_file_path, encoding="utf-8") as f:
                     self.read_config(CONFIG_SECTION, f)
@@ -634,7 +640,9 @@ cd "{experiment_run_dir}"
         return script
 
     @classmethod
-    def _default_config_yaml(cls):
+    def _default_config_yaml(cls, include_comments=None):
+        if include_comments is None:
+            include_comments = ramble.config.get("config:include_workspace_comments", True)
 
         # Construct string for default variants
         variant_string = ""
@@ -658,7 +666,9 @@ cd "{experiment_run_dir}"
             variant_string = f"""  {namespace.variants}:
 {merged_string}"""
 
-        return f"""\
+        comments = ""
+        if include_comments:
+            comments = """\
 # This is a ramble workspace config file.
 #
 # It describes the experiments, the software stack
@@ -676,9 +686,12 @@ cd "{experiment_run_dir}"
 #         experiments:
 #           single_node: # Arbitrary experiment name
 #             variables:
-#               n_ranks: '{{processes_per_node}}'
+#               n_ranks: '{processes_per_node}'
 
-ramble:
+"""
+
+        return f"""\
+{comments}ramble:
   env_vars:
     set:
       OMP_NUM_THREADS: '{{n_threads}}'

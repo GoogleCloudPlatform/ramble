@@ -26,6 +26,7 @@ config:
     - $ramble/var/ramble/workspaces
   report_dirs: ~/.ramble/reports
   include_phase_dependencies: false
+  include_workspace_comments: true
   resolve_variables_in_subprocesses: false
   stage_method: cp
   spack:

@@ -308,6 +308,9 @@ Several general configuration options can be set within the ``config`` section:
   ``cp``, ``rsync``, ``symbolic_link``, and ``hard_link``. Default is ``cp``.
 * ``resolve_variables_in_subprocesses``: A boolean flag that controls if environment
   variables should be resolved in subprocesses. Default is ``False``.
+* ``include_workspace_comments``: A boolean flag that controls whether newly
+  created workspaces include boilerplate comments in ``ramble.yaml``. Default is
+  ``True``.
 * ``shell``: Defines the shell to use for generated scripts. Default is ``bash``.
 
 .. _env-vars-config:
