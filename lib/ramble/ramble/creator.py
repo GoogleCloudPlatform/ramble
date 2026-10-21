@@ -17,14 +17,8 @@ import ramble.util.naming as nm
 
 def get_template(object_type):
     """Load the python template for a given ObjectType from templates directory."""
-
-    # Map ObjectType to template file names
-    mapping = {
-        ramble.repository.ObjectTypes.applications: "application.py.tpl",
-        ramble.repository.ObjectTypes.modifiers: "modifier.py.tpl",
-    }
-
-    tpl_name = mapping.get(object_type, "generic.py.tpl")
+    type_def = ramble.repository.type_definitions.get(object_type, {})
+    tpl_name = type_def.get("template", "generic.py.tpl")
     tpl_path = os.path.join(ramble.paths.share_path, "templates", tpl_name)
 
     if os.path.exists(tpl_path):
@@ -90,15 +84,9 @@ def create_object(
 
     # Choose template & default base class
     template = get_template(object_type)
-
-    if object_type == ramble.repository.ObjectTypes.applications:
-        default_base = "ExecutableApplication"
-    elif object_type == ramble.repository.ObjectTypes.modifiers:
-        default_base = "BasicModifier"
-    else:
-        default_base = "object"
-
+    default_base = type_def.get("default_base", "object")
     resolved_base = base_class or default_base
+    kit_name = type_def.get("kit_name") or "appkit"
 
     # Format metadata variables
     m_args = ", ".join(repr(m) for m in (maintainers or []))
@@ -114,6 +102,7 @@ def create_object(
                 name=name,
                 maintainers=m_args,
                 tags=t_args,
+                kit_name=kit_name,
             )
         )
 
