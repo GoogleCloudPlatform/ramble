@@ -762,7 +762,9 @@ class LogsPipeline(Pipeline):
             logger.all_msg(f"Experiment: {exp}")
             logger.all_msg(f"    Experiment log file: {log_file}")
 
-            analysis_logs, _, _ = app_inst.analysis_dicts(app_inst.success_list)
+            analysis_logs, _, _ = app_inst.analysis_dicts(
+                app_inst.success_list, include_fom_defs=False
+            )
 
             logger.all_msg("    Auxiliary experiment logs:")
             for log in analysis_logs:
