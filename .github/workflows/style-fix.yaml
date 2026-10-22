@@ -25,6 +25,7 @@ jobs:
       group: style-failure-comment-${{ github.event.check_run.head_sha }}
       cancel-in-progress: false
     permissions:
+      checks: read
       contents: read
       issues: write
       pull-requests: write
@@ -77,29 +78,76 @@ jobs:
               return;
             }
 
-            const body = [
-              marker,
-              'It looks like this pull request has style check issues! I can help fix formatting automatically if you ask me. Just comment:',
-              '',
-              '```',
-              '/style-fix',
-              '```',
-              '(or `@ramblebot fix style` / `@ramblebot style fix`)',
-              '',
-              "...and I'll run `ramble style --fix` and amend your latest commit with the fixes.",
-              '',
-              'Alternatively, you can run locally:',
-              '```bash',
-              'ramble style --fix',
-              '```',
-              'and update the pull request.',
-            ].join('\n');
+            let outputText = (checkRun.output && checkRun.output.text) || '';
+            if (!outputText && checkRun.id) {
+              try {
+                const { data: fullCheckRun } = await github.rest.checks.get({
+                  owner,
+                  repo,
+                  check_run_id: checkRun.id,
+                });
+                outputText = (fullCheckRun.output && fullCheckRun.output.text) || '';
+              } catch (err) {
+                core.warning(`Failed to fetch full check run output: ${err.message}`);
+              }
+            }
+
+            const hasStyleErr = outputText.includes('Style tests failed');
+            const hasCompletionErr =
+              outputText.includes('Commands changed and bash completion is not updated') ||
+              outputText.includes('ramble commands --update-completion');
+
+            if (!hasStyleErr && !hasCompletionErr) {
+              core.info(
+                `PR-Style check on PR #${prNumber} did not fail on ramble style or bash completion; skipping comment.`
+              );
+              return;
+            }
+
+            const lines = [marker];
+
+            if (hasStyleErr) {
+              lines.push(
+                'It looks like this pull request has style check issues! I can help fix formatting automatically if you ask me. Just comment:',
+                '',
+                '```',
+                '/style-fix',
+                '```',
+                '(or `@ramblebot fix style` / `@ramblebot style fix`)',
+                '',
+                "...and I'll run `ramble style --fix` and amend your latest commit with the fixes.",
+                '',
+                'Alternatively, you can run locally:',
+                '```bash',
+                'ramble style --fix',
+                '```',
+                'and update the pull request.'
+              );
+              if (hasCompletionErr) {
+                lines.push(
+                  '',
+                  '> [!NOTE]',
+                  '> This pull request also needs the bash autocompletion script updated, which cannot be fixed automatically by `@ramblebot`. Please run the following command locally and include the changes in your pull request:',
+                  '> ```bash',
+                  '> ramble commands --update-completion',
+                  '> ```'
+                );
+              }
+            } else if (hasCompletionErr) {
+              lines.push(
+                'It looks like this pull request modified CLI commands or arguments without updating the bash autocompletion script. Automatic fixes for autocompletion are not supported—please run the following command locally and update the pull request:',
+                '',
+                '```bash',
+                'ramble commands --update-completion',
+                '```'
+              );
+            }
 
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number: prNumber,
-              body,
+              body: lines.join('\n'),
             });
 
   fix-style:
