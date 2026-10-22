@@ -15,8 +15,16 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 For questions, interactive discussions, and community support, join the
 `Ramble Slack workspace <https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ>`_
 or visit `GitHub Discussions <https://github.com/Ramble-Project/ramble/discussions>`_.
+
 Design proposals and architecture documents can be found in the
 `Ramble Design Docs repository <https://github.com/Ramble-Project/ramble-design-docs>`_.
+
+Ramble is a member project of the
+`High Performance Software Foundation (HPSF) <https://hpsf.io/>`_, a directed
+fund of the `Linux Foundation <https://www.linuxfoundation.org/>`_. For
+questions, interactive discussions, and community support, join the
+
+
 
 .. toctree::
    :maxdepth: 1
@@ -70,6 +78,7 @@ Design proposals and architecture documents can be found in the
    Slack <https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ>
    GitHub Discussions <https://github.com/Ramble-Project/ramble/discussions>
    Design Docs <https://github.com/Ramble-Project/ramble-design-docs>
+   HPSF <https://hpsf.io/projects/ramble/>
 
 .. toctree::
    :maxdepth: 2
