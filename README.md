@@ -1,3 +1,5 @@
+[![HPSF Emerging Project](https://raw.githubusercontent.com/hpsfoundation/tac/main/badges/HPSF_Project_Badge_Emerging.png)](https://hpsf.io/projects/ramble/)
+
 Ramble is a multi-platform experimentation framework that increases exploration
 productivity and improves reproducibility. Ramble is capable of driving
 software installation, acquiring input files, configuring experiments, and
@@ -68,16 +70,22 @@ Example configuration files are also contained in the
 
 Community
 ------------------------
+Questions, discussion, and contributions are welcome. Contributions can be
+anything from new object definitions to bugfixes, documentation, or even new
+core features.
 
-Ramble is an open source project.  Questions, discussion, and
-contributions are welcome. Contributions can be anything from new
-packages to bugfixes, documentation, or even new core features.
+Project governance is described in [GOVERNANCE.md](GOVERNANCE.md).
+
+Ramble is an open source project and an Emerging Project in the
+[High Performance Software Foundation (HPSF)](https://hpsf.io/), a directed fund
+of the [Linux Foundation](https://www.linuxfoundation.org/).
 
 Resources:
 
-* [**Github Discussions**](https://github.com/Ramble-Project/ramble/discussions): not just for discussions, also Q&A.
+* [**GitHub Discussions**](https://github.com/Ramble-Project/ramble/discussions): not just for discussions, also Q&A.
 * [**Slack**](https://join.slack.com/t/ramble-project/shared_invite/zt-4dsziazv5-eM2VUwsdjsEN4JCnWjqgIQ): join the Ramble Slack workspace for interactive discussions, questions, and community support.
 * [**Design Documents**](https://github.com/Ramble-Project/ramble-design-docs): proposals and design documents for Ramble features and architecture.
+* [**HPSF Project Page**](https://hpsf.io/projects/ramble/): learn more about Ramble and the High Performance Software Foundation.
 
 Contributing
 ------------------------
