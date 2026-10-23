@@ -102,6 +102,7 @@ def test_black_version_mismatch(capsys):
     style.run_black(mock_black, [], args)
 
     captured = capsys.readouterr()
+    assert style._BLACK_GOLDEN_VERSION is not None
     assert "WARNING: black version is 25.0.0" in captured.err
     assert (
         f"but the version used for the PR style test is {style._BLACK_GOLDEN_VERSION}"
