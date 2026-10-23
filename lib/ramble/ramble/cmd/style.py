@@ -16,7 +16,7 @@ import shlex
 import shutil
 import sys
 import tempfile
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 
 from llnl.util.filesystem import mkdirp, working_dir
 
@@ -53,8 +53,19 @@ include_patterns = [
 # max line length we're enforcing (note: this duplicates what's in .flake8)
 max_line_length = 99
 
+
+def _get_pinned_version(pkg_name: str) -> Optional[str]:
+    pinned_req = os.path.join(ramble.paths.prefix, "requirements-pinned.txt")
+    if os.path.isfile(pinned_req):
+        with open(pinned_req, encoding="utf-8") as f:
+            match = re.search(rf"^{re.escape(pkg_name)}==([^\s;]+)", f.read(), re.MULTILINE)
+            if match:
+                return match.group(1)
+    return None
+
+
 # The black version used by the PR style test
-_BLACK_GOLDEN_VERSION = "26.5.1"
+_BLACK_GOLDEN_VERSION = _get_pinned_version("black")
 
 common_object_exemptions = {
     # Exempt lines with urls and descriptions from overlong line errors.
@@ -499,7 +510,7 @@ def run_black(black_cmd, file_list, args):
 
     version_out = black_cmd("--version", output=str, error=str)
     match = re.search(r"black,\s*(\d+\.\d+\.\d+)", version_out)
-    if match:
+    if match and _BLACK_GOLDEN_VERSION:
         installed_version = match.group(1)
         if installed_version != _BLACK_GOLDEN_VERSION:
             print(
