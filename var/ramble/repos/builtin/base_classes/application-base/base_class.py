@@ -1189,7 +1189,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
         backup_variables = self.variables.copy()
 
-        self._define_commands(success_list=self.success_list)
+        self._define_commands(
+            success_list=self.success_list, include_fom_defs=True
+        )
         self._define_formatted_executables()
 
         ##########################################
@@ -2276,7 +2278,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         flattened_env_vars["unset"] = list(flattened_env_vars["unset"])
         return [flattened_env_vars]
 
-    def _define_commands(self, exec_graph=None, success_list=None):
+    def _define_commands(
+        self, exec_graph=None, success_list=None, include_fom_defs=False
+    ):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -2324,7 +2328,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                         )
                         logs.append(expanded_log)
 
-            analysis_logs, _, _ = self.analysis_dicts(success_list)
+            analysis_logs, _, _ = self.analysis_dicts(
+                success_list, include_fom_defs=include_fom_defs
+            )
             logs = sorted(set(logs) | analysis_logs.keys())
 
             if logs:
@@ -3588,7 +3594,9 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
             # Copy all figure of merit files
             criteria_list = self.success_list
-            analysis_files, _, _ = self.analysis_dicts(criteria_list)
+            analysis_files, _, _ = self.analysis_dicts(
+                criteria_list, include_fom_defs=False
+            )
             for file in analysis_files:
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -3958,13 +3966,19 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         """Create a dictionary to represent a new log file"""
         return {"success_criteria": [], "contexts": {}}
 
-    def analysis_dicts(self, criteria_list):
+    def analysis_dicts(self, criteria_list, include_fom_defs=True):
         """Extract files that need to be analyzed.
 
         Process figures_of_merit, and return the manipulated dictionaries
         to allow them to be extracted.
 
         Additionally, ensure the success criteria list is complete.
+
+        Args:
+            criteria_list: ScopedCriteriaList of success criteria for this experiment
+            include_fom_defs (bool): Whether to expand and compile FOM and context
+                definitions (file_fom_defs and inmem_fom_defs). Set to False when
+                only log file paths (files) are needed.
 
         Returns:
             files (dict): All files that need to be processed
@@ -3986,13 +4000,14 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         for _, obj_inst in self.objects():
             if obj_inst.success_criteria:
                 obj_satisfied_criteria = {}
+                obj_variants = obj_inst.experiment_variants()
                 for (
                     when_set,
                     criteria_dict,
                 ) in obj_inst.success_criteria.items():
                     if not self.expander.satisfies(
                         when_set,
-                        variant_set=obj_inst.experiment_variants(),
+                        variant_set=obj_variants,
                     ):
                         continue
 
@@ -4051,18 +4066,15 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                 owning_object=self,
             )
 
+        exp_run_dir = self.expander.experiment_run_dir
+
         # Extract file paths for all criteria
         for criteria, _ in criteria_list.all_criteria():
             log_path = self.expander.expand_var(criteria.file)
 
             # Ensure log path is absolute. If not, prepend the experiment run directory
-            if (
-                not os.path.isabs(log_path)
-                and self.expander.experiment_run_dir not in log_path
-            ):
-                log_path = os.path.join(
-                    self.expander.experiment_run_dir, log_path
-                )
+            if not os.path.isabs(log_path) and exp_run_dir not in log_path:
+                log_path = os.path.join(exp_run_dir, log_path)
 
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
@@ -4076,27 +4088,37 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
         if self.workflow_manager is not None:
             fom_sources.append(self.workflow_manager)
 
+        exp_variants = self.experiment_variants()
         all_contexts = {}
         for source in fom_sources:
             for (
                 when_fs,
                 source_context_defs,
             ) in source.figure_of_merit_contexts.items():
-                if self.expander.satisfies(
-                    when_fs, variant_set=self.experiment_variants()
-                ):
+                if self.expander.satisfies(when_fs, variant_set=exp_variants):
                     all_contexts.update(source_context_defs)
-            extra_vars = (
-                source.modded_variables(self)
-                if source.origin_type == "modifier"
-                else None
-            )
+
+            if not source.figures_of_merit:
+                continue
+
+            extra_vars_computed = False
+            extra_vars = None
+            expanded_log_files = {}
+
             # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
             for when_fs, source_contexts in source.figures_of_merit.items():
                 if not self.expander.satisfies(
-                    when_fs, variant_set=self.experiment_variants()
+                    when_fs, variant_set=exp_variants
                 ):
                     continue
+
+                if not extra_vars_computed:
+                    extra_vars = (
+                        source.modded_variables(self)
+                        if source.origin_type == "modifier"
+                        else None
+                    )
+                    extra_vars_computed = True
 
                 for context_fs, source_foms in source_contexts.items():
                     if (
@@ -4136,83 +4158,99 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
 
                         for fom, source_def in source_foms.items():
                             is_inmem = source_def["fom_map_key"] is not None
-                            dest_def_dict = (
-                                inmem_fom_defs if is_inmem else file_fom_defs
-                            )
-                            _preset_context_dict(dest_def_dict, context)
-                            if fom in dest_def_dict[context]["foms"]:
-                                logger.warn(
-                                    f"FOM {fom} already defined in context {context} by "
-                                    f"{dest_def_dict[context]['foms'][fom]['origin']}. "
-                                    f"Overwriting with new definition from {source.name}"
-                                )
-                            else:
-                                dest_def_dict[context]["foms"][fom] = {}
 
                             def _expand_var(var, extra_vars=extra_vars):
                                 return self.expander.expand_var(
                                     var, extra_vars=extra_vars
                                 )
 
-                            def _try_expand_var_or_none(var: str, expander):
-                                try:
-                                    return expander.expand_var(
-                                        var, allow_passthrough=False
+                            if include_fom_defs:
+                                dest_def_dict = (
+                                    inmem_fom_defs
+                                    if is_inmem
+                                    else file_fom_defs
+                                )
+                                _preset_context_dict(dest_def_dict, context)
+                                if fom in dest_def_dict[context]["foms"]:
+                                    logger.warn(
+                                        f"FOM {fom} already defined in context {context} by "
+                                        f"{dest_def_dict[context]['foms'][fom]['origin']}. "
+                                        f"Overwriting with new definition from {source.name}"
                                     )
-                                except ramble.expander.RambleSyntaxError:
-                                    return None
+                                else:
+                                    dest_def_dict[context]["foms"][fom] = {}
 
-                            expanded_regex = (
-                                ""
-                                if is_inmem
-                                else _expand_var(source_def["regex"])
-                            )
-                            fom_def = {
-                                "origin": source.name,
-                                "origin_type": source.origin_type,
-                                "contexts": set(source_def["contexts"]),
-                                "group": (
-                                    ""
-                                    if is_inmem
-                                    else _expand_var(source_def["group_name"])
-                                ),
-                                "units": _expand_var(source_def["units"]),
-                                "regex": (
-                                    ""
-                                    if is_inmem
-                                    else re.compile(expanded_regex)
-                                ),
-                                "pre_filter": (
-                                    ""
-                                    if is_inmem
-                                    else get_literal_from_regex(expanded_regex)
-                                ),
-                                "fom_type": source_def["fom_type"].to_dict(),
-                                "fom_map_key": source_def["fom_map_key"],
-                                # If expansion works (i.e., it doesn't rely on the matched fom
-                                # groups), then cache it here to avoid repeated expansion later.
-                                "units_expanded": _try_expand_var_or_none(
-                                    source_def["units"], self.expander
-                                ),
-                                "fom_name_expanded": _try_expand_var_or_none(
-                                    fom, self.expander
-                                ),
-                            }
+                                def _try_expand_var_or_none(
+                                    var: str, expander
+                                ):
+                                    try:
+                                        return expander.expand_var(
+                                            var, allow_passthrough=False
+                                        )
+                                    except ramble.expander.RambleSyntaxError:
+                                        return None
 
-                            dest_def_dict[context]["foms"][fom] = fom_def
+                                expanded_regex = (
+                                    ""
+                                    if is_inmem
+                                    else _expand_var(source_def["regex"])
+                                )
+                                fom_def = {
+                                    "origin": source.name,
+                                    "origin_type": source.origin_type,
+                                    "contexts": set(source_def["contexts"]),
+                                    "group": (
+                                        ""
+                                        if is_inmem
+                                        else _expand_var(
+                                            source_def["group_name"]
+                                        )
+                                    ),
+                                    "units": _expand_var(source_def["units"]),
+                                    "regex": (
+                                        ""
+                                        if is_inmem
+                                        else re.compile(expanded_regex)
+                                    ),
+                                    "pre_filter": (
+                                        ""
+                                        if is_inmem
+                                        else get_literal_from_regex(
+                                            expanded_regex
+                                        )
+                                    ),
+                                    "fom_type": source_def[
+                                        "fom_type"
+                                    ].to_dict(),
+                                    "fom_map_key": source_def["fom_map_key"],
+                                    # If expansion works (i.e., it doesn't rely on the matched fom
+                                    # groups), then cache it here to avoid repeated expansion later.
+                                    "units_expanded": _try_expand_var_or_none(
+                                        source_def["units"], self.expander
+                                    ),
+                                    "fom_name_expanded": _try_expand_var_or_none(
+                                        fom, self.expander
+                                    ),
+                                }
+
+                                dest_def_dict[context]["foms"][fom] = fom_def
+                                logger.debug(f"Conf = {fom_def}")
 
                             if is_inmem:
                                 continue
-                            log_path = _expand_var(source_def["log_file"])
-                            # Ensure log path is absolute. If not, prepend the experiment run dir
-                            if (
-                                not os.path.isabs(log_path)
-                                and self.expander.experiment_run_dir
-                                not in log_path
-                            ):
-                                log_path = os.path.join(
-                                    self.expander.experiment_run_dir, log_path
-                                )
+                            raw_log = source_def["log_file"]
+                            log_path = expanded_log_files.get(raw_log)
+                            if log_path is None:
+                                log_path = _expand_var(raw_log)
+                                # Ensure log path is absolute. If not, prepend the experiment run dir
+                                if (
+                                    not os.path.isabs(log_path)
+                                    and exp_run_dir not in log_path
+                                ):
+                                    log_path = os.path.join(
+                                        exp_run_dir, log_path
+                                    )
+                                expanded_log_files[raw_log] = log_path
 
                             if log_path not in files:
                                 files[log_path] = self._new_file_dict()
@@ -4222,7 +4260,6 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
                             files[log_path]["contexts"][context].append(fom)
 
                             logger.debug(f"Log = {log_path}")
-                            logger.debug(f"Conf = {fom_def}")
 
         return files, file_fom_defs, inmem_fom_defs
 
