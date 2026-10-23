@@ -150,6 +150,11 @@ def test_create_tables_dataset_exists(mock_bigquery_client):
     # Assert
     mock_client.get_dataset.assert_called_with(uri)
     mock_client.create_dataset.assert_not_called()
+    for table_def in uploader.schema:
+        expected_query = (
+            f"SELECT value FROM `{uri}.metadata` WHERE key = '{table_def['metadata_key']}'"
+        )
+        mock_client.query.assert_any_call(expected_query)
     assert mock_client.get_table.call_count == len(uploader.schema)
     mock_client.create_table.assert_not_called()
     uploader.upload_metadata.assert_not_called()
@@ -390,6 +395,8 @@ def test_fom_validation_fails_with_none():
         "unit": "s",
         "origin": "test",
         "origin_type": "test",
+        "fom_type": "TIME",
+        "better_direction": "LOWER",
         "context": "test",
         "experiment_id": 1,
         "experiment_name": "test_exp",
@@ -399,6 +406,100 @@ def test_fom_validation_fails_with_none():
 
     with pytest.raises(jsonschema.exceptions.ValidationError):
         validate_data(bad_fom, schema)
+
+
+def test_fom_type_and_better_direction_upload(tmpdir):
+    """Test that fom_type and better_direction are extracted, validated, and uploaded."""
+    import sqlite3
+
+    from ramble.util.foms import FomType
+
+    results = {
+        "experiments": [
+            {
+                "name": "exp1",
+                "RAMBLE_STATUS": "SUCCESS",
+                "RAMBLE_VARIABLES": {"workspace_name": "test_ws"},
+                "application_name": "app1",
+                "workload_name": "workload1",
+                "n_nodes": 1,
+                "processes_per_node": 1,
+                "n_ranks": 1,
+                "n_threads": 1,
+                "CONTEXTS": [
+                    {
+                        "name": "null",
+                        "foms": [
+                            {
+                                "name": "runtime",
+                                "value": "1.23",
+                                "units": "s",
+                                "origin": "app1",
+                                "origin_type": "application",
+                                "fom_type": FomType.TIME.to_dict(),
+                            },
+                            {
+                                "name": "bw",
+                                "value": "456.7",
+                                "units": "GB/s",
+                                "origin": "app1",
+                                "origin_type": "application",
+                                "fom_type": {
+                                    "name": "THROUGHPUT",
+                                    "better_direction": "HIGHER",
+                                },
+                            },
+                            {
+                                "name": "legacy_fom",
+                                "value": "42",
+                                "units": "",
+                                "origin": "app1",
+                                "origin_type": "application",
+                            },
+                        ],
+                    }
+                ],
+                "SOFTWARE": {},
+            }
+        ],
+        "workspace_hash": "hash123",
+    }
+
+    uri = str(tmpdir / "test_fom_type_upload.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        formatted_data = format_data(results)
+        _, _, _, foms_to_insert, _, _, _, _ = _prepare_data(formatted_data, uri)
+
+        assert len(foms_to_insert) == 3
+        foms_by_name = {f["name"]: f for f in foms_to_insert}
+
+        assert foms_by_name["runtime"]["fom_type"] == "TIME"
+        assert foms_by_name["runtime"]["better_direction"] == "LOWER"
+
+        assert foms_by_name["bw"]["fom_type"] == "THROUGHPUT"
+        assert foms_by_name["bw"]["better_direction"] == "HIGHER"
+
+        assert foms_by_name["legacy_fom"]["fom_type"] == "UNDEFINED"
+        assert foms_by_name["legacy_fom"]["better_direction"] == "INDETERMINATE"
+
+        uploader.create_tables(uri)
+        uploader.perform_upload(uri, formatted_data)
+
+        conn = sqlite3.connect(uri)
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name, fom_type, better_direction FROM foms ORDER BY name")
+            rows = cursor.fetchall()
+            assert rows == [
+                ("bw", "THROUGHPUT", "HIGHER"),
+                ("legacy_fom", "UNDEFINED", "INDETERMINATE"),
+                ("runtime", "TIME", "LOWER"),
+            ]
+        finally:
+            conn.close()
 
 
 @pytest.mark.parametrize(

@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-fom_schema_version = 0.1
+fom_schema_version = 0.2
 fom_schema = {
     0.1: {
         "type": "object",
@@ -31,5 +31,31 @@ fom_schema = {
             "experiment_name",
         ],
         "additionalProperties": False,
-    }
+    },
+    0.2: {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "value": {"type": "string"},
+            "unit": {"type": "string"},
+            "origin": {"type": "string"},
+            "origin_type": {"type": "string"},
+            "fom_type": {"type": "string"},
+            "better_direction": {"type": "string"},
+            "context": {"type": "string"},
+            "experiment_id": {"type": "integer"},
+            "experiment_name": {"type": "string"},
+        },
+        "required": [
+            "name",
+            "value",
+            "unit",
+            "origin",
+            "origin_type",
+            "context",
+            "experiment_id",
+            "experiment_name",
+        ],
+        "additionalProperties": False,
+    },
 }
