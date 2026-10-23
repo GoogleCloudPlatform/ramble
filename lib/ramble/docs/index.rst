@@ -40,6 +40,7 @@ Design proposals and architecture documents can be found in the
    success_criteria
    results
    mirror_config
+   pipelines
 
 .. toctree::
    :maxdepth: 2
