@@ -28,6 +28,7 @@ from ramble.schema.experiments_metadata import (
 from ramble.schema.fom import fom_schema, fom_schema_version
 from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.schema.software_db import software_db_schema, software_db_schema_version
+from ramble.util.foms import BetterDirection, FomType
 from ramble.util.logger import logger
 
 default_node_type_val = "Not Specified"
@@ -327,6 +328,16 @@ def format_data(data_in):
             # 'experiment_id': experiment_id,
             for context in exp[ResultKeys.CONTEXTS]:
                 for fom in context["foms"]:
+                    raw_fom_type = fom.get("fom_type")
+                    fom_type_obj = FomType.from_value(raw_fom_type) or FomType.UNDEFINED
+                    better_direction_obj = None
+                    if isinstance(raw_fom_type, dict) and "better_direction" in raw_fom_type:
+                        better_direction_obj = BetterDirection.from_value(
+                            raw_fom_type["better_direction"]
+                        )
+                    if better_direction_obj is None:
+                        better_direction_obj = fom_type_obj.better_direction()
+
                     # TODO: check on value to make sure it's a number
                     e.foms.append(
                         {
@@ -335,6 +346,8 @@ def format_data(data_in):
                             "unit": fom["units"],
                             "origin": fom["origin"],
                             "origin_type": fom["origin_type"],
+                            "fom_type": fom_type_obj.name,
+                            "better_direction": better_direction_obj.name,
                             "context": context["name"],
                         }
                     )
@@ -436,26 +449,14 @@ def _get_metadata_to_insert():
             "value": db_schema_version,
             "timestamp": now_timestamp,
         },
-        {
-            "key": "experiment_schema_version",
-            "value": str(experiment_schema_version),
-            "timestamp": now_timestamp,
-        },
-        {
-            "key": "fom_schema_version",
-            "value": str(fom_schema_version),
-            "timestamp": now_timestamp,
-        },
-        {
-            "key": "metadata_schema_version",
-            "value": str(metadata_schema_version),
-            "timestamp": now_timestamp,
-        },
-        {
-            "key": "software_db_schema_version",
-            "value": str(software_db_schema_version),
-            "timestamp": now_timestamp,
-        },
+        *[
+            {
+                "key": table_def["metadata_key"],
+                "value": str(table_def["version"]),
+                "timestamp": now_timestamp,
+            }
+            for table_def in Uploader.schema
+        ],
         {
             "key": "ramble_version",
             "value": ramble.util.version.get_version(),
@@ -523,7 +524,7 @@ class BigQueryUploader(Uploader):
             try:
                 query = (
                     f"SELECT value FROM `{uri}.metadata` WHERE key = "
-                    f"'{table_def['table']}_schema_version'"
+                    f"'{table_def['metadata_key']}'"
                 )
                 query_job = client.query(query)
                 results = query_job.result()
