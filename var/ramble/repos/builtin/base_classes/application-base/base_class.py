@@ -70,6 +70,7 @@ from ramble.util.foms import NULL_CONTEXT as _NULL_CONTEXT
 from ramble.util.foms import (
     FomType,
     SummaryFoms,
+    get_context_display_name,
     get_literal_from_regex,
 )
 from ramble.util.format import when_order
@@ -94,14 +95,6 @@ ObjectMixin = ramble.repository.get_base_class("object-mixin")
 _DEFAULT_CONTENT_PERM = (
     stat.S_IRWXU | stat.S_IRWXG | stat.S_IROTH | stat.S_IXOTH
 )
-
-
-def _get_context_display_name(context):
-    return (
-        f"default ({_NULL_CONTEXT}) context"
-        if context == _NULL_CONTEXT
-        else f"{context} context"
-    )
 
 
 def _check_shell_support(app_inst):
@@ -3870,7 +3863,7 @@ class ApplicationBase(ObjectMixin, metaclass=DirectiveMeta):
             context_map = {
                 "name": context,
                 "foms": [],
-                "display_name": _get_context_display_name(context),
+                "display_name": get_context_display_name(context),
             }
 
             summary_foms = []
