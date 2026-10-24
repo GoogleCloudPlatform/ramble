@@ -14,6 +14,10 @@ from enum import Enum
 NULL_CONTEXT = "null"
 
 
+def get_context_display_name(context):
+    return f"default ({NULL_CONTEXT}) context" if context == NULL_CONTEXT else f"{context} context"
+
+
 # For a FOM, the direction that is 'better' e.g., faster is better
 class BetterDirection(Enum):
     _description: str
